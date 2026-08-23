@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 * {
     box-sizing: border-box;
     margin: 0;
@@ -620,9 +621,236 @@ body {
     position: absolute;
     background: white;
 }
+/* SOBRE_NOCTUA TIME */
+.sobre-noctua {
+    width: 100%;
+    padding: 58px 20px 68px;
+    background-color: #ffffff;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Titulo */
+
+.sobre-noctua h2 {
+    color: #1A1F71;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 20px;
+}
+
+/* textos */
+
+.descricao {
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.descricao p {
+    color: #64748B;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.descricao p:last-child {
+    margin-bottom: 0;
+}
+
+/* CARDS */
+
+.metricas {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 44px;
+}
+
+/* Os CARDS */
+
+.metrica {
+    width: 270px;
+    height: 162px;
+
+    padding: 24px 18px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+
+    text-align: left;
+
+    background-color: #ffffff;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+
+    /* Sombra da segunda imagem */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.metrica:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Pros Numeros */
+
+.valor {
+    color: #1A1F71;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+/* Descrição do Card */
+
+.descricao-metrica {
+    color: #64748B;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+.quem-somos {
+    width: 100%;
+    padding: 80px 20px;
+    background-color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+}
+
+.quem-somos-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* CABEÇALHO */
+.quem-somos-header {
+    max-width: 750px;
+    margin: 0 auto 50px;
+    text-align: center;
+}
+
+.quem-somos-label {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: #1A1F71;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.quem-somos-header h2 {
+    margin: 0 0 18px;
+    color: #1A1F71;
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.quem-somos-header p {
+    margin: 0;
+    color: #555;
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.quem-somos-header strong {
+    color: #1A1F71;
+    font-weight: 600;
+}
+
+/* EQUIPE */
+.equipe {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+}
+
+/* CARD */
+.membro {
+    overflow: hidden;
+    background-color: #ffffff;
+    border: 1px solid #e9e9e9;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.membro:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* FOTO */
+.membro-foto {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background-color: #f1f1f1;
+}
+
+.membro-foto img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.membro:hover .membro-foto img {
+    transform: scale(1.05);
+}
+
+/* INFORMAÇÕES */
+.membro-info {
+    padding: 20px;
+    text-align: center;
+}
+
+.membro-info h3 {
+    margin: 0 0 5px;
+    color: #1A1F71;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.membro-info p {
+    margin: 0 0 18px;
+    color: #777;
+    font-size: 13px;
+}
+
+/* LINKS */
+.membro-links {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.membro-links a {
+    padding: 7px 12px;
+    color: #1A1F71;
+    border: 1px solid #1A1F71;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.membro-links a:hover {
+    color: #ffffff;
+    background-color: #1A1F71;
+}
 
 /* Media Queries: Esconde o gráfico e centraliza o texto quando a tela fica menor */
 @media (max-width: 1024px) {
+
     .hero-graphic-wrapper {
         display: none; /* Some com a ilustração quando iria quebrar para baixo */
     }
@@ -655,6 +883,23 @@ body {
 }
 
 @media (max-width: 768px) {
+    .metricas {
+        flex-wrap: wrap;
+    }
+    .equipe {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .quem-somos {
+        padding: 60px 20px;
+    }
+
+    .quem-somos-header h2 {
+        font-size: 30px;
+    }
+
+    .equipe {
+        grid-template-columns: repeat(2, 1fr);
+    }
     .hero-title {
         font-size: 30px;
     }
@@ -662,6 +907,29 @@ body {
     .hero-description {
         font-size: 15px;
         margin-bottom: 30px;
+    }
+    .sobre-noctua {
+        padding: 45px 20px 50px;
+    }
+
+    .sobre-noctua h2 {
+        font-size: 26px;
+    }
+
+    .descricao p {
+        font-size: 12px;
+    }
+
+    .metricas {
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        margin-top: 35px;
+    }
+
+    .metrica {
+        width: 270px;
+        height: 162px;
     }
 
     .hero-actions {
@@ -681,6 +949,13 @@ body {
     
     .hero-container {
         padding: 30px 16px;
+    }
+     .equipe {
+        grid-template-columns: 1fr;
+    }
+
+    .membro-foto {
+        height: 260px;
     }
 }
 
