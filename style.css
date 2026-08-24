@@ -987,6 +987,11 @@ body {
     transform: scale(1.1);
 }
 
+/* Footer */
+footer {
+    background-color: #1A1F71;
+}
+
 /* Media Queries: Esconde o gráfico e centraliza o texto quando a tela fica menor */
 @media (max-width: 1024px) {
 
