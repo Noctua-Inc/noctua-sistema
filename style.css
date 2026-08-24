@@ -856,7 +856,7 @@ body {
 
 .missao-valores {
     width: 100%;
-    height: 50vh;
+    min-height: 50vh;
     padding: 40px;
     background-color: #F8FAFC;
     display: flex;
@@ -913,7 +913,79 @@ body {
 }
 
 /* Soluções de Monitoramento */
+.solucoes-monitoramento {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 36px;
+    margin: 100px 0;
+}
 
+.solucoes-monitoramento .header {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.solucoes-monitoramento h2 {
+    font-size: 40px;
+    font-weight: 700;
+}
+
+.solucoes-monitoramento p {
+    font-size: 17px;
+    font-weight: 400;
+    width: 55%;
+}
+
+.solucoes-monitoramento .cards {
+    display: flex;
+    flex-wrap: wrap;
+    width: 80%;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+}
+
+.solucoes-monitoramento .card {
+    width: 588px;
+    height: 240px;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0px 1px 3px 0px #00000014;
+}
+
+.solucoes-monitoramento .card .title span {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1E293B;
+}
+
+.solucoes-monitoramento .card .desc span {
+    font-size: 14px;
+    font-weight: 400;
+    color: #64748B;
+}
+
+.solucoes-monitoramento .card .saiba-mais {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2563EB;
+    cursor: pointer;
+    transition: 0.3s all ease-in-out;
+}
+
+.solucoes-monitoramento .card .saiba-mais:hover {
+    transform: scale(1.1);
+}
 
 /* Media Queries: Esconde o gráfico e centraliza o texto quando a tela fica menor */
 @media (max-width: 1024px) {
