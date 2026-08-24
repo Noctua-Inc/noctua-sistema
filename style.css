@@ -912,17 +912,21 @@ body {
     font-size: 15px;
 }
 
+
 /* Soluções de Monitoramento */
 .solucoes-monitoramento {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: 36px;
     margin: 100px 0;
+    padding: 0 20px;
 }
 
 .solucoes-monitoramento .header {
+    width: 100%;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -938,20 +942,24 @@ body {
 .solucoes-monitoramento p {
     font-size: 17px;
     font-weight: 400;
-    width: 55%;
+    width: 100%;
+    max-width: 700px;
+    text-align: center;
 }
 
 .solucoes-monitoramento .cards {
     display: flex;
     flex-wrap: wrap;
-    width: 80%;
+    width: 100%;
+    max-width: 1200px;
     align-items: center;
     justify-content: center;
     gap: 32px;
 }
 
 .solucoes-monitoramento .card {
-    width: 588px;
+    width: calc(50% - 16px);
+    max-width: 588px;
     height: 240px;
     border: 1px solid #E2E8F0;
     border-radius: 12px;
@@ -990,6 +998,67 @@ body {
 /* Footer */
 footer {
     background-color: #1A1F71;
+    width: 100%;
+    min-height: 410px;
+    padding: 50px 8% 30px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+footer img {
+    width: 150px;
+}
+
+footer p,
+footer li {
+    color: #FFFFFFA6;
+    text-decoration: none;
+    list-style-type: none;
+    margin-bottom: 10px;
+}
+
+footer li {
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+footer .footer-alto {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+}
+
+footer .bloco {
+    min-width: 0;
+}
+
+footer .footer-alto .title {
+    margin-bottom: 20px;
+}
+
+footer .footer-alto h3 {
+    font-size: 15px;
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+footer .footer-baixo {
+    width: 100%;
+    border-top: 1px solid #FFFFFF1A;
+    padding-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+}
+
+footer .footer-baixo div {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
 }
 
 /* Media Queries: Esconde o gráfico e centraliza o texto quando a tela fica menor */
@@ -1028,6 +1097,37 @@ footer {
 
     .missao-valores .cards .card {
         min-height: 35vh;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .solucoes-monitoramento {
+        margin: 70px 0;
+    }
+
+    .solucoes-monitoramento h2 {
+        font-size: 34px;
+    }
+
+    .solucoes-monitoramento .card {
+        width: 100%;
+        max-width: 600px;
+    }
+
+    footer {
+        padding: 50px 6% 30px;
+    }
+
+    footer .footer-alto {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px 30px;
+    }
+
+    footer .footer-baixo {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-top: 30px;
     }
 }
 
@@ -1137,5 +1237,107 @@ footer {
 @media (max-width: 740px) {
     .nav-links .nav-link:not(:first-child) {
         display: none;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .solucoes-monitoramento h2 {
+        font-size: 25px;
+    }
+
+    .solucoes-monitoramento .card {
+        padding: 20px;
+        min-height: 220px;
+    }
+
+    footer {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    footer .footer-alto {
+        gap: 30px;
+    }
+
+    footer .footer-baixo div {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .solucoes-monitoramento {
+        margin: 50px 0;
+        padding: 0 16px;
+        gap: 28px;
+    }
+
+    .solucoes-monitoramento h2 {
+        font-size: 28px;
+        text-align: center;
+    }
+
+    .solucoes-monitoramento p {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .solucoes-monitoramento .cards {
+        gap: 20px;
+    }
+
+    .solucoes-monitoramento .card {
+        width: 100%;
+        height: auto;
+        min-height: 240px;
+        padding: 22px;
+    }
+
+    .solucoes-monitoramento .card .title span {
+        font-size: 17px;
+    }
+
+    .solucoes-monitoramento .card .desc span {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    footer {
+        padding: 45px 24px 25px;
+    }
+
+    footer .footer-alto {
+        grid-template-columns: 1fr;
+        gap: 35px;
+    }
+
+    footer .footer-alto .title {
+        margin-bottom: 15px;
+    }
+
+    footer img {
+        width: 130px;
+    }
+
+    footer p,
+    footer li {
+        font-size: 13px;
+    }
+
+    footer li {
+        white-space: normal;
+    }
+
+    footer .footer-baixo {
+        margin-top: 20px;
+        padding-top: 25px;
+        gap: 20px;
+    }
+
+    footer .footer-baixo div {
+        width: 100%;
+        gap: 15px 25px;
     }
 }
