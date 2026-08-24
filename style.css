@@ -912,6 +912,9 @@ body {
     font-size: 15px;
 }
 
+/* Soluções de Monitoramento */
+
+
 /* Media Queries: Esconde o gráfico e centraliza o texto quando a tela fica menor */
 @media (max-width: 1024px) {
 
