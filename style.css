@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -307,7 +308,9 @@ body {
 }
 
 /* Cards & Grid elements */
-.card-box, .card-icon, .card-line {
+.card-box,
+.card-icon,
+.card-line {
     position: absolute;
 }
 
@@ -621,6 +624,7 @@ body {
     position: absolute;
     background: white;
 }
+
 /* SOBRE_NOCTUA TIME */
 .sobre-noctua {
     width: 100%;
@@ -695,6 +699,7 @@ body {
     /* Sombra da segunda imagem */
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
+
 .metrica:hover {
     transform: translateY(-6px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -718,6 +723,7 @@ body {
     font-weight: 400;
     line-height: 1.5;
 }
+
 .quem-somos {
     width: 100%;
     padding: 80px 20px;
@@ -848,11 +854,70 @@ body {
     background-color: #1A1F71;
 }
 
+.missao-valores {
+    width: 100%;
+    height: 50vh;
+    padding: 40px;
+    background-color: #F8FAFC;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.missao-valores h2 {
+    margin-bottom: 5vh;
+    color: #1A1F71;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 20px;
+}
+
+.missao-valores .cards {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    flex: 1;
+}
+
+.missao-valores .cards .card {
+    width: 30vw;
+    min-height: 22vh;
+    padding: 20px;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.missao-valores .cards .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.missao-valores .cards .card .title {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.missao-valores .cards .card .title span {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.missao-valores .cards .card .desc span {
+    color: #64748B;
+    font-size: 15px;
+}
+
 /* Media Queries: Esconde o gráfico e centraliza o texto quando a tela fica menor */
 @media (max-width: 1024px) {
 
     .hero-graphic-wrapper {
-        display: none; /* Some com a ilustração quando iria quebrar para baixo */
+        display: none;
+        /* Some com a ilustração quando iria quebrar para baixo */
     }
 
     .hero-container {
@@ -880,15 +945,21 @@ body {
         justify-content: center;
         width: 100%;
     }
+
+    .missao-valores .cards .card {
+        min-height: 35vh;
+    }
 }
 
 @media (max-width: 768px) {
     .metricas {
         flex-wrap: wrap;
     }
+
     .equipe {
         grid-template-columns: repeat(3, 1fr);
     }
+
     .quem-somos {
         padding: 60px 20px;
     }
@@ -900,6 +971,7 @@ body {
     .equipe {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .hero-title {
         font-size: 30px;
     }
@@ -908,6 +980,7 @@ body {
         font-size: 15px;
         margin-bottom: 30px;
     }
+
     .sobre-noctua {
         padding: 45px 20px 50px;
     }
@@ -937,8 +1010,25 @@ body {
         width: 100%;
     }
 
-    .btn-primary-large, .btn-outline-large {
+    .btn-primary-large,
+    .btn-outline-large {
         width: 100%;
+    }
+
+    .missao-valores h2 {
+        font-size: 26px;
+        margin-bottom: 20px;
+    }
+
+    .missao-valores .cards {
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: 1fr;
+    }
+
+    .missao-valores .cards .card {
+        width: 70vw;
+        min-height: 25vh;
     }
 }
 
@@ -946,16 +1036,21 @@ body {
     .hero-title {
         font-size: 26px;
     }
-    
+
     .hero-container {
         padding: 30px 16px;
     }
-     .equipe {
+
+    .equipe {
         grid-template-columns: 1fr;
     }
 
     .membro-foto {
         height: 260px;
+    }
+
+    .missao-valores h2{
+        font-size: 26px;
     }
 }
 
