@@ -33,7 +33,7 @@
                 </div>
                 <div class="user-info">
                     <span class="user-name">Ana Souza</span>
-                    <span class="user-role">Admin</span>
+                    <span class="user-role">Analista</span>
                 </div>
             </a>
             <a href="index.html">
@@ -47,7 +47,7 @@
 
 
         <main class="content">
-            <p class="titulo">Visão Geral Alertas</p>
+            <p class="titulo">Alertas</p>
             <section class="metrics-grid">
                 <div class="card-red">
                     <span class="card-title">Alertas Ativos</span>
@@ -59,102 +59,89 @@
                     <span class="card-title">58% dos alertas</span>
                 </div>
                 <div class="card">
-                    <span class="card-title">Pico de Incidentes no Dia</span>
-                    <span class="card-value">14h</span>
+                    <span class="card-title">Reincidência de Alertas</span>
+                    <span class="card-value">14%</span>
                 </div>
                 <div class="card">
                     <span class="card-title">Tempo Médio Até Resolução</span>
                     <span class="card-value">18min</span>
                 </div>
+
             </section>
 
             <section class="table-card">
                 <div class="table-card-header">
-                    <div class="table-header-title">Mainframes monitorados</div>
-                    
+                    <h3>Histórico de Alertas</h3>
                     <div class="table-filters">
-                        <div class="filter-group">
-                            <select class="filter-select">
-                                <option value="todos">Todos os Status</option>
-                                <option value="alerta">Em Alerta</option>
-                                <option value="operacional">Operacional</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <select class="filter-select">
-                                <option value="todos">Ordenar por</option>
-                                <option value="cpu">Maior uso de CPU</option>
-                                <option value="ram">Maior uso de RAM</option>
-                                <option value="disco">Maior uso de Disco</option>
-                            </select>
-                        </div>
+                        <div class="input-container">
+                                <input type="text" class="filter-select" placeholder="Buscar Servidor">
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </div>
+                        <select class="filter-select">
+                            <option value="">Status Alerta</option>
+                            <option value="aberto">Em Aberto</option>
+                            <option value="investigacao">Em Investigação</option>
+                            <option value="resolvido">Resolvido</option>
+                        </select>
                     </div>
                 </div>
-            
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Servidor</th>
-                            <th>CPU</th>
-                            <th>RAM</th>
-                            <th>Disco</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>srv-prod-01</strong></td>
-                            <td>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 60%;"></div></div>
-                                <span>60%</span>
-                            </td>
-                            <td>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 72%;"></div></div>
-                                <span>72%</span>
-                            </td>
-                            <td>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill-alert" style="width: 91%;"></div></div>
-                                <span>91%</span>
-                            </td>
-                            <td><span class="badge-status-alert">Em Alerta</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>srv-prod-02</strong></td>
-                            <td>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 59%;"></div></div>
-                                <span>59%</span>
-                            </td>
-                            <td>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 68%;"></div></div>
-                                <span>68%</span>
-                            </td>
-                            <td>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 58%;"></div></div>
-                                <span>58%</span>
-                            </td>
-                            <td><span class="badge-status">Operacional</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>db-primary</strong></td>
-                            <td>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 54%;"></div></div>
-                                <span>54%</span>
-                            </td>
-                            <td>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill-alert" style="width: 96%;"></div></div>
-                                <span>96%</span>
-                            </td>
-                            <td>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 45%;"></div></div>
-                                <span>45%</span>
-                            </td>
-                            <td><span class="badge-status-alert">Em Alerta</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+
+                <!-- Tabela com Rolagem Interna -->
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Servidor</th>
+                                <th>Componente</th>
+                                <th>Mensagem do Alerta</th>
+                                <th>Data / Hora</th>
+                                <th>Status Alerta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>db-primary</strong></td>
+                                <td>RAM</td>
+                                <td>Uso de memória atingiu 96% da capacidade.</td>
+                                <td>27/08/2026 - 10:42</td>
+                                <td><span class="badge-status-alert">Aberto</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>srv-prod-01</strong></td>
+                                <td>Disco</td>
+                                <td>Partição principal /var acima de 91%.</td>
+                                <td>27/08/2026 - 09:15</td>
+                                <td><span class="badge-status-attention">Em Investigação</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>srv-prod-02</strong></td>
+                                <td>RAM</td>
+                                <td>Consumo constante acima de 85%.</td>
+                                <td>27/08/2026 - 08:30</td>
+                                <td><span class="badge-status-attention">Em Investigação</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>srv-web-03</strong></td>
+                                <td>CPU</td>
+                                <td>Pico pontual de processamento (88%).</td>
+                                <td>26/08/2026 - 22:10</td>
+                                <td><span class="badge-status">Resolvido</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>db-secondary</strong></td>
+                                <td>CPU</td>
+                                <td>Uso contínuo de 98% por mais de 10 min.</td>
+                                <td>26/08/2026 - 14:02</td>
+                                <td><span class="badge-status">Resolvido</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </section>
+
+            
+
+            
         </main>
     </div>
 </body>

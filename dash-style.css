@@ -134,18 +134,17 @@
             min-height: 100vh;
         }
 
-        /* HEADER FIXO OU ROLÁVEL */
         .header {
             height: 64px;
             background-color: #FFFFFF;
             border-bottom: 1px solid #E2E8F0;
             padding: 0 32px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 90;
+            gap: 20px;
         }
 
         .header-title {
@@ -153,70 +152,6 @@
             font-size: 20px;
             font-weight: 700;
         }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .search-box {
-            position: relative;
-            width: 220px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 8px 14px 8px 36px;
-            background-color: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
-            stroke: #64748B;
-        }
-
-        .notification-btn {
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-
-        .badge-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #EF4444;
-            border-radius: 50%;
-            border: 2px solid white;
-            position: absolute;
-            top: -2px;
-            right: -2px;
-        }
-
-        .avatar {
-            width: 36px;
-            height: 36px;
-            background-color: #1A1F71;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 13px;
-        }
-
-        /* CONTEÚDO DAS METRICAS E TABELAS */
         .content {
             padding: 32px;
             display: flex;
@@ -231,7 +166,6 @@
             text-align: center;
         }
 
-        /* GRID DE CARDS */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -273,6 +207,32 @@
 
         .card-red .card-value {
             color: #790000;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .card-yellow {
+            background-color: #e4ef50;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .card-yellow .card-title {
+            color: #757575;
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        .card-yellow .card-value {
+            color: #777900;
             font-size: 28px;
             font-weight: 700;
         }
@@ -339,6 +299,7 @@
             outline: none;
             cursor: pointer;
             transition: all 0.2s;
+            width: 150px;
         }
 
         .filter-select:hover {
@@ -348,6 +309,26 @@
 
         .filter-select:focus {
             border-color: #2563EB;
+        }
+
+        .input-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgb(141, 141, 141);
+            pointer-events: none; 
+        }
+
+        .filter-select {
+            padding: 10px 10px 10px 36px;
+            box-sizing: border-box;
         }
 
 
@@ -372,6 +353,7 @@
             padding: 16px 24px;
             border-bottom: 1px solid #E2E8F0;
             font-size: 14px;
+            height: 50px;
         }
 
         tr:last-child td {
@@ -399,6 +381,13 @@
             border-radius: 3px;
         }
 
+        .progress-bar-fill-attention {
+            height: 100%;
+            background-color: #f1fc1e;
+            border-radius: 3px;
+        }
+
+
         .badge-status {
             display: inline-block;
             padding: 4px 12px;
@@ -419,6 +408,16 @@
             border-radius: 20px;
         }
 
+        .badge-status-attention {
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: #fffb78;
+            color: #b3bc00;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 20px;
+        }
+
         .action-link {
             color: #2563EB;
             font-size: 12px;
@@ -431,7 +430,7 @@
         }
 
         .table-wrapper {
-            max-height: 300px; /* Ajuste a altura máxima conforme necessário */
+            max-height: 350px; /* Ajuste a altura máxima conforme necessário */
             overflow-y: auto;
             overflow-x: auto;
         }
