@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+/* Definindo seletor global */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Definindo uma fonte geral */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Separando as duas seções */
+
+.content {
+    justify-content: space-between;
+    display: flex;
+    width: 100%;
+}
+
+.content .left-content {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 47%;
+}
+
+.content .right-content {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 47%;
+    padding: 3rem;
+}
+
+
+/* Definindo conteúdo esquerdo */
+
+.content .left-content {
+    background-color: #1A1F71;
+}
+
+.content .left-content .banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.content .left-content .imagemSlogan {
+    position: relative;
+}
+
+.content .left-content .banner .textoSlogan {
+    position: absolute;
+    text-align: center;
+    color: #fff;
+    transform:translate(-50%, -30%);
+    top: 50%;
+    left: 50%;
+}
+
+.content .left-content .banner .textoSlogan .tituloEsquerdo {
+    letter-spacing: 0.05em;
+    font-size: 0.8em;
+    margin-top: 2em;
+}
+
+.content .left-content .banner .textoSlogan .subtituloEsquerdo {
+    font-weight: 200;
+    margin: 1.5em 0;
+}
+
+.content .left-content .banner .textoSlogan .botaoEsquerdo {
+    border: 1px solid #FBBF24;
+    background-color: #FBBF24;
+    color: #1A1F71;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    padding: 0.5em 1em;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.content .left-content .banner .textoSlogan .botaoEsquerdo:hover {
+    transition: 0.3s;
+    color: #FBBF24;
+    background-color: #1a1e71;
+    box-shadow: 0px 0px 30px lab(80.44% 9.66 77.02 / 0.295);
+}
+
+.content .left-content .banner .description p {
+    font-weight: 300;
+}
+
+.content .banner {
+    width: 100%;
+    height: 100%;
+}
+
+/* Definido conteúdo direito */
+
+.content .right-content form h1 {
+    color: #1A1F71;
+}
+
+.content .right-content form p {
+    color: #1E293B;
+    font-weight: 600;
+} 
+.content .right-content form .subtitulo p {
+    color: #64748B;
+    font-weight: 400;
+}
+.content .right-content .form{
+    flex-direction: column;
+    text-align: left;
+    display: flex;
+    gap: 1.3rem;
+}
+
+.content .right-content .form form{
+    flex-direction: column;
+    display: flex;
+    max-width: 50rem;
+    width: 100%;
+}
+
+.content .right-content .form form input{
+    border: 2px solid #E2E8F0;
+    border-radius: 0.4rem;
+    padding-top: 0.9rem;
+    padding: 1em;
+    margin: 1rem 0;
+}
+
+.content .right-content .form form button{
+    font-family: 'Poppins', sans-serif;
+    background-color: #2563EB;
+    cursor: pointer;
+    color: #fff;
+    border: 1px solid #2563EB;
+    border-radius: 0.4rem;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: 0.3s;
+    padding: 1rem;
+}
+
+.content .right-content .form form button:hover {
+    background-color: #fff;
+    color: #2563EB;
+    box-shadow: 0px 0px 30px lab(43.09% 42.25 -83.21 / 0.295);
+    transition: 0.3s;
+}
+
+input {
+    font-family: 'Poppins', sans-serif;
+}
+
+
+.form #voltarSite {
+    text-decoration: none;
+    color: #64748B;
+}
+
+.form a {
+    text-decoration: none;
+    color: #2563EB;
+    font-weight: 550;
+}
+
+.form #esqueciSenha {
+    justify-content: end;
+    display: flex;
+}
