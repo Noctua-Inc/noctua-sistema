@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/cadastro.css">
+    <link rel="stylesheet" href="cadastro.css">
     <title>Cadastro | Noctua</title>
 </head>
 <body>
@@ -11,7 +11,7 @@
         <div class="left-content">
             <div class="banner">
                 <div class="imagemSlogan">
-                    <img src="assets/Icon.png">
+                    <img src="assets/noctua_icon.png">
                     <div class="textoSlogan">
                         <div class="noctuaName"><h1>Noctua</h1></div>
                         <div class="tituloEsquerdo"><h1>Visibilidade total sobre <br> sua infraestrura</h1></div>
@@ -36,10 +36,6 @@
                     <input type="email" name="email" placeholder="anasouza@empresa.com.br" required id="email">
                     <p>CPF</p>
                     <input type="text" name="cpf" placeholder="000.000.000-00" required id="cpf">
-                    <p>Data de nascimento</p>
-                    <input type="text" name="data_nascimento" placeholder="01/01/1990" required id="data_nascimento">
-                    <p>Empresa</p>
-                    <input type="text" name="empresa" placeholder="Nome da empresa" required id="empresa">
                     <p>Senha</p>
                     <input type="password" name="password" placeholder="Senha" required id="password">
                     <p>Confirmar senha</p>
@@ -66,7 +62,6 @@
         let nomeUsuario = document.getElementById('nome_completo').value
         let emailUsuario = document.getElementById('email').value          
         let cpfUsuario = document.getElementById('cpf').value
-        let dataNascimentoUsuario = document.getElementById('data_nascimento').value
         let senhaUsuario = document.getElementById('password').value
         let confirmSenhaUsuario = document.getElementById('confirm_password').value
         
@@ -79,9 +74,8 @@
                 nome: nomeUsuario,
                 email: emailUsuario,
                 cpf: cpfUsuario,
-                data_nascimento: dataNascimentoUsuario,
-                empresa: empresaUsuario,
-                senha: senhaUsuario
+                senha: senhaUsuario,
+                confirmar_senha:confirmSenhaUsuario
             })
         })
     }
