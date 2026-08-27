@@ -33,7 +33,7 @@
                 </div>
                 <div class="user-info">
                     <span class="user-name">Ana Souza</span>
-                    <span class="user-role">Admin</span>
+                    <span class="user-role">Analista</span>
                 </div>
             </a>
             <a href="index.html">
@@ -47,134 +47,190 @@
 
         <header class="header">
             <h1 class="header-title">Visão Geral</h1>
-            <div class="header-actions">
-                <div class="search-box">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" placeholder="Buscar servidor...">
-                </div>
-                <div class="notification-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                    <div class="badge-dot"></div>
-                </div>
-                <div class="avatar">AS</div>
+            <div class="filter-group">
+                <select class="filter-select">
+                    <option value="todos">Visão Geral</option>
+                    <option value="alerta">Mainframe01</option>
+                    <option value="operacional">Mainframe02</option>
+                </select>
             </div>
         </header>
 
         <main class="content">
             <section class="metrics-grid">
                 <div class="card">
-                    <span class="card-title">Uptime médio</span>
-                    <span class="card-value">99.97%</span>
-                    <span class="card-trend trend-up">+0.02%</span>
+                    <span class="card-title">Total Servidores Monitorados</span>
+                    <span class="card-value">5</span>
                 </div>
                 <div class="card">
-                    <span class="card-title">Servidores ativos</span>
-                    <span class="card-value">1.847</span>
-                    <span class="card-trend trend-up">+12 hoje</span>
+                    <span class="card-title">Taxa de Disponibilidade</span>
+                    <span class="card-value">99.8%</span>
                 </div>
-                <div class="card">
-                    <span class="card-title">Alertas em aberto</span>
-                    <span class="card-value">3</span>
-                    <span class="card-trend trend-up">-5 vs ontem</span>
+                <div class="card-red">
+                    <span class="card-title">Alertas</span>
+                    <span class="card-value">1</span>
                 </div>
-                <div class="card">
-                    <span class="card-title">Latência média</span>
-                    <span class="card-value">42ms</span>
-                    <span class="card-trend trend-down">+8ms</span>
+                <div class="card-yellow">
+                    <span class="card-title">Servidores em Estado de Atenção</span>
+                    <span class="card-value">2</span>
                 </div>
             </section>
 
-            <section class="dashboard-row">
-                <div class="chart-card">
-                    <div class="card-header">
-                        <div>
-                            <h3>Uso de Recursos — 24h</h3>
-                            <span class="card-subtitle">Média de CPU entre todos os servidores ativos</span>
-                        </div>
-                    </div>
-                    <div class="chart-placeholder">
-
-                    </div>
-                    <div class="chart-labels">
-                        <span>00h</span><span>04h</span><span>08h</span><span>12h</span><span>16h</span><span>20h</span><span>23h</span>
+            <div class="chart-card">
+                <div class="card-header">
+                    <div>
+                        <h3>Uso de Recursos — 24h</h3>
+                        <span class="card-subtitle">Média de CPU entre todos os servidores ativos</span>
                     </div>
                 </div>
+                <div class="chart-placeholder">
 
-                <div class="alerts-card">
-                    <div class="card-header">
-                        <h3>Alertas recentes</h3>
-                    </div>
-                    <div class="alert-list">
-                        <div class="alert-item">
-                            <div class="alert-dot dot-red"></div>
-                            <div class="alert-info">
-                                <p>worker-03: CPU acima de 95% por 10 min</p>
-                                <span>Hoje às 16:42 · Crítico</span>
-                            </div>
-                        </div>
-                        <div class="alert-item">
-                            <div class="alert-dot dot-yellow"></div>
-                            <div class="alert-info">
-                                <p>api-gateway: latência p99 &gt; 800ms</p>
-                                <span>Hoje às 15:58 · Aviso</span>
-                            </div>
-                        </div>
-                        <div class="alert-item">
-                            <div class="alert-dot dot-blue"></div>
-                            <div class="alert-info">
-                                <p>db-primary: backup concluído com sucesso</p>
-                                <span>Hoje às 14:33 · Info</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-            </section>
+                <div class="chart-labels">
+                    <span>00h</span><span>04h</span><span>08h</span><span>12h</span><span>16h</span><span>20h</span><span>23h</span>
+                </div>
+            </div>
 
             <section class="table-card">
-                <div class="table-header-title">Status dos serviços monitorados</div>
+                <div class="table-card-header">
+                    <div class="table-header-title">Mainframes monitorados</div>
+                    
+                    <div class="table-filters">
+                        <div class="filter-group">
+                            <div class="input-container">
+                                <input type="text" class="filter-select" placeholder="Buscar Servidor">
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <select class="filter-select">
+                                <option value="todos">Todos Status</option>
+                                <option value="alerta">Em Alerta</option>
+                                <option value="operacional">Operacional</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select class="filter-select">
+                                <option value="todos">Ordenar por</option>
+                                <option value="cpu">Maior uso de CPU</option>
+                                <option value="ram">Maior uso de RAM</option>
+                                <option value="disco">Maior uso de Disco</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            
+            <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
                             <th>Servidor</th>
-                            <th>Tipo</th>
                             <th>CPU</th>
+                            <th>RAM</th>
+                            <th>Disco</th>
                             <th>Status</th>
-                            <th>Ação</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><strong>srv-prod-01</strong></td>
-                            <td>Web Server</td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 60%;"></div></div>
+                                <span>60%</span>
+                            </td>
                             <td>
                                 <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 72%;"></div></div>
                                 <span>72%</span>
                             </td>
-                            <td><span class="badge-status">Operacional</span></td>
-                            <td><a href="#" class="action-link">Ver detalhes</a></td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill-alert" style="width: 91%;"></div></div>
+                                <span>91%</span>
+                            </td>
+                            <td><span class="badge-status-alert">Em Alerta</span></td>
                         </tr>
                         <tr>
                             <td><strong>srv-prod-02</strong></td>
-                            <td>Web Server</td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 59%;"></div></div>
+                                <span>59%</span>
+                            </td>
                             <td>
                                 <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 68%;"></div></div>
                                 <span>68%</span>
                             </td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 58%;"></div></div>
+                                <span>58%</span>
+                            </td>
                             <td><span class="badge-status">Operacional</span></td>
-                            <td><a href="#" class="action-link">Ver detalhes</a></td>
                         </tr>
                         <tr>
                             <td><strong>db-primary</strong></td>
-                            <td>Database</td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 54%;"></div></div>
+                                <span>54%</span>
+                            </td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill-alert" style="width: 96%;"></div></div>
+                                <span>96%</span>
+                            </td>
                             <td>
                                 <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 45%;"></div></div>
                                 <span>45%</span>
                             </td>
-                            <td><span class="badge-status">Operacional</span></td>
-                            <td><a href="#" class="action-link">Ver detalhes</a></td>
+                            <td><span class="badge-status-alert">Em Alerta</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>db-primary</strong></td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 54%;"></div></div>
+                                <span>54%</span>
+                            </td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill-attention" style="width: 85%;"></div></div>
+                                <span>85%</span>
+                            </td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 45%;"></div></div>
+                                <span>45%</span>
+                            </td>
+                            <td><span class="badge-status-attention">Atenção</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>db-primary</strong></td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 54%;"></div></div>
+                                <span>54%</span>
+                            </td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill-alert" style="width: 96%;"></div></div>
+                                <span>96%</span>
+                            </td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 45%;"></div></div>
+                                <span>45%</span>
+                            </td>
+                            <td><span class="badge-status-alert">Em Alerta</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>db-primary</strong></td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 54%;"></div></div>
+                                <span>54%</span>
+                            </td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill-alert" style="width: 96%;"></div></div>
+                                <span>96%</span>
+                            </td>
+                            <td>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 45%;"></div></div>
+                                <span>45%</span>
+                            </td>
+                            <td><span class="badge-status-alert">Em Alerta</span></td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
             </section>
         </main>
     </div>
