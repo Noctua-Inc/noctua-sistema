@@ -7,20 +7,39 @@
     <link rel="stylesheet" href="dash-style.css">
     <link rel="icon" href="assets/icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 </head>
 <body>
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            Dashboard
+            <a href="dash-alertas.html"><img class="logo" src="assets/noctua-logo-branca.png" alt="Noctua Logo" /></a>
         </div>
+
         <ul class="sidebar-menu">
-            <li><a href="#" class="active">Visão Geral</a></li>
-            <li><a href="#">Servidores</a></li>
-            <li><a href="#">Cadastro de Servidores</a></li>
-            <li><a href="cad-componentes.html">Cadastro de Componentes</a></li>
-            <li><a href="#">Configurações</a></li>
+            <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation" style="color:white;"></i>Alertas</a></li>
+            <li><a href="dash-servidores.html" class="active"><i class="fa-solid fa-server" style="color:white;"></i>Servidores</a></li>
+            <li><a href="#"><i class="fa-regular fa-pen-to-square" style="color:white;"></i>Editar Servidores</a></li>
+            <li><a href="#"><i class="fa-solid fa-gear" style="color:white;"></i>Configurações</a></li>
         </ul>
+
+        <div class="sidebar-user">
+            <a href="#">
+                <div class="user-avatar">
+                    <span>AS</span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">Ana Souza</span>
+                    <span class="user-role">Admin</span>
+                </div>
+            </a>
+            <a href="index.html">
+                <i class="fa-solid fa-right-from-bracket" style="color:rgb(255, 102, 102);"></i>
+            </a>
+        </div>
     </aside>
 
     <!-- wrapper rolagem -->
