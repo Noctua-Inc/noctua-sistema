@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/styles/dash-style.css">
+    <link rel="icon" href="/assets/icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <a href="dash-alertas.html"><img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo" /></a>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"
+                        style="color:white;"></i>Alertas</a></li>
+            <li><a href="dash-servidores.html" class="active"><i class="fa-solid fa-server"
+                        style="color:white;"></i>Servidores</a></li>
+            <li><a href="#"><i class="fa-regular fa-pen-to-square" style="color:white;"></i>Editar Servidores</a></li>
+            <li><a href="#"><i class="fa-solid fa-gear" style="color:white;"></i>Configurações</a></li>
+        </ul>
+
+        <div class="sidebar-user">
+            <a href="#">
+                <div class="user-avatar">
+                    <span>AS</span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">Ana Souza</span>
+                    <span class="user-role">Analista</span>
+                </div>
+            </a>
+            <a href="index.html">
+                <i class="fa-solid fa-right-from-bracket" style="color:rgb(255, 102, 102);"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- wrapper rolagem -->
+    <div class="main-wrapper">
+
+        <header class="header">
+            <h1 class="header-title">Visão Geral</h1>
+            <div class="filter-group">
+                <select class="filter-select">
+                    <option value="todos">Visão Geral</option>
+                    <option value="alerta">Mainframe01</option>
+                    <option value="operacional">Mainframe02</option>
+                </select>
+            </div>
+        </header>
+
+        <main class="content">
+            <section class="metrics-grid">
+                <div class="card">
+                    <span class="card-title">Total Servidores Monitorados</span>
+                    <span class="card-value">5</span>
+                </div>
+                <div class="card">
+                    <span class="card-title">Taxa de Disponibilidade</span>
+                    <span class="card-value">99.8%</span>
+                </div>
+                <div class="card-red">
+                    <span class="card-title">Alertas</span>
+                    <span class="card-value">1</span>
+                </div>
+                <div class="card-yellow">
+                    <span class="card-title">Servidores em Estado de Atenção</span>
+                    <span class="card-value">2</span>
+                </div>
+            </section>
+
+            <div class="chart-card">
+                <div class="card-header">
+                    <div>
+                        <h3>Uso de Recursos — 24h</h3>
+                        <span class="card-subtitle">Média de CPU entre todos os servidores ativos</span>
+                    </div>
+                </div>
+                <div class="chart-placeholder">
+
+                </div>
+                <div class="chart-labels">
+                    <span>00h</span><span>04h</span><span>08h</span><span>12h</span><span>16h</span><span>20h</span><span>23h</span>
+                </div>
+            </div>
+
+            <section class="table-card">
+                <div class="table-card-header">
+                    <div class="table-header-title">Mainframes monitorados</div>
+
+                    <div class="table-filters">
+                        <div class="filter-group">
+                            <div class="input-container">
+                                <input type="text" class="filter-select" placeholder="Buscar Servidor">
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <select class="filter-select">
+                                <option value="todos">Todos Status</option>
+                                <option value="alerta">Em Alerta</option>
+                                <option value="operacional">Operacional</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select class="filter-select">
+                                <option value="todos">Ordenar por</option>
+                                <option value="cpu">Maior uso de CPU</option>
+                                <option value="ram">Maior uso de RAM</option>
+                                <option value="disco">Maior uso de Disco</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Servidor</th>
+                                <th>CPU</th>
+                                <th>RAM</th>
+                                <th>Disco</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>srv-prod-01</strong></td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 60%;"></div>
+                                    </div>
+                                    <span>60%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 72%;"></div>
+                                    </div>
+                                    <span>72%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill-alert" style="width: 91%;"></div>
+                                    </div>
+                                    <span>91%</span>
+                                </td>
+                                <td><span class="badge-status-alert">Em Alerta</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>srv-prod-02</strong></td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 59%;"></div>
+                                    </div>
+                                    <span>59%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 68%;"></div>
+                                    </div>
+                                    <span>68%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 58%;"></div>
+                                    </div>
+                                    <span>58%</span>
+                                </td>
+                                <td><span class="badge-status">Operacional</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>db-primary</strong></td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 54%;"></div>
+                                    </div>
+                                    <span>54%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill-alert" style="width: 96%;"></div>
+                                    </div>
+                                    <span>96%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 45%;"></div>
+                                    </div>
+                                    <span>45%</span>
+                                </td>
+                                <td><span class="badge-status-alert">Em Alerta</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>db-primary</strong></td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 54%;"></div>
+                                    </div>
+                                    <span>54%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill-attention" style="width: 85%;"></div>
+                                    </div>
+                                    <span>85%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 45%;"></div>
+                                    </div>
+                                    <span>45%</span>
+                                </td>
+                                <td><span class="badge-status-attention">Atenção</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>db-primary</strong></td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 54%;"></div>
+                                    </div>
+                                    <span>54%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill-alert" style="width: 96%;"></div>
+                                    </div>
+                                    <span>96%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 45%;"></div>
+                                    </div>
+                                    <span>45%</span>
+                                </td>
+                                <td><span class="badge-status-alert">Em Alerta</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>db-primary</strong></td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 54%;"></div>
+                                    </div>
+                                    <span>54%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill-alert" style="width: 96%;"></div>
+                                    </div>
+                                    <span>96%</span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: 45%;"></div>
+                                    </div>
+                                    <span>45%</span>
+                                </td>
+                                <td><span class="badge-status-alert">Em Alerta</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

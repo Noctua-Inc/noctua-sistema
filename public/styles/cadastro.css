@@ -10,10 +10,11 @@ body {
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
     display: flex;
-    overflow-x: hidden; 
+    overflow-x: hidden;
 }
 
 /* Estrutura Principal */
+
 .content {
     display: flex;
     width: 100%;
@@ -21,6 +22,7 @@ body {
 }
 
 /* Seção Esquerda (Banner) */
+
 .content .left-content {
     flex: 1;
     background-color: #1A1F71;
@@ -66,12 +68,13 @@ body {
 
 .content .left-content .banner .textoSlogan .tituloEsquerdo {
     letter-spacing: 0.05em;
-    font-size: 0.8em;
+    font-size: 1em;
     margin-top: 1em;
 }
 
 .content .left-content .banner .textoSlogan .subtituloEsquerdo {
     font-weight: 200;
+    font-size: 1.3em;
     margin: 1em 0 1.5em 0;
 }
 
@@ -88,15 +91,10 @@ body {
     transition: 0.3s;
 }
 
-.content .left-content .banner .textoSlogan .botaoEsquerdo:hover {
-    color: #FBBF24;
-    background-color: #1a1e71;
-    box-shadow: 0px 0px 30px lab(80.44% 9.66 77.02 / 0.295);
-}
-
 /* Seção Direita (Formulário) */
+
 .content .right-content {
-    flex: 1;
+    flex: 1.3; /* dá mais espaço proporcional para o lado direito */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -108,26 +106,26 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 24rem;
-    gap: 0.8rem;
+    max-width: 34rem; /* era 24rem */
+    gap: 1.1rem; /* era 0.8rem */
 }
 
 .content .right-content form h1 {
     color: #1A1F71;
-    font-size: 1.6rem;
+    font-size: 2.1rem; /* era 1.6rem */
 }
 
 .content .right-content form p {
     color: #1E293B;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 1rem; /* era 0.85rem */
     margin-top: 0.4rem;
 }
 
-.content .right-content form .subtitulo p {
+.content .right-content .form .subtitulo p {
     color: #64748B;
     font-weight: 400;
-    font-size: 0.9rem;
+    font-size: 1.05rem; /* era 0.9rem */
     margin-top: 0.2rem;
     margin-bottom: 0.5rem;
 }
@@ -136,14 +134,15 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
+    gap: 0.3rem;
 }
 
 .content .right-content .form form input {
     border: 2px solid #E2E8F0;
-    border-radius: 0.4rem;
-    padding: 0.65rem 0.8rem;
+    border-radius: 0.5rem;
+    padding: 0.9rem 1rem; /* era 0.65rem 0.8rem */
     font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
+    font-size: 1.05rem; /* era 0.9rem */
     margin-top: 0.2rem;
 }
 
@@ -153,10 +152,10 @@ body {
     cursor: pointer;
     color: #fff;
     border: 1px solid #2563EB;
-    border-radius: 0.4rem;
-    padding: 0.75rem;
-    margin-top: 1rem;
-    font-size: 1rem;
+    border-radius: 0.5rem;
+    padding: 1rem; /* era 0.75rem */
+    margin-top: 1.2rem;
+    font-size: 1.1rem; /* era 1rem */
     font-weight: 600;
     transition: 0.3s;
 }
@@ -170,7 +169,7 @@ body {
 .form #voltarSite {
     text-decoration: none;
     color: #64748B;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
 }
 
 .form a {
@@ -179,28 +178,19 @@ body {
     font-weight: 550;
 }
 
-/* Itens específicos do Login mantendo a padronização */
-.esqueci-senha-container {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: -0.2rem;
-}
-
-.esqueci-senha-container a {
+.form .terms p {
     font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.form .terms p, 
-.form .login-link p {
-    font-size: 0.8rem;
     color: #64748B;
-    text-align: center;
 }
 
-.form .login-link {
+.form .login-link p {
+    font-size: 0.95rem;
+    color: #64748B;
+    text-align: center; /* centraliza o "Faça login" */
     margin-top: 0.5rem;
 }
+
+/* Responsividade para telas menores */
 
 @media screen and (max-width: 900px) {
     .content {
@@ -208,12 +198,12 @@ body {
     }
 
     .content .left-content {
-        display: none; /* Esconde completamente o banner no celular */
+        display: none;
     }
 
     .content .right-content {
         width: 100%;
-        min-height: 100vh; /* Faz o formulário ocupar a altura total da tela */
+        min-height: 100vh;
         padding: 2rem 1.5rem;
     }
 }
@@ -224,10 +214,10 @@ body {
     }
     
     .content .right-content .form {
-        gap: 0.4rem;
+        gap: 0.6rem;
     }
 
     .content .right-content .form form input {
-        padding: 0.5rem 0.7rem;
+        padding: 0.6rem 0.8rem;
     }
 }
