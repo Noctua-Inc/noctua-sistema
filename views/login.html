@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/login.css">
+    <title>Login | Noctua</title>
+</head>
+
+<body>
+    <div class="content">
+
+        <div class="left-content">
+            <div class="banner">
+                <div class="imagemSlogan">
+                    <img src="/assets/icon-cadastro-login.svg" alt="Slogan Noctua">
+                    <div class="textoSlogan">
+                        <!-- <div class="noctuaName">
+                            <h1>Noctua</h1>
+                        </div> -->
+                        <div class="tituloEsquerdo">
+                            <h1>Bem-vindo(a) de volta</h1>
+                        </div>
+                        <div class="subtituloEsquerdo">
+                            <p>Acesse sua plataforma de monitoramento e tenha visibilidade total sobre sua
+                                infraestrutura em tempo real.</p>
+                        </div>
+                        <div class="botaoEsquerdo">
+                            <p>Entre em contato</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-content">
+            <div class="form">
+                <a href="/" id="voltarSite"> ← Voltar ao site</a>
+                <form  id="form_login" onsubmit="login(event)">
+                    <h1>Entrar na plataforma</h1>
+                    <div class="subtitulo">
+                        <p>Informe suas credenciais para acessar a dashboard.</p>
+                    </div>
+
+                    <p>E-mail corporativo</p>
+                    <input type="email" name="email" placeholder="anasouza@empresa.com.br" required id="email">
+
+                    <p>Senha</p>
+                    <input type="password" name="password" placeholder="Senha" required id="password">
+
+                    <!-- <div class="esqueci-senha-container">
+                        <a href="esqueci_senha.html" id="esqueciSenha">Esqueci minha senha</a>
+                    </div> -->
+
+                    <button>Entrar</button>
+                </form>
+
+                <div class="login-link">
+                    <p>Não tem uma conta? <a href="cadastro.html">Clique aqui</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="/js/login.js"></script>
+</html>
