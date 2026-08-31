@@ -17,10 +17,13 @@ function login(event) {
     .then(response => response.json())
     .then(data => {
         console.log(data.mensagem);
+        errorMessage(data.icon, data.mensagem, data.descricao);
 
-        setTimeout(() => {
-            window.location = '/dash-alertas.html';
-        }, 2000);
+        if((data.mensagem).includes('sucesso')){
+            setTimeout(() => {
+                window.location = '/dash-alertas.html'
+            }, 2000);
+        }
     })
     .catch(error => {
         console.log('Erro ao logar', error);

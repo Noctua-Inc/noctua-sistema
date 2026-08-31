@@ -16,21 +16,13 @@ async function cadastrar(req, res) {
             confirmacao_senha
         } = req.body;
 
-        const vetor_verificacao = [nome, email_institucional, cpf, senha, confirmacao_senha];
-
-        for (let i = 0; i < vetor_verificacao.length; i++) {
-            if (!vetor_verificacao[i]) {
-                return res.status(400).json({
-                    mensagem: 'Preencha todos os campos corretamente!'
-                });
-            }
-        }
-
         let regex_email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!regex_email.test(email_institucional)) {
             return res.status(400).json({
-                mensagem: 'Digite um email válido!'
+                icon: '../../assets/erro.svg',
+                mensagem: 'Digite um email válido!',
+                descricao: 'O e-mail digitado não está no formato correto. Certifique-se de incluir o "@" e um domínio válido'
             })
         }
 
@@ -39,7 +31,9 @@ async function cadastrar(req, res) {
 
         if (!empresa) {
             return res.status(404).json({
-                mensagem: 'Domínio da empresa não encontrado'
+                icon: '../../assets/erro.svg',
+                mensagem: 'Domínio de empresa não encontrado!',
+                descricao: 'Empresa e email corporativo indefinidos'
             });
         }
 
@@ -47,7 +41,9 @@ async function cadastrar(req, res) {
 
         if (!cpf_regex.test(cpf)) {
             return res.status(400).json({
-                mensagem: 'O CPF deve obrigatoriamente ter 11 dígitos!'
+                icon: '../../assets/erro.svg',
+                mensagem: 'Digite um CPF válido!',
+                descricao: 'O CPF deve ter obrigatoriamente 11 dígitos!'
             })
         }
 
@@ -55,13 +51,17 @@ async function cadastrar(req, res) {
 
         if (!senha_regex.test(senha)) {
             return res.status(400).json({
-                mensagem: 'Digite uma senha com ao menos 8 caracteres, uma letra maiúscula, um número e um caractere especial!'
+                icon: '../../assets/erro.svg',
+                mensagem: 'Digite uma senha válida!',
+                descricao: 'A senha deve conter ao menos 8 caracteres, uma letra maiúscula, um número e um caractere especial!'
             })
         }
 
         if (senha !== confirmacao_senha) {
             return res.status(400).json({
-                mensagem: 'Confirmação de senha inválida!'
+                icon: '../../assets/erro.svg',
+                mensagem: 'Confirmação de senha inválida!',
+                descricao: 'As senhas digitadas não estão correspondendo'
             })
         }
 
@@ -93,7 +93,9 @@ async function cadastrar(req, res) {
         );
 
         res.status(201).json({
-            mensagem: 'Usuário cadastrado com sucesso'
+            icon: '../../assets/sucesso.svg',
+            mensagem: 'Usuário cadastrado com sucesso!',
+            descricao: ''
         });
 
     } catch (erro) {
@@ -101,7 +103,9 @@ async function cadastrar(req, res) {
         console.error(erro);
 
         res.status(500).json({
-            mensagem: 'Erro ao cadastrar usuário'
+            icon: '../../assets/erro.svg',
+            mensagem: 'Erro ao cadastrar usuário!',
+            descricao: ''
         });
     }
 }
@@ -140,7 +144,9 @@ async function login(req, res) {
 
         if (!usuario) {
             return res.status(401).json({
-                mensagem: 'email ou senha inválidos'
+                icon: '../../assets/erro.svg',
+                mensagem: 'Email ou senha inválidas!',
+                descricao: ''
             });
         }
 
@@ -151,21 +157,24 @@ async function login(req, res) {
 
         if (!senhaValida) {
             return res.status(401).json({
-                mensagem: 'email ou senha inválidos'
+                icon: '../../assets/erro.svg',
+                mensagem: 'Email ou senha inválidas!',
+                descricao: ''
             });
         }
 
-        console.log('email:', usuario.email_institucional);
-        console.log('verificado:', usuario.verificado);
-
         if (!usuario.verificado) {
             return res.status(403).json({
-                mensagem: 'email ainda não verificado'
+                icon: '../../assets/erro.svg',
+                mensagem: 'Email ainda não verificado!',
+                descricao: 'Atenção! É necessário verificar seu email para ter acesso aos nossos recursos. Verifique sua caixa de email!'
             });
         }
 
         return res.status(200).json({
-            mensagem: 'Login realizado com sucesso'
+            icon: '../../assets/sucesso.svg',
+            mensagem: 'Login realizado com sucesso!',
+            descricao: 'Redirecionando para a dashboard...'
         });
 
     } catch (erro) {
@@ -173,7 +182,9 @@ async function login(req, res) {
         console.error(erro);
 
         res.status(500).json({
-            mensagem: 'Erro ao tentar login'
+            icon: '../../assets/erro.svg',
+            mensagem: 'Erro ao tentar login!',
+            descricao: ''
         });
     }
 }

@@ -94,7 +94,8 @@ body {
 /* Seção Direita (Formulário) */
 
 .content .right-content {
-    flex: 1.3; /* dá mais espaço proporcional para o lado direito */
+    flex: 1.3;
+    /* dá mais espaço proporcional para o lado direito */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -106,26 +107,31 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 34rem; /* era 24rem */
-    gap: 1.1rem; /* era 0.8rem */
+    max-width: 34rem;
+    /* era 24rem */
+    gap: 1.1rem;
+    /* era 0.8rem */
 }
 
 .content .right-content form h1 {
     color: #1A1F71;
-    font-size: 2.1rem; /* era 1.6rem */
+    font-size: 2.1rem;
+    /* era 1.6rem */
 }
 
 .content .right-content form p {
     color: #1E293B;
     font-weight: 600;
-    font-size: 1rem; /* era 0.85rem */
+    font-size: 1rem;
+    /* era 0.85rem */
     margin-top: 0.4rem;
 }
 
 .content .right-content .form .subtitulo p {
     color: #64748B;
     font-weight: 400;
-    font-size: 1.05rem; /* era 0.9rem */
+    font-size: 1.05rem;
+    /* era 0.9rem */
     margin-top: 0.2rem;
     margin-bottom: 0.5rem;
 }
@@ -140,9 +146,11 @@ body {
 .content .right-content .form form input {
     border: 2px solid #E2E8F0;
     border-radius: 0.5rem;
-    padding: 0.9rem 1rem; /* era 0.65rem 0.8rem */
+    padding: 0.9rem 1rem;
+    /* era 0.65rem 0.8rem */
     font-family: 'Poppins', sans-serif;
-    font-size: 1.05rem; /* era 0.9rem */
+    font-size: 1.05rem;
+    /* era 0.9rem */
     margin-top: 0.2rem;
 }
 
@@ -153,9 +161,11 @@ body {
     color: #fff;
     border: 1px solid #2563EB;
     border-radius: 0.5rem;
-    padding: 1rem; /* era 0.75rem */
+    padding: 1rem;
+    /* era 0.75rem */
     margin-top: 1.2rem;
-    font-size: 1.1rem; /* era 1rem */
+    font-size: 1.1rem;
+    /* era 1rem */
     font-weight: 600;
     transition: 0.3s;
 }
@@ -186,8 +196,41 @@ body {
 .form .login-link p {
     font-size: 0.95rem;
     color: #64748B;
-    text-align: center; /* centraliza o "Faça login" */
+    text-align: center;
+    /* centraliza o "Faça login" */
     margin-top: 0.5rem;
+}
+
+.content .div_erro {
+    width: 20dvw;
+    min-height: 5dvh;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #1A1F71;
+    background-color: #f5f6ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.content .div_erro .icon{
+    width: 35px;
+    height: 35px;
+    margin-bottom: 5px  ;
+}
+
+.content .div_erro .title{
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+}
+.content .div_erro .desc{
+    font-size: 16px;
+    color: #4f5c6d;
+    text-align: center;
 }
 
 /* Responsividade para telas menores */
@@ -212,7 +255,7 @@ body {
     .content .right-content {
         padding: 1rem 2rem;
     }
-    
+
     .content .right-content .form {
         gap: 0.6rem;
     }

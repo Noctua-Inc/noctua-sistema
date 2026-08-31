@@ -198,6 +198,38 @@ body {
     margin-top: 0.5rem;
 }
 
+.content .div_erro {
+    width: 20dvw;
+    min-height: 5dvh;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #1A1F71;
+    background-color: #f5f6ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.content .div_erro .icon{
+    width: 35px;
+    height: 35px;
+    margin-bottom: 5px  ;
+}
+
+.content .div_erro .title{
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+}
+.content .div_erro .desc{
+    font-size: 16px;
+    color: #4f5c6d;
+    text-align: center;
+}
+
 @media screen and (max-width: 900px) {
     .content {
         flex-direction: column;
