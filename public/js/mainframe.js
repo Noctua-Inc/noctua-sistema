@@ -1,69 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  const DEFAULT_LOCALIZACOES = [
-    { id_localizacao: 1, nome: "Data Center São Paulo", pais: "Brasil", estado: "São Paulo", cidade: "São Paulo", cod_regiao: "01310-100" },
-    { id_localizacao: 2, nome: "Data Center Rio de Janeiro", pais: "Brasil", estado: "Rio de Janeiro", cidade: "Rio de Janeiro", cod_regiao: "20040-020" },
-    { id_localizacao: 3, nome: "Data Center Brasília", pais: "Brasil", estado: "Distrito Federal", cidade: "Brasília", cod_regiao: "70040-010" },
-  ];
-
-  const DEFAULT_COMPONENTES = [
-    { id_componente: 1, tipo: "CPU", fabricante: "IBM", modelo: "Power 10", num_serie: "CPU001", capacidade: 32 },
-    { id_componente: 2, tipo: "RAM", fabricante: "Samsung", modelo: "DDR4 ECC", num_serie: "RAM001", capacidade: 256 },
-    { id_componente: 3, tipo: "Disco", fabricante: "IBM", modelo: "FlashSystem", num_serie: "DSK001", capacidade: 4000 },
-    { id_componente: 4, tipo: "Rede", fabricante: "Cisco", modelo: "Nexus 9000", num_serie: "NET001", capacidade: 100 },
-    { id_componente: 5, tipo: "Temperatura", fabricante: "Honeywell", modelo: "HT-200", num_serie: "TMP001", capacidade: 80 },
-    { id_componente: 6, tipo: "Processos", fabricante: "IBM", modelo: "Process Monitor", num_serie: "PRC001", capacidade: 1000 },
-  ];
-
-  const DEFAULT_MAINFRAMES = [
-    {
-      id_mainframe: 1, hostname: "MF-PROD-01", fabricante: "IBM", modelo: "z16", numero_serie: "MF0001",
-      status: "ativo", sis_operacional: "z/OS", versao_so: 2.5, fk_usuario: 1, fk_localizacao: 1,
-      parametros: [
-        { id_parametro: 1, fk_componente: 1, pico_max: 90, pico_min: 10, percentual: 5 },
-        { id_parametro: 2, fk_componente: 2, pico_max: 95, pico_min: 20, percentual: 5 },
-        { id_parametro: 3, fk_componente: 3, pico_max: 90, pico_min: 10, percentual: 3 },
-      ],
-    },
-    {
-      id_mainframe: 2, hostname: "MF-HML-01", fabricante: "IBM", modelo: "z15", numero_serie: "MF0002",
-      status: "ativo", sis_operacional: "z/OS", versao_so: 2.4, fk_usuario: 1, fk_localizacao: 2,
-      parametros: [
-        { id_parametro: 4, fk_componente: 1, pico_max: 85, pico_min: 15, percentual: 7 },
-        { id_parametro: 5, fk_componente: 4, pico_max: 95, pico_min: 10, percentual: 8 },
-      ],
-    },
-    {
-      id_mainframe: 3, hostname: "MF-DR-01", fabricante: "IBM", modelo: "z16", numero_serie: "MF0003",
-      status: "manut.", sis_operacional: "z/VM", versao_so: 7.3, fk_usuario: 1, fk_localizacao: 3,
-      parametros: [
-        { id_parametro: 6, fk_componente: 1, pico_max: 80, pico_min: 20, percentual: 1 },
-        { id_parametro: 7, fk_componente: 2, pico_max: 90, pico_min: 20, percentual: 5 },
-        { id_parametro: 8, fk_componente: 4, pico_max: 90, pico_min: 10, percentual: 8 },
-      ],
-    },
-    {
-      id_mainframe: 4, hostname: "MF-DEV-01", fabricante: "IBM", modelo: "z14", numero_serie: "MF0004",
-      status: "inativo", sis_operacional: "z/VSE", versao_so: 6.2, fk_usuario: 1, fk_localizacao: 1,
-      parametros: [
-        { id_parametro: 9, fk_componente: 1, pico_max: 80, pico_min: 10, percentual: 7 },
-      ],
-    },
-  ];
-
   const STATUS_CSS = { ativo: "status-ativo", inativo: "status-inativo", "manut.": "status-manutencao" };
   const STATUS_NOME = { ativo: "Ativo", inativo: "Inativo", "manut.": "Manutenção" };
-
-  function getData(chave, padrao) {
-    const data = localStorage.getItem(chave);
-    if (data) return JSON.parse(data);
-    localStorage.setItem(chave, JSON.stringify(padrao));
-    return padrao;
-  }
-
-  function saveData(chave, data) {
-    localStorage.setItem(chave, JSON.stringify(data));
-  }
 
   function escapeHtml(str) {
     if (str === null || str === undefined) return "";
@@ -72,15 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }[m]));
   }
 
-  let localizacoes = getData("noctua_localizacoes", DEFAULT_LOCALIZACOES);
-  let componentes = getData("noctua_componentes", DEFAULT_COMPONENTES);
-  let mainframes = getData("noctua_mainframes", DEFAULT_MAINFRAMES);
+  let localizacoes = [];
+  let componentes = [];
+  let mainframes = [];
 
   const tableBody = document.getElementById("table-body");
   if (!tableBody) return;
 
   let deleteConfirmId = null;
   let editParametros = [];
+  let editFkUsuario = 1;
   let currentStep = 1;
 
   const emptyState = document.getElementById("empty-state");
@@ -132,8 +71,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const novoCompSerie = document.getElementById("novo-comp-serie");
   const novoCompCapacidade = document.getElementById("novo-comp-capacidade");
 
-  // Localizações
-  function carregarLocalizacoes() {
+  //  Localizações 
+  function preencherSelectLocalizacoes() {
     if (!editLocalizacaoSelect) return;
     editLocalizacaoSelect.innerHTML = `<option value="">Selecione uma localização</option>`;
     localizacoes.forEach((loc) => {
@@ -142,6 +81,11 @@ document.addEventListener("DOMContentLoaded", () => {
       option.textContent = `${loc.nome} — ${loc.cidade}/${loc.estado}`;
       editLocalizacaoSelect.appendChild(option);
     });
+  }
+
+  async function carregarLocalizacoes() {
+    localizacoes = await api.get("/localizacao");
+    preencherSelectLocalizacoes();
   }
 
   function atualizarDadosLocalizacao() {
@@ -183,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (btnSalvarNovaLocalizacao) {
-    btnSalvarNovaLocalizacao.addEventListener("click", () => {
+    btnSalvarNovaLocalizacao.addEventListener("click", async () => {
       const nome = novaLocNome.value.trim();
       const pais = novaLocPais.value.trim();
       const estado = novaLocEstado.value.trim();
@@ -195,22 +139,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const novoId = localizacoes.reduce((max, l) => Math.max(max, l.id_localizacao), 0) + 1;
-      const novaLocalizacao = { id_localizacao: novoId, nome, pais, estado, cidade, cod_regiao };
-
-      localizacoes = [...localizacoes, novaLocalizacao];
-      saveData("noctua_localizacoes", localizacoes);
-
-      carregarLocalizacoes();
-      editLocalizacaoSelect.value = novoId;
-      atualizarDadosLocalizacao();
-
-      toggleFormNovaLocalizacao(false);
+      try {
+        const nova = await api.post("/localizacao", { nome, pais, estado, cidade, cod_regiao });
+        await carregarLocalizacoes();
+        editLocalizacaoSelect.value = nova.id_localizacao;
+        atualizarDadosLocalizacao();
+        toggleFormNovaLocalizacao(false);
+      } catch (err) {
+        alert(err.message);
+      }
     });
   }
 
-  // Componentes
-  function carregarComponentes() {
+  //  Componentes 
+  function preencherSelectComponentes() {
     if (!editCompSelect) return;
     editCompSelect.innerHTML = `<option value="">Selecione um componente</option>`;
     componentes.forEach((c) => {
@@ -219,6 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
       option.textContent = `${c.tipo} — ${c.fabricante} ${c.modelo}`;
       editCompSelect.appendChild(option);
     });
+  }
+
+  async function carregarComponentes() {
+    componentes = await api.get("/componente");
+    preencherSelectComponentes();
   }
 
   function renderEditComponentes() {
@@ -274,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
       editCompSelect.value = "";
       if (jaExiste) return;
 
-      editParametros.push({ id_parametro: Date.now(), fk_componente: id, pico_max: 100, pico_min: 0, percentual: 80 });
+      editParametros.push({ fk_componente: id, pico_max: 100, pico_min: 0, percentual: 80 });
       renderEditComponentes();
     });
   }
@@ -305,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (btnSalvarNovoComponente) {
-    btnSalvarNovoComponente.addEventListener("click", () => {
+    btnSalvarNovoComponente.addEventListener("click", async () => {
       const tipo = novoCompTipo.value.trim();
       const fabricante = novoCompFabricante.value.trim();
       const modelo = novoCompModelo.value.trim();
@@ -316,28 +263,26 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Preencha todos os campos do novo componente.");
         return;
       }
-
       if (num_serie.length !== 6) {
         alert("O número de série do componente deve ter exatamente 6 caracteres.");
         return;
       }
-
       if (!Number.isInteger(capacidade) || capacidade < 0) {
         alert("A capacidade deve ser um número inteiro maior ou igual a zero.");
         return;
       }
 
-      const novoId = componentes.reduce((max, c) => Math.max(max, c.id_componente), 0) + 1;
-      const novoComponente = { id_componente: novoId, tipo, fabricante, modelo, num_serie, capacidade };
+      try {
+        const novo = await api.post("/componente", { tipo, fabricante, modelo, num_serie, capacidade });
+        await carregarComponentes();
 
-      componentes = [...componentes, novoComponente];
-      saveData("noctua_componentes", componentes);
-      carregarComponentes();
+        editParametros.push({ fk_componente: novo.id_componente, pico_max: 100, pico_min: 0, percentual: 80 });
+        renderEditComponentes();
 
-      editParametros.push({ id_parametro: Date.now(), fk_componente: novoId, pico_max: 100, pico_min: 0, percentual: 80 });
-      renderEditComponentes();
-
-      toggleFormNovoComponente(false);
+        toggleFormNovoComponente(false);
+      } catch (err) {
+        alert(err.message);
+      }
     });
   }
 
@@ -356,29 +301,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Tabela
-  function obterLocalizacao(id) {
-    return localizacoes.find((l) => l.id_localizacao === id);
-  }
-
-  function obterComponentes(mainframe) {
-    return mainframe.parametros
-      .map((p) => componentes.find((c) => c.id_componente === p.fk_componente)?.tipo)
-      .filter(Boolean);
+  //  Tabela 
+  async function carregarMainframes() {
+    mainframes = await api.get("/mainframe");
+    renderTable();
   }
 
   function renderTable() {
     const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
     const filtered = mainframes.filter((m) => {
-      const localizacao = obterLocalizacao(m.fk_localizacao);
-      const componentesTexto = obterComponentes(m).join(", ").toLowerCase();
+      const componentesTexto = (m.componentes || "").toLowerCase();
+      const codRegiao = (m.cod_regiao || "").toLowerCase();
 
       return (
         m.hostname.toLowerCase().includes(query) ||
         m.sis_operacional.toLowerCase().includes(query) ||
         componentesTexto.includes(query) ||
-        (localizacao && localizacao.cod_regiao.toLowerCase().includes(query))
+        codRegiao.includes(query)
       );
     });
 
@@ -391,8 +331,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (emptyState) emptyState.classList.add("hidden");
 
       tableBody.innerHTML = filtered.map((m) => {
-        const localizacao = obterLocalizacao(m.fk_localizacao);
-        const componentesTexto = obterComponentes(m).join(", ");
         const acoesConfirmacao = deleteConfirmId === m.id_mainframe
           ? `<button type="button" class="btn-confirm" data-confirm-id="${m.id_mainframe}">Confirmar</button>
              <button type="button" class="btn-cancel">Cancelar</button>`
@@ -402,9 +340,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <tr>
             <td>${escapeHtml(m.hostname)}</td>
             <td style="color:#6b7280">${escapeHtml(m.sis_operacional)} ${escapeHtml(m.versao_so)}</td>
-            <td style="color:#9ca3af;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(componentesTexto)}</td>
+            <td style="color:#9ca3af;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(m.componentes)}</td>
             <td><span class="status ${STATUS_CSS[m.status] || ""}">${STATUS_NOME[m.status] || m.status}</span></td>
-            <td style="color:#9ca3af">${localizacao ? escapeHtml(localizacao.cod_regiao) : "-"}</td>
+            <td style="color:#9ca3af">${m.cod_regiao ? escapeHtml(m.cod_regiao) : "-"}</td>
             <td>
               <div class="actions">
                 <button type="button" class="btn-edit" data-id="${m.id_mainframe}">Editar</button>
@@ -429,7 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Etapas do modal
+  //  Etapas do modal 
   function showStep(step) {
     currentStep = step;
 
@@ -457,29 +395,37 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Abrir e fechar modal
-  function openModal(id) {
-    const target = mainframes.find((m) => m.id_mainframe === Number(id));
-    if (!target || !modalEdit) return;
+  async function openModal(id) {
+    if (!modalEdit) return;
 
-    editIdInput.value = target.id_mainframe;
-    editHostnameInput.value = target.hostname;
-    editFabricanteInput.value = target.fabricante;
-    editModeloInput.value = target.modelo;
-    editNumeroSerieInput.value = target.numero_serie;
-    editSoInput.value = target.sis_operacional;
-    editVersaoSoInput.value = target.versao_so;
-    editStatusSelect.value = target.status;
-    editLocalizacaoSelect.value = target.fk_localizacao;
-    atualizarDadosLocalizacao();
+    try {
+      const target = await api.get(`/mainframe/${id}`);
 
-    editParametros = target.parametros.map((p) => ({ ...p }));
-    renderEditComponentes();
+      editIdInput.value = target.id_mainframe;
+      editFkUsuario = target.fk_usuario;
+      editHostnameInput.value = target.hostname;
+      editFabricanteInput.value = target.fabricante;
+      editModeloInput.value = target.modelo;
+      editNumeroSerieInput.value = target.numero_serie;
+      editSoInput.value = target.sis_operacional;
+      editVersaoSoInput.value = target.versao_so;
+      editStatusSelect.value = target.status;
+      editLocalizacaoSelect.value = target.fk_localizacao;
+      atualizarDadosLocalizacao();
 
-    toggleFormNovaLocalizacao(false);
-    toggleFormNovoComponente(false);
+      editParametros = target.parametros.map((p) => ({
+        fk_componente: p.fk_componente, pico_max: p.pico_max, pico_min: p.pico_min, percentual: p.percentual,
+      }));
+      renderEditComponentes();
 
-    showStep(1);
-    modalEdit.classList.remove("hidden");
+      toggleFormNovaLocalizacao(false);
+      toggleFormNovoComponente(false);
+
+      showStep(1);
+      modalEdit.classList.remove("hidden");
+    } catch (err) {
+      alert(err.message);
+    }
   }
 
   function closeModal() {
@@ -489,7 +435,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Eventos da tabela
-  tableBody.addEventListener("click", (e) => {
+  tableBody.addEventListener("click", async (e) => {
     const editBtn = e.target.closest(".btn-edit");
     const askBtn = e.target.closest(".btn-delete");
     const confirmBtn = e.target.closest(".btn-confirm");
@@ -502,8 +448,12 @@ document.addEventListener("DOMContentLoaded", () => {
       renderTable();
     } else if (confirmBtn) {
       const id = Number(confirmBtn.dataset.confirmId);
-      mainframes = mainframes.filter((m) => m.id_mainframe !== id);
-      saveData("noctua_mainframes", mainframes);
+      try {
+        await api.delete(`/mainframe/${id}`);
+        mainframes = mainframes.filter((m) => m.id_mainframe !== id);
+      } catch (err) {
+        alert(err.message);
+      }
       deleteConfirmId = null;
       renderTable();
     } else if (cancelBtn) {
@@ -514,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Salvar edição
   if (formEdit) {
-    formEdit.addEventListener("submit", (e) => {
+    formEdit.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const id = Number(editIdInput.value);
@@ -531,29 +481,24 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("O número de série do mainframe deve ter exatamente 6 caracteres.");
         return;
       }
-
-      const hostnameDuplicado = mainframes.some(
-        (m) => m.id_mainframe !== id && m.hostname.toLowerCase() === hostname.toLowerCase()
-      );
-      if (hostnameDuplicado) {
-        alert("Já existe um mainframe com esse hostname.");
-        return;
-      }
-
       if (!fk_localizacao) {
         alert("Selecione uma localização.");
         return;
       }
 
-      mainframes = mainframes.map((m) => m.id_mainframe !== id ? m : {
-        ...m,
+      const corpo = {
         hostname, fabricante, modelo, numero_serie, sis_operacional, versao_so, status, fk_localizacao,
-        parametros: editParametros.map((p) => ({ ...p })),
-      });
+        fk_usuario: editFkUsuario,
+        parametros: editParametros,
+      };
 
-      saveData("noctua_mainframes", mainframes);
-      closeModal();
-      renderTable();
+      try {
+        await api.put(`/mainframe/${id}`, corpo);
+        await carregarMainframes();
+        closeModal();
+      } catch (err) {
+        alert(err.message);
+      }
     });
   }
 
@@ -563,7 +508,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (searchInput) searchInput.addEventListener("input", renderTable);
 
   // Inicialização
-  carregarLocalizacoes();
-  carregarComponentes();
-  renderTable();
+  (async function iniciar() {
+    try {
+      await Promise.all([carregarLocalizacoes(), carregarComponentes()]);
+      await carregarMainframes();
+    } catch (err) {
+      console.error(err);
+      alert("Não foi possível carregar os dados do servidor. Verifique se a API está no ar.");
+    }
+  })();
 });

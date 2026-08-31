@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOCTUA — Cadastro de Mainframe</title>
+  <link rel="stylesheet" href="/styles/mainframes.css">
+  <link rel="icon" href="/assets/icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <a href="dash-alertas.html"><img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo" /></a>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"></i>Alertas</a></li>
+      <li><a href="dash-servidores.html"><i class="fa-solid fa-server"></i>Servidores</a></li>
+      <li><a href="mainframes.html" class="active"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
+      <li><a href="#"><i class="fa-solid fa-gear"></i>Configurações</a></li>
+    </ul>
+
+    <div class="sidebar-user">
+      <a href="#">
+        <div class="user-avatar"><span>AS</span></div>
+        <div class="user-info">
+          <span class="user-name">Ana Souza</span>
+          <span class="user-role">Analista</span>
+        </div>
+      </a>
+      <a href="index.html"><i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);"></i></a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="content-center">
+      <div class="modal-card modal-edit-card">
+        <div class="modal-header">
+          <div>
+            <h2>Cadastrar mainframe</h2>
+            <p>Comece a monitorar sua infraestrutura em minutos.</p>
+          </div>
+          <a href="mainframes.html" class="btn-close-modal" title="Voltar para mainframes">&times;</a>
+        </div>
+
+        <div class="modal-steps">
+          <div class="modal-step active" data-step-indicator="1"><span>1</span><small>Localização</small></div>
+          <div class="modal-step-line"></div>
+          <div class="modal-step" data-step-indicator="2"><span>2</span><small>Mainframe</small></div>
+          <div class="modal-step-line"></div>
+          <div class="modal-step" data-step-indicator="3"><span>3</span><small>Componentes</small></div>
+        </div>
+
+        <form id="form-mainframe">
+          <input type="hidden" id="editing-id" value="" />
+
+          <!-- Etapa 1: Localização -->
+          <section class="modal-step-content active" data-step="1">
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fa-solid fa-location-dot"></i>
+                <div>
+                  <h3>Localização</h3>
+                  <span>Onde o mainframe está instalado</span>
+                </div>
+              </div>
+
+              <div class="location-select-row">
+                <div class="field">
+                  <label for="localizacao">Localização</label>
+                  <div class="select-wrap">
+                    <select id="localizacao" required>
+                      <option value="">Selecione uma localização</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="button" class="btn-add-component" id="btn-toggle-nova-localizacao"><i class="fa-solid fa-plus"></i> Nova localização</button>
+              </div>
+              <div class="form-grid">
+                <div class="field"><label for="pais">País</label><input type="text" id="pais" readonly></div>
+                <div class="field"><label for="estado">Estado</label><input type="text" id="estado" readonly></div>
+                <div class="field"><label for="cidade">Cidade</label><input type="text" id="cidade" readonly></div>
+                <div class="field"><label for="regiao">CEP</label><input type="text" id="regiao" readonly></div>
+              </div>
+
+              <div class="inline-new-form hidden" id="form-nova-localizacao">
+                <div class="form-section-title">
+                  <i class="fa-solid fa-map-pin"></i>
+                  <div>
+                    <h3>Nova localização</h3>
+                    <span>Cadastre um novo data center</span>
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="field"><label for="nova-loc-nome">Nome</label><input type="text" id="nova-loc-nome" maxlength="100"></div>
+                  <div class="field"><label for="nova-loc-pais">País</label><input type="text" id="nova-loc-pais" maxlength="100"></div>
+                  <div class="field"><label for="nova-loc-estado">Estado</label><input type="text" id="nova-loc-estado" maxlength="100"></div>
+                  <div class="field"><label for="nova-loc-cidade">Cidade</label><input type="text" id="nova-loc-cidade" maxlength="100"></div>
+                  <div class="field"><label for="nova-loc-regiao">CEP</label><input type="text" id="nova-loc-regiao" maxlength="9" placeholder="Ex: 01310-100"></div>
+                </div>
+                <div class="inline-form-actions">
+                  <button type="button" class="btn-cancel" id="btn-cancelar-nova-localizacao">Cancelar</button>
+                  <button type="button" class="btn-submit" id="btn-salvar-nova-localizacao">Salvar localização</button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <a href="mainframes.html" class="btn-cancel">Cancelar</a>
+              <button type="button" class="btn-submit btn-next" data-next="2">Próximo <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </section>
+
+          <!-- Etapa 2: Dados do mainframe -->
+          <section class="modal-step-content" data-step="2">
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fa-solid fa-server"></i>
+                <div>
+                  <h3>Dados do mainframe</h3>
+                  <span>Informações do equipamento</span>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="field"><label for="hostname">Hostname</label><input type="text" id="hostname" maxlength="100" placeholder="Ex: MF-PROD-02" required></div>
+                <div class="field"><label for="fabricante">Fabricante</label><input type="text" id="fabricante" maxlength="100" placeholder="Ex: IBM" required></div>
+                <div class="field"><label for="modelo">Modelo</label><input type="text" id="modelo" maxlength="100" placeholder="Ex: z16" required></div>
+                <div class="field"><label for="numero-serie">Número de série (6 caracteres)</label><input type="text" id="numero-serie" maxlength="6" required></div>
+                <div class="field">
+                  <label for="sistema-operacional">Sistema operacional</label>
+                  <div class="select-wrap">
+                    <select id="sistema-operacional" required>
+                      <option value="">Selecione um sistema</option>
+                      <option value="z/OS">z/OS</option>
+                      <option value="z/VM">z/VM</option>
+                      <option value="z/VSE">z/VSE</option>
+                      <option value="Linux on Z">Linux on Z</option>
+                      <option value="Linux">Linux</option>
+                      <option value="Windows">Windows</option>
+                      <option value="MacOS">MacOS</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field"><label for="versao-so">Versão do SO</label><input type="number" id="versao-so" step="0.1" min="0" required></div>
+                <div class="field">
+                  <label for="status-mainframe">Status inicial</label>
+                  <div class="select-wrap">
+                    <select id="status-mainframe" required>
+                      <option value="ativo">Ativo</option>
+                      <option value="inativo">Inativo</option>
+                      <option value="manut.">Manutenção</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn-cancel btn-prev" data-prev="1"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+              <button type="button" class="btn-submit btn-next" data-next="3">Próximo <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </section>
+
+          <!-- Etapa 3: Componentes -->
+          <section class="modal-step-content" data-step="3">
+            <div class="form-section">
+              <div class="form-section-title">
+                <i class="fa-solid fa-microchip"></i>
+                <div>
+                  <h3>Componentes</h3>
+                  <span>Componentes para monitorar</span>
+                </div>
+              </div>
+
+              <div class="component-add">
+                <div class="field">
+                  <label for="componente">Componente</label>
+                  <div class="select-wrap">
+                    <select id="componente">
+                      <option value="">Selecione para adicionar...</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="button" class="btn-add-component" id="btn-add-componente"><i class="fa-solid fa-plus"></i> Adicionar</button>
+              </div>
+
+              <button type="button" class="btn-link-add" id="btn-toggle-novo-componente"><i class="fa-solid fa-plus"></i> Cadastrar novo componente</button>
+
+              <div class="inline-new-form hidden" id="form-novo-componente">
+                <div class="form-section-title">
+                  <i class="fa-solid fa-microchip"></i>
+                  <div>
+                    <h3>Novo componente</h3>
+                    <span>Cadastre um componente que ainda não existe</span>
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="field"><label for="novo-comp-tipo">Tipo</label><input type="text" id="novo-comp-tipo" maxlength="100" placeholder="Ex: CPU"></div>
+                  <div class="field"><label for="novo-comp-fabricante">Fabricante</label><input type="text" id="novo-comp-fabricante" maxlength="100" placeholder="Ex: Intel"></div>
+                  <div class="field"><label for="novo-comp-modelo">Modelo</label><input type="text" id="novo-comp-modelo" maxlength="100"></div>
+                  <div class="field"><label for="novo-comp-serie">Nº de série (6 caracteres)</label><input type="text" id="novo-comp-serie" maxlength="6" placeholder="Ex: CPU002"></div>
+                  <div class="field"><label for="novo-comp-capacidade">Capacidade</label><input type="number" id="novo-comp-capacidade" min="0" step="1"></div>
+                </div>
+                <div class="inline-form-actions">
+                  <button type="button" class="btn-cancel" id="btn-cancelar-novo-componente">Cancelar</button>
+                  <button type="button" class="btn-submit" id="btn-salvar-novo-componente">Salvar e adicionar</button>
+                </div>
+              </div>
+
+              <div id="componentes-selecionados" class="componentes-selecionados"></div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn-cancel btn-prev" data-prev="2"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+              <button type="submit" class="btn-submit" id="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Cadastrar mainframe</button>
+            </div>
+          </section>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/cadastro-mainframe.js"></script>
+</body>
+
+</html>
