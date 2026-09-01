@@ -4,6 +4,7 @@ import routesLocalizacao from './src/routes/localizacao.js';
 import routesComponente from './src/routes/componente.js';
 import routesMainframe from './src/routes/mainframe.js';
 import routesParametro from './src/routes/parametro.js';
+import routesAuth from './src/routes/authRoutes.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -26,6 +27,7 @@ app.use('/api/localizacao', routesLocalizacao);
 app.use('/api/componente', routesComponente);
 app.use('/api/mainframe', routesMainframe);
 app.use('/api/parametro', routesParametro);
+app.use('/api/autenticacao', routesAuth);
 
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
