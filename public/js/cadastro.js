@@ -1,4 +1,6 @@
-function errorMessage(icone, titulo, descricao) {
+const { response } = require("express");
+
+function message(icone, titulo, descricao) {
     const div_content = document.querySelector('.content');
 
     const div_erro = document.createElement('div');
@@ -11,7 +13,7 @@ function errorMessage(icone, titulo, descricao) {
     icon.classList.add('icon');
     title.classList.add('title');
     desc.classList.add('desc');
-    
+
     icon.src = `${icone}`;
     title.textContent = `${titulo}`
     desc.textContent = `${descricao}`
@@ -25,6 +27,32 @@ function errorMessage(icone, titulo, descricao) {
         div_erro.style.display = 'none';
     }, 5000);
 }
+
+function emailPopup(){
+    const div_content = document.querySelector('.content');
+    const div_popup = document.createElement('div');
+
+    const icon = document.createElement('img');
+    const title = document.createElement('p');
+    const desc = document.createElement('p');
+
+    div_popup.classList.add('div_popup');
+
+    icon.classList.add('icon_popup');
+    title.classList.add('title_popup');
+    desc.classList.add('desc_popup');
+
+    icon.src = '../assets/email.svg'
+    title.textContent('Verifique sua caixa de email!')
+    desc.textContent('Para prosseguir e acessar nossos recursos, é necessário que você verifique seu email. Verifique sua caixa de email e clique em "Confirmar email" para continuar acessando os recursos da Noctua');
+
+    div_popup.appendChild(icon);
+    div_popup.appendChild(title);
+    div_popup.appendChild(desc);
+
+    div_content.appendChild(div_popup);
+}
+
 
 function cadastrar(event) {
     event.preventDefault();
@@ -50,7 +78,11 @@ function cadastrar(event) {
     })
         .then(response => response.json())
         .then(data => {
-            errorMessage(data.icon, data.mensagem, data.descricao);
+            message(data.icon, data.mensagem, data.descricao);
+
+            if(response.status == 200){
+                emailPopup();
+            }
         })
         .catch(error => {
             console.log('Erro ao cadastrar', error);

@@ -37,7 +37,7 @@ async function verificarEmail(req, res) {
         );
 
         return res.status(200).json({
-            mensagem: 'email verificado com sucesso'
+            mensagem: 'Email verificado com sucesso'
         });
 
     } catch (erro) {
