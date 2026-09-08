@@ -1,6 +1,4 @@
-const { response } = require("express");
-
-function message(icone, titulo, descricao) {
+function mensagem(icone, titulo, descricao) {
     const div_content = document.querySelector('.content');
 
     const div_erro = document.createElement('div');
@@ -32,27 +30,30 @@ function emailPopup(){
     const div_content = document.querySelector('.content');
     const div_popup = document.createElement('div');
 
+    const btn = document.createElement('button');
     const icon = document.createElement('img');
     const title = document.createElement('p');
     const desc = document.createElement('p');
 
     div_popup.classList.add('div_popup');
 
+    btn.classList.add('close_btn')
     icon.classList.add('icon_popup');
     title.classList.add('title_popup');
     desc.classList.add('desc_popup');
 
     icon.src = '../assets/email.svg'
-    title.textContent('Verifique sua caixa de email!')
-    desc.textContent('Para prosseguir e acessar nossos recursos, é necessário que você verifique seu email. Verifique sua caixa de email e clique em "Confirmar email" para continuar acessando os recursos da Noctua');
+    title.textContent = 'Verifique sua caixa de email!';
+    desc.textContent = 'Para prosseguir e acessar nossos recursos, é necessário que você verifique seu email. Verifique sua caixa de email e clique em "Confirmar email" para continuar acessando os recursos da Noctua';
+    btn.textContent = 'X';
 
     div_popup.appendChild(icon);
     div_popup.appendChild(title);
     div_popup.appendChild(desc);
+    div_popup.appendChild(btn)
 
     div_content.appendChild(div_popup);
 }
-
 
 function cadastrar(event) {
     event.preventDefault();
@@ -78,7 +79,7 @@ function cadastrar(event) {
     })
         .then(response => response.json())
         .then(data => {
-            message(data.icon, data.mensagem, data.descricao);
+            mensagem(data.icon, data.mensagem, data.descricao);
 
             if(response.status == 200){
                 emailPopup();

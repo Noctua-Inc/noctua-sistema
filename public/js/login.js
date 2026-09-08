@@ -1,5 +1,3 @@
-const { response } = require("express");
-
 function login(event) {
     event.preventDefault();
 
@@ -19,9 +17,9 @@ function login(event) {
         .then(response => response.json())
         .then(data => {
             console.log(data.mensagem);
-            message(data.icon, data.mensagem, data.descricao);
+            mensagem(data.icon, data.mensagem, data.descricao);
 
-            if (response.status == 200) {
+            if ((data.mensagem).includes('sucesso')) {
                 setTimeout(() => {
                     window.location = '/dash-alertas.html'
                 }, 2000);
