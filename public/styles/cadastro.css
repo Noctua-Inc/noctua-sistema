@@ -172,18 +172,21 @@ body {
 }
 
 .content .right-content .form form .btn-mostrar-senha {
-  background-color: none;
+  background-color: #fff;
   color: #1E293B;
   border: none;
   padding: 8px 12px;
   border-radius: 4px;
   font-size: 20px;
   cursor: pointer;
+  position: absolute;
+  right: 10px;
 }
 
 .content .right-content .form .mostrar-senha {
     display: flex;
     align-items: center;
+    position: relative;
 }
 
 .content .right-content .form .mostrar-senha input {
