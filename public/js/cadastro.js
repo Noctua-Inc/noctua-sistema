@@ -26,7 +26,7 @@ function mensagem(icone, titulo, descricao) {
     }, 5000);
 }
 
-function mostrarSenha(id_senha, id_div_olho){
+function mostrarSenha(id_senha){
     let senhaValor = document.getElementById(id_senha);
 
     if (senhaValor.type === "password") {
