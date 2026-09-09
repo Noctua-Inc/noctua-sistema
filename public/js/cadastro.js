@@ -26,6 +26,17 @@ function mensagem(icone, titulo, descricao) {
     }, 5000);
 }
 
+function mostrarSenha(id_senha){
+    let senhaValor = document.getElementById(id_senha);
+
+    if (senhaValor.type === "password") {
+        senhaValor.type = "text";
+        id_botao_mostrar_senha.innerHTML = ``
+    } else {
+        senhaValor.type = "password";
+    }
+}
+
 function emailPopup(){
     const div_content = document.querySelector('.content');
     const div_popup = document.createElement('div');
