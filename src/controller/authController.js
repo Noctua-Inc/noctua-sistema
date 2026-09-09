@@ -1,4 +1,5 @@
 import authModel from '../model/authModel.js';
+import bcrypt from 'bcrypt';
 
 class AuthController {
 
@@ -15,7 +16,6 @@ class AuthController {
                 });
             }
 
-
             const usuario = await authModel.buscarUsuario(email);
 
             if (!usuario) {
@@ -25,13 +25,14 @@ class AuthController {
                 });
             }
 
-            if (senha !== usuario.senha) {
+            const senhaValida = await bcrypt.compare(senha, usuario.senha);
+
+            if (!senhaValida) {
 
                 return res.status(401).json({
                     mensagem: 'Senha inválida'
                 });
             }
-
 
             const mainframe = await authModel.buscarMainframe(
                 hostname,
@@ -45,11 +46,9 @@ class AuthController {
                 });
             }
 
-
             const componentes = await authModel.buscarComponentes(
                 mainframe.id_mainframe
             );
-
 
             if (componentes.length === 0) {
 
@@ -57,7 +56,6 @@ class AuthController {
                     mensagem: 'Mainframe autenticado, mas não possui componentes cadastrados'
                 });
             }
-
 
             return res.status(200).json({
                 autenticado: true,
@@ -78,4 +76,4 @@ class AuthController {
     }
 }
 
-export default AuthController;;
+export default AuthController;
