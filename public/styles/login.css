@@ -143,7 +143,26 @@ body {
     margin-top: 0.2rem;
 }
 
-.content .right-content .form form button {
+.content .right-content .form form #password {
+    width: 100vw;
+}
+
+.content .right-content .form form .btn-mostrar-senha {
+  background-color: none;
+  color: #1E293B;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.content .right-content .form .mostrar-senha {
+    display: flex;
+    align-items: center;
+}
+
+.content .right-content .form form .btn-principal {
     font-family: 'Poppins', sans-serif;
     background-color: #2563EB;
     cursor: pointer;

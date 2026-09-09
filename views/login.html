@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha512-QeR2VH+lsBE5LSAe1Q5EnTBbe7XTBubt8dG93Y7gidSgdMCr8nVqKcfKAMyN96SV8KDbZVTDXChatu5G2KQGzg==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <title>Login | Noctua</title>
 </head>
 
@@ -47,13 +48,18 @@
                     <input type="email" name="email" placeholder="anasouza@empresa.com.br" required id="email">
 
                     <p>Senha</p>
-                    <input type="password" name="password" placeholder="Senha" required id="password">
+                    <div class="mostrar-senha">
+                        <input type="password" name="password" placeholder="Senha" required id="password">
+                        <button onclick="mostrarSenha('password')" class="btn-mostrar-senha">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
 
                     <!-- <div class="esqueci-senha-container">
                         <a href="esqueci_senha.html" id="esqueciSenha">Esqueci minha senha</a>
                     </div> -->
 
-                    <button>Entrar</button>
+                    <button class="btn-principal" onclick="login(event)">Entrar</button>
                 </form>
 
                 <div class="login-link">
