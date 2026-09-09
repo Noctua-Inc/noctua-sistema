@@ -26,18 +26,22 @@ function mensagem(icone, titulo, descricao) {
     }, 5000);
 }
 
-function mostrarSenha(id_senha){
+function mostrarSenha(id_senha) {
     let senhaValor = document.getElementById(id_senha);
+    const icone = event.currentTarget.querySelector('.i');
 
     if (senhaValor.type === "password") {
         senhaValor.type = "text";
-        id_botao_mostrar_senha.innerHTML = ``
+        icone.classList.remove('fa-eye');
+        icone.classList.add('fa-eye-slash');
     } else {
         senhaValor.type = "password";
+        icone.classList.remove('fa-eye-slash');
+        icone.classList.add('fa-eye');
     }
 }
 
-function emailPopup(){
+function emailPopup() {
     const div_content = document.querySelector('.content');
     const div_popup = document.createElement('div');
 
@@ -66,6 +70,16 @@ function emailPopup(){
     div_content.appendChild(div_popup);
 }
 
+document.querySelector('.content').addEventListener('click', (event) => {
+    if (event.target.classList.contains('close_btn')) {
+        document.querySelector('.div_popup').style.display = 'none';
+
+        setTimeout(() => {
+            window.location = '/login.html';
+        }, 2000);
+    }
+});
+
 function cadastrar(event) {
     event.preventDefault();
 
@@ -88,11 +102,15 @@ function cadastrar(event) {
             confirmacao_senha: confirmSenhaUsuario
         })
     })
-        .then(response => response.json())
-        .then(data => {
+        .then(res => {
+            const status = res.status;
+
+            return res.json().then(data => ({ status, data }))
+        })
+        .then(({ status, data }) => {
             mensagem(data.icon, data.mensagem, data.descricao);
 
-            if(response.status == 200){
+            if(status == 200 || status == 201){
                 emailPopup();
             }
         })
