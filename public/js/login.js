@@ -29,14 +29,3 @@ function login(event) {
             console.log('Erro ao logar', error);
         });
 }
-
-function mostrarSenha(id_senha){
-    let senhaValor = document.getElementById(id_senha);
-
-    if (senhaValor.type === "password") {
-        senhaValor.type = "text";
-        id_botao_mostrar_senha.innerHTML = ``
-    } else {
-        senhaValor.type = "password";
-    }
-}
