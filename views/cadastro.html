@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles/cadastro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha512-QeR2VH+lsBE5LSAe1Q5EnTBbe7XTBubt8dG93Y7gidSgdMCr8nVqKcfKAMyN96SV8KDbZVTDXChatu5G2KQGzg==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <title>Cadastro | Noctua</title>
 </head>
 
@@ -35,7 +36,7 @@
         <div class="right-content">
             <div class="form">
                 <a href="/" id="voltarSite"> ← Voltar ao site</a>
-                <form id="form_cadastro" onsubmit="cadastrar(event)">
+                <form id="form_cadastro">
                     <h1>Crie sua conta</h1>
                     <div class="subtitulo">
                         <p>Comece a monitorar sua infraestrutura em minutos.</p>
@@ -49,11 +50,21 @@
                     <p>CPF</p>
                     <input type="text" name="cpf" placeholder="000.000.000-00" required id="cpf">
                     <p>Senha</p>
-                    <input type="password" name="password" placeholder="Senha" required id="password">
+                    <div class="mostrar-senha">
+                        <input type="password" name="password" placeholder="Senha" required id="password">
+                        <button onclick="mostrarSenha('password')" class="btn-mostrar-senha">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+
                     <p>Confirmar senha</p>
-                    <input type="password" name="confirm_password" placeholder="Confirmar senha" required
-                        id="confirm_password">
-                    <button>Cadastrar</button>
+                    <div class="mostrar-senha">
+                        <input type="password" name="confirm_password" placeholder="Confirmar senha" required id="confirm_password">
+                        <button onclick="mostrarSenha('confirm_password')" class="btn-mostrar-senha">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    <button class="btn-principal" onclick="cadastrar(event)">Cadastrar</button>
 
                 </form>
 
