@@ -54,6 +54,7 @@ function emailPopup(){
 
     div_content.appendChild(div_popup);
 }
+emailPopup()
 
 function cadastrar(event) {
     event.preventDefault();
