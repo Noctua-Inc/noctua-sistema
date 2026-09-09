@@ -65,7 +65,16 @@ function emailPopup(){
 
     div_content.appendChild(div_popup);
 }
-emailPopup()
+
+const btn_close = document.querySelector('.close_btn').addEventListener('click', () =>{
+    const popup_div = document.querySelector('.div_popup').style.display = 'none';
+
+    alert('redirecionando...');
+    setTimeout(() => {
+
+        window.location = '/login.html'
+    }, 2000);
+})
 
 function cadastrar(event) {
     event.preventDefault();
@@ -89,13 +98,17 @@ function cadastrar(event) {
             confirmacao_senha: confirmSenhaUsuario
         })
     })
-        .then(response => response.json())
-        .then(data => {
+        .then(res => {
+            const status = res.status;
+            
+            return res.json().then(data => ({ status, data }))
+        })
+        .then(({ status, data }) => {
             mensagem(data.icon, data.mensagem, data.descricao);
 
-            if(response.status == 200){
-                emailPopup();
-            }
+            // if(status == 200 || status == 201){
+            //     emailPopup();
+            // }
         })
         .catch(error => {
             console.log('Erro ao cadastrar', error);
