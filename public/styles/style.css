@@ -716,6 +716,211 @@ body {
     width: 100%;
 }
 
+/* FALE CONOSCO */
+.fale-conosco {
+    padding: 60px 20px;
+    width: 100%;
+}
+
+.fale-conosco h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #1A1F71;
+}
+
+.fale-conosco-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+/* LADO ESQUERDO */
+.fcosco-container-esquerda {
+    flex: 1;
+    max-width: 480px;
+}
+
+.fcosco-container-esquerda h1 {
+    font-size: 2.0rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #1A1F71;
+    margin-bottom: 16px;
+}
+
+.fcosco-container-esquerda .subtitulo {
+    font-size: 1rem;
+    color: #64748b;
+    margin-bottom: 40px;
+    font-weight: 500;
+}
+
+/* Card de E-mail */
+.card-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+}
+
+.icone-email {
+    width: 44px;
+    height: 44px;
+    background-color: #f1f0fe;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icone-email i {
+    color: #2563EB;
+    font-size: 1.2rem;
+}
+
+.texto-email {
+    display: flex;
+    flex-direction: column;
+}
+
+.texto-email span {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 2px;
+}
+
+.texto-email a {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1A1F71;
+    text-decoration: none;
+}
+
+.texto-email a:hover {
+    text-decoration: underline;
+}
+
+/* LADO DIREITO */
+.fconosco-container-direita {
+    flex: 1;
+    max-width: 520px;
+}
+
+.card-formulario {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f1f5f9;
+}
+
+.card-formulario h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #1A1F71;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1A1F71;
+    margin-bottom: 8px;
+}
+
+.input-group input,
+.input-group textarea {
+    font-family: inherit;
+    width: 100%;
+    padding: 14px 16px;
+    background-color: #f8fafc;
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1A1F71;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.input-group input::placeholder {
+    color: #94a3b8;
+}
+
+.input-group textarea::placeholder {
+    color: #94a3b8;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    background-color: #ffffff;
+    border-color: #1A1F71;
+    box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+}
+
+.input-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.btn-enviar {
+    background-color: #2563EB;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-enviar:hover {
+    background-color: #1D4ED8;
+}
+
+.btn-enviar:active {
+    transform: scale(0.98);
+}
+
+.input-group input::placeholder,
+.input-group textarea::placeholder {
+    color: #94a3b8;
+    font-family: inherit;
+}
+
+
+@media (max-width: 768px) {
+    .fale-conosco-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .fcosco-container-esquerda,
+    .fconosco-container-direita {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .fcosco-container-esquerda h1 {
+        font-size: 2rem;
+    }
+}
+
 /* Footer */
 footer {
     background-color: #1A1F71;
