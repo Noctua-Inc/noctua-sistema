@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/styles/style.css">
     <link rel="icon" href="/assets/icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
@@ -54,56 +55,7 @@
                 </div>
 
                 <div class="hero-graphic-wrapper">
-                    <div class="graphic-canvas">
-                        <div class="box-center-dark"></div>
-                        <div class="line-accent-1"></div>
-                        <div class="line-accent-2"></div>
-                        <div class="line-accent-3"></div>
-                        <div class="dot-accent"></div>
-
-                        <div class="card-box card-tl"></div>
-                        <div class="card-icon card-icon-tl"></div>
-                        <div class="card-line card-line-1"></div>
-                        <div class="card-line card-line-2"></div>
-                        <div class="card-line card-line-3"></div>
-
-                        <div class="card-box card-tr"></div>
-                        <div class="card-icon card-icon-tr"></div>
-                        <div class="card-line card-line-4"></div>
-                        <div class="card-line card-line-5"></div>
-                        <div class="card-line card-line-6"></div>
-
-                        <div class="card-box card-bl"></div>
-                        <div class="card-icon card-icon-bl"></div>
-                        <div class="card-line card-line-7"></div>
-                        <div class="card-line card-line-8"></div>
-                        <div class="card-line card-line-9"></div>
-
-                        <div class="card-box card-br"></div>
-                        <div class="card-icon card-icon-br"></div>
-                        <div class="card-line card-line-10"></div>
-                        <div class="card-line card-line-11"></div>
-
-                        <div class="card-box card-ml"></div>
-                        <div class="card-icon card-icon-ml"></div>
-                        <div class="card-line card-line-12"></div>
-                        <div class="card-line card-line-13"></div>
-                        <div class="card-line card-line-14"></div>
-
-                        <div class="card-box card-mr"></div>
-                        <div class="card-icon card-icon-mr"></div>
-                        <div class="card-line card-line-15"></div>
-                        <div class="card-line card-line-16"></div>
-                        <div class="card-line card-line-17"></div>
-
-                        <div class="ring-inner"></div>
-                        <div class="ring-mid"></div>
-                        <div class="ring-outer"></div>
-
-                        <div class="badge-square-bg"></div>
-                        <div class="badge-square-mid"></div>
-                        <div class="badge-square-dot"></div>
-                    </div>
+                    <img class="hero-image" src="/assets/dashboard_img_inicio.png"/>
                 </div>
             </div>
         </section>
@@ -113,26 +65,24 @@
                 <h2>Quem é a Noctua</h2>
 
                 <div class="descricao">
-                    <p> A Noctua é uma empresa de tecnologia B2B especializada no monitoramento e na
+                    <p>
+                        A Noctua é uma empresa de tecnologia B2B especializada no monitoramento e na
                         observabilidade de mainframes e infraestruturas críticas utilizadas por empresas
                         do setor de pagamentos e bandeiras. Nascemos da necessidade de garantir visibilidade,
                         em tempo real, sobre ambientes de alta disponibilidade,
-                        onde desempenho, estabilidade e continuidade operacional são essenciais. </p>
-
-                    <p>
-                        Nossa solução permite acompanhar de forma centralizada os principais indicadores dos ambientes
-                        de mainframe, identificando gargalos, anomalias e possíveis falhas antes que impactem as
-                        operações.
-                        Transformamos dados de monitoramento em informações claras e acionáveis, contribuindo para maior
-                        disponibilidade,
-                        confiabilidade e eficiência na operação de sistemas críticos de pagamentos.
+                        onde desempenho, estabilidade e continuidade operacional são essenciais.
                     </p>
                 </div>
 
                 <div class="metricas">
 
                     <div class="metrica">
-                        <span class="valor">100%</span>
+                        <div class="card-header">
+                            <div class="icon-wrapper">
+                                <i class="fa-solid fa-server"></i>
+                            </div>
+                            <span class="valor">100%</span>
+                        </div>
                         <span class="descricao-metrica">
                             Foco em monitoramento<br>
                             de mainframes
@@ -140,7 +90,12 @@
                     </div>
 
                     <div class="metrica">
-                        <span class="valor">24/7</span>
+                        <div class="card-header">
+                            <div class="icon-wrapper">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <span class="valor">24/7</span>
+                        </div>
                         <span class="descricao-metrica">
                             Monitoramento contínuo<br>
                             da infraestrutura
@@ -148,7 +103,12 @@
                     </div>
 
                     <div class="metrica">
-                        <span class="valor">N1 → N3</span>
+                        <div class="card-header">
+                            <div class="icon-wrapper">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <span class="valor">N1 → N3</span>
+                        </div>
                         <span class="descricao-metrica">
                             Níveis de análise<br>
                             e escalonamento
@@ -159,6 +119,117 @@
 
             </div>
         </section>
+    
+        <section class="missao-valores" id="missao-valores">
+            <h2>Missão, Visão e Valores</h2>
+
+            <div class="cards">
+                <div class="card">
+                    <div class="title">
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <span>Missão</span>
+                    </div>
+                    <div class="desc">
+                        <span>Manter as transações do seu negócio sempre em movimento. Monitoramos sua infraestrutura de
+                            mainframe 24/7 para antecipar falhas, proteger a operação e garantir que cada transação
+                            chegue ao seu destino com segurança.</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="title">
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-eye"></i>
+                        </div>
+                        <span>Visão</span>
+                    </div>
+                    <div class="desc">
+                        <span>Ser o parceiro de confiança das empresas que não podem parar — reconhecidos pela robustez
+                            do nosso monitoramento e pela tranquilidade que entregamos a quem depende de infraestrutura
+                            crítica.</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="title">
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <span>Valores</span>
+                    </div>
+                    <div class="desc">
+                        <span>Estabilidade que não é acaso, mas resultado de monitoramento constante. Segurança em cada
+                            transação, escalabilidade para crescer com o seu negócio e transparência total sobre a saúde
+                            da sua infraestrutura.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="solucoes-monitoramento" id="solucoes-monitoramento">
+            <div class="header">
+                <h2>Soluções de Monitoramento</h2>
+                <p>
+                    Um portfólio completo de observabilidade para cada camada da sua infraestrutura, aplicável a
+                    qualquer setor ou escala de operação.
+                </p>
+            </div>
+
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <h3 class="card-title">Monitoramento de CPU</h3>
+                    </div>
+                    <p class="card-desc">
+                        Acompanhe uso, temperatura e throttling de processadores em todos os seus servidores com
+                        alertas em tempo real e histórico granular.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-memory"></i>
+                        </div>
+                        <h3 class="card-title">Monitoramento de RAM</h3>
+                    </div>
+                    <p class="card-desc">
+                        Detecte vazamentos de memória, picos de alocação e gargalos antes que impactem seus
+                        usuários, com dashboards por processo e container.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-network-wired"></i>
+                        </div>
+                        <h3 class="card-title">Monitoramento de Rede</h3>
+                    </div>
+                    <p class="card-desc">
+                        Mapeie o tráfego, monitore latência entre nós, detecte anomalias de pacotes e identifique
+                        gargalos de bandwidth em tempo real.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-server"></i>
+                        </div>
+                        <h3 class="card-title">Mainframe Health</h3>
+                    </div>
+                    <p class="card-desc">
+                        Monitore taxa de erros, latência de endpoints, throughput e disponibilidade de todos os
+                        seus gateways e microsserviços em um único painel.
+                    </p>
+                </div>
+            </div>
+        </section>
+
         <section class="quem-somos" id="quem-somos">
             <div class="quem-somos-container">
 
@@ -286,111 +357,7 @@
                 </div>
             </div>
         </section>
-        <section class="missao-valores" id="missao-valores">
-            <h2>Missão, Visão e Valores</h2>
-
-            <div class="cards">
-                <div class="card">
-                    <div class="title">
-                        <img src="/assets/missao.svg" alt="missao-icon">
-                        <span>Missão</span>
-                    </div>
-                    <div class="desc">
-                        <span>Manter as transações do seu negócio sempre em movimento. Monitoramos sua infraestrutura de
-                            mainframe 24/7 para antecipar falhas, proteger a operação e garantir que cada transação
-                            chegue ao seu destino com segurança.</span>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="title">
-                        <img src="/assets/visao.svg" alt="visao-icon">
-                        <span>Visão</span>
-                    </div>
-                    <div class="desc">
-                        <span>Ser o parceiro de confiança das empresas que não podem parar — reconhecidos pela robustez
-                            do nosso monitoramento e pela tranquilidade que entregamos a quem depende de infraestrutura
-                            crítica.</span>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="title">
-                        <img src="./assets/valores.svg" alt="valores-icon">
-                        <span>Valores</span>
-                    </div>
-                    <div class="desc">
-                        <span>Estabilidade que não é acaso, mas resultado de monitoramento constante. Segurança em cada
-                            transação, escalabilidade para crescer com o seu negócio e transparência total sobre a saúde
-                            da sua infraestrutura.</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="solucoes-monitoramento" id="solucoes-monitoramento">
-            <div class="header">
-                <h2>Soluções de Monitoramento</h2>
-                <p>
-                    Um portfólio completo de observabilidade para cada camada da sua infraestrutura, aplicável a
-                    qualquer setor ou escala de operação.
-                </p>
-            </div>
-
-            <div class="cards">
-                <div class="card">
-                    <div class="title">
-                        <img src="/assets/monitoramento-cpu.svg" alt=""> <br>
-                        <span>Monitoramento de CPU</span>
-                    </div>
-                    <div class="desc">
-                        <span>Acompanhe uso, temperatura e throttling de processadores em todos os seus servidores com
-                            alertas em tempo real e histórico granular.</span>
-                    </div>
-                    <div>
-                        <a class="saiba-mais">Saiba mais →</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="title">
-                        <img src="/assets/monitoramento-ram.svg" alt=""> <br>
-                        <span>Monitoramento de RAM</span>
-                    </div>
-                    <div class="desc">
-                        <span>Detecte vazamentos de memória, picos de alocação e gargalos antes que impactem seus
-                            usuários, com dashboards por processo e container.</span>
-                    </div>
-                    <div>
-                        <a class="saiba-mais">Saiba mais →</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="title">
-                        <img src="/assets/monitoramento-rede.svg" alt=""> <br>
-                        <span>Monitoramento de Rede</span>
-                    </div>
-                    <div class="desc">
-                        <span>Mapeie o tráfego, monitore latência entre nós, detecte anomalias de pacotes e identifique
-                            gargalos de bandwidth em tempo real.</span>
-                    </div>
-                    <div>
-                        <a class="saiba-mais">Saiba mais →</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="title">
-                        <img src="/assets/mainframe.svg" alt=""> <br>
-                        <span>Mainframe Health</span>
-                    </div>
-                    <div class="desc">
-                        <span>Monitore taxa de erros, latência de endpoints, throughput e disponibilidade de todos os
-                            seus gateways e microsserviços em um único painel.</span>
-                    </div>
-                    <div>
-                        <a class="saiba-mais">Saiba mais →</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+        
         <footer>
             <section class="footer-alto">
                 <div class="bloco">
