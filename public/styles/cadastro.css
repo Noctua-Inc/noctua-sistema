@@ -89,6 +89,7 @@ body {
     border-radius: 2rem;
     cursor: pointer;
     transition: 0.3s;
+    text-decoration: none;
 }
 
 /* Seção Direita (Formulário) */
