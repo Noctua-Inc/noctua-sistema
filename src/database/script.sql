@@ -88,6 +88,7 @@ CREATE TABLE parametro (
 INSERT INTO empresa (razao_social, cnpj, dominio)
 VALUES
 ('Tech Solutions LTDA', '12345678000101', 'techsolutions.com.br'),
+('São Paulo Tech School', '99765432000199', 'sptech.school'),
 ('Nexus Sistemas LTDA', '98765432000199', 'nexussistemas.com.br'),
-('Alpha Digital LTDA', '45678912000155', 'alphadigital.com.br');
-
+('Alpha Digital LTDA', '45678912000155', 'alphadigital.com.br'),
+('São Paulo Tech School', '42578909867905', 'sptech.school');
