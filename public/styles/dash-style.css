@@ -111,14 +111,14 @@
             color: #FFFFFF;
         }
 
-        .user-name {
+        #user-name {
             color: #FFFFFF;
             font-size: 13px;
             font-weight: 600;
             line-height: 1.2;
         }
 
-        .user-role {
+        #user-role {
             color: rgba(255, 255, 255, 0.50);
             font-size: 12px;
             font-weight: 300;

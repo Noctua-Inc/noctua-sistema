@@ -30,5 +30,17 @@ app.use('/api/parametro', routesParametro);
 app.use('/api/autenticacao', routesAuth);
 
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`
+
+        ##   ##    #######    #######   ########   ##   ##     ######
+        ###  ##   ##     ##  ##            ##      ##   ##    ##    ##
+        #### ##   ##     ##  ##            ##      ##   ##    ##    ##
+        ## ####   ##     ##  ##            ##      ##   ##    ########
+        ##  ###   ##     ##  ##            ##      ##   ##    ##    ##
+        ##   ##   ##     ##  ##            ##      ##   ##    ##    ##
+        ##   ##    #######    #######      ##       #####     ##    ##
+
+        
+        Servidor rodando em http://localhost:${port}
+        `);
 });

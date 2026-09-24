@@ -10,7 +10,7 @@ async function enviarEmail(email, token) {
 
     const { data, error } = await resend.emails.send({
         from: 'Autenticação de cadastro <onboarding@resend.dev>',
-        to: ['isabella.csantos@sptech.school'],
+        to: [`${email}`],
         subject: 'Verifique seu email',
         html: `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7; padding: 40px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">

@@ -48,12 +48,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnAddComponente = document.getElementById("btn-add-componente");
   const btnCloseModal = document.getElementById("btn-close-modal");
   const btnCancelModal = document.getElementById("btn-cancel-modal");
+  const formLocalizacaoRead = document.getElementById("form-grid-read");
 
   // Nova localização
   const btnToggleNovaLocalizacao = document.getElementById("btn-toggle-nova-localizacao");
+  const btnToggleEditarLocalizacao = document.getElementById("btn-toggle-editar-localizacao");
   const btnCancelarNovaLocalizacao = document.getElementById("btn-cancelar-nova-localizacao");
   const btnSalvarNovaLocalizacao = document.getElementById("btn-salvar-nova-localizacao");
   const formNovaLocalizacao = document.getElementById("form-nova-localizacao");
+  const btnDeletarLocalizacao = document.getElementById("btn-deletar");
+  const btnSalvarAlteracoes = document.getElementById("btn-atualizar");
   const novaLocNome = document.getElementById("nova-loc-nome");
   const novaLocPais = document.getElementById("nova-loc-pais");
   const novaLocEstado = document.getElementById("nova-loc-estado");
@@ -83,9 +87,84 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+function atualizarBotaoLocalizacao() {
+  if (!editLocalizacaoSelect) return;
+
+  const possuiLocalizacao = editLocalizacaoSelect.value !== "";
+
+  if (btnToggleNovaLocalizacao) {
+    btnToggleNovaLocalizacao.classList.toggle("hidden", possuiLocalizacao);
+  }
+
+  if (btnToggleEditarLocalizacao) {
+    btnToggleEditarLocalizacao.classList.toggle("hidden", !possuiLocalizacao);
+  }
+}
+
+  function toggleBtnEditar(modoEdit){
+    if (!formNovaLocalizacao) return;
+
+    if (btnSalvarNovaLocalizacao) {
+      btnSalvarNovaLocalizacao.classList.toggle("hidden", modoEdit);
+    }
+
+    if (btnSalvarAlteracoes) {
+      btnSalvarAlteracoes.classList.toggle("hidden", !modoEdit);
+    }
+  }
+
   async function carregarLocalizacoes() {
     localizacoes = await api.get("/localizacao");
     preencherSelectLocalizacoes();
+  }
+
+  if(btnDeletarLocalizacao){
+    btnDeletarLocalizacao.addEventListener("click", async () => {
+      const id = Number(editLocalizacaoSelect.value)
+
+      try {
+        await api.delete(`/localizacao/${id}`);
+
+        await carregarLocalizacoes();
+        editLocalizacaoSelect.value = "";
+        atualizarDadosLocalizacao();
+        atualizarBotaoLocalizacao();
+        esconderFormGrid();
+        toggleFormNovaLocalizacao(false);
+
+        console.log("Remoção concluída!")
+      } catch (error) {
+        console.log(error.message)
+      }
+    });
+  }
+
+  if (btnSalvarAlteracoes){
+    btnSalvarAlteracoes.addEventListener("click", async () => {
+      const nome = novaLocNome.value.trim();
+      const pais = novaLocPais.value.trim();
+      const estado = novaLocEstado.value.trim();
+      const cidade = novaLocCidade.value.trim();
+      const cod_regiao = novaLocRegiao.value.trim();
+
+      const id = Number(editLocalizacaoSelect.value);
+      try {
+        await api.put(`/localizacao/${id}`, {nome, pais, estado, cidade, cod_regiao})
+
+        await carregarLocalizacoes();
+        editLocalizacaoSelect.value = id;
+        atualizarDadosLocalizacao();
+
+        toggleFormEditarLocalizacao(false);
+        esconderFormGrid();
+
+        alert("Localização atualizada com sucesso!");
+
+      } catch (error) {
+        console.log(error.message)
+      }
+
+    });
   }
 
   function atualizarDadosLocalizacao() {
@@ -99,7 +178,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (editRegiaoInput) editRegiaoInput.value = localizacao ? localizacao.cod_regiao : "";
   }
 
-  if (editLocalizacaoSelect) editLocalizacaoSelect.addEventListener("change", atualizarDadosLocalizacao);
+  if (editLocalizacaoSelect) editLocalizacaoSelect.addEventListener("change", () => {
+    atualizarDadosLocalizacao();
+    atualizarBotaoLocalizacao();
+    esconderFormGrid();
+  });
 
   function limparFormNovaLocalizacao() {
     novaLocNome.value = "";
@@ -109,18 +192,67 @@ document.addEventListener("DOMContentLoaded", () => {
     novaLocRegiao.value = "";
   }
 
+  function preencherInputsLoc(){
+    const id = Number(editLocalizacaoSelect.value);
+
+    const localizacao = localizacoes.find(
+      (loc) => loc.id_localizacao === id
+    );
+
+    if(!localizacao) return;
+
+    novaLocPais.value = localizacao.pais;
+    novaLocNome.value = localizacao.nome;
+    novaLocEstado.value = localizacao.estado;
+    novaLocCidade.value = localizacao.cidade;
+    novaLocRegiao.value = localizacao.cod_regiao;
+
+  }
+
   function toggleFormNovaLocalizacao(mostrar) {
     if (!formNovaLocalizacao) return;
     formNovaLocalizacao.classList.toggle("hidden", !mostrar);
     if (mostrar) limparFormNovaLocalizacao();
   }
 
-  if (btnToggleNovaLocalizacao) {
-    btnToggleNovaLocalizacao.addEventListener("click", () => {
-      const estaVisivel = !formNovaLocalizacao.classList.contains("hidden");
-      toggleFormNovaLocalizacao(!estaVisivel);
-    });
+  function toggleFormEditarLocalizacao(mostrar){
+    if (!formNovaLocalizacao) return;
+    formNovaLocalizacao.classList.toggle("hidden", !mostrar);
+    if(mostrar) preencherInputsLoc();
   }
+
+  function esconderFormGrid(){
+    if(!formLocalizacaoRead) return;
+
+    const possuiLocalizacao = editLocalizacaoSelect.value !== "";
+
+    formLocalizacaoRead.classList.toggle("hidden", !possuiLocalizacao)
+    
+  }
+
+if (btnToggleNovaLocalizacao) {
+  btnToggleNovaLocalizacao.addEventListener("click", () => {
+    const estaVisivel = !formNovaLocalizacao.classList.contains("hidden");
+
+    if (!estaVisivel) {
+      toggleBtnEditar(false);  
+    }
+
+    toggleFormNovaLocalizacao(!estaVisivel);
+  });
+}
+
+if (btnToggleEditarLocalizacao) {
+  btnToggleEditarLocalizacao.addEventListener("click", () => {
+    const estaVisivel = !formNovaLocalizacao.classList.contains("hidden");
+
+    if (!estaVisivel) {
+      toggleBtnEditar(true);
+    }
+
+    toggleFormEditarLocalizacao(!estaVisivel);
+  });
+}
 
   if (btnCancelarNovaLocalizacao) {
     btnCancelarNovaLocalizacao.addEventListener("click", () => toggleFormNovaLocalizacao(false));
@@ -149,6 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert(err.message);
       }
     });
+
   }
 
   //  Componentes 
@@ -300,7 +433,6 @@ document.addEventListener("DOMContentLoaded", () => {
       editParametros[Number(input.dataset.index)][input.dataset.field] = Number(input.value);
     });
   }
-
   //  Tabela 
   async function carregarMainframes() {
     mainframes = await api.get("/mainframe");
@@ -412,6 +544,8 @@ document.addEventListener("DOMContentLoaded", () => {
       editStatusSelect.value = target.status;
       editLocalizacaoSelect.value = target.fk_localizacao;
       atualizarDadosLocalizacao();
+      atualizarBotaoLocalizacao();
+      esconderFormGrid();
 
       editParametros = target.parametros.map((p) => ({
         fk_componente: p.fk_componente, pico_max: p.pico_max, pico_min: p.pico_min, percentual: p.percentual,
@@ -512,6 +646,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await Promise.all([carregarLocalizacoes(), carregarComponentes()]);
       await carregarMainframes();
+      //await carregarUsuario();
     } catch (err) {
       console.error(err);
       alert("Não foi possível carregar os dados do servidor. Verifique se a API está no ar.");

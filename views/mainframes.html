@@ -30,8 +30,8 @@
       <a href="#">
         <div class="user-avatar"><span>AS</span></div>
         <div class="user-info">
-          <span class="user-name">Ana Souza</span>
-          <span class="user-role">Analista</span>
+          <span id="user-name">Ana Souza</span>
+          <span id="user-role">Analista</span>
         </div>
       </a>
       <a href="index.html"><i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);"></i></a>
@@ -117,10 +117,12 @@
                   </select>
                 </div>
               </div>
+              <button type="button" class="btn-add-component hidden" id="btn-toggle-editar-localizacao"><i
+                  class="fa-solid fa-pencil"></i> Editar localização</button>
               <button type="button" class="btn-add-component" id="btn-toggle-nova-localizacao"><i
                   class="fa-solid fa-plus"></i> Nova localização</button>
             </div>
-            <div class="form-grid">
+            <div class="form-grid hidden" id="form-grid-read">
               <div class="field"><label for="edit-pais">País</label><input type="text" id="edit-pais" readonly></div>
               <div class="field"><label for="edit-estado">Estado</label><input type="text" id="edit-estado" readonly>
               </div>
@@ -151,7 +153,9 @@
               </div>
               <div class="inline-form-actions">
                 <button type="button" class="btn-cancel" id="btn-cancelar-nova-localizacao">Cancelar</button>
+                <button type="button" class="btn-delet" id="btn-deletar">Deletar</button>
                 <button type="button" class="btn-submit" id="btn-salvar-nova-localizacao">Salvar localização</button>
+                <button type="button" class="btn-submit hidden" id="btn-atualizar">Editar Localização</button>
               </div>
             </div>
           </div>
