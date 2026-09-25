@@ -1,7 +1,7 @@
 :root {
             --sidebar-bg: #1b1c57;
             --sidebar-active: #2a2c7a;
-            --main-bg: #f4f6f9; /* Fundo geral um pouco mais claro para destacar os painéis */
+            --main-bg: #f4f6f9; 
             --panel-bg: #d3d9e2;
             --card-bg: #ffffff;
             --selected-bg: #d4e2f7;
@@ -80,7 +80,7 @@
         .menu-items li a.active {
             background-color: var(--sidebar-active);
             color: #ffffff;
-            border-left-color: #fbbf24; /* Destaque amarelo */
+            border-left-color: #fbbf24; 
         }
 
         .menu-items i {
@@ -154,7 +154,7 @@
 
         .users-column {
             flex: 1;
-            overflow: hidden; /* Para permitir scroll interno */
+            overflow: hidden; 
         }
 
         .roles-column {
@@ -173,10 +173,9 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            padding-right: 8px; /* Espaço para a scrollbar */
+            padding-right: 8px; 
         }
 
-        /* Custom Scrollbar */
         .scrollable-area::-webkit-scrollbar {
             width: 6px;
         }
@@ -198,6 +197,12 @@
             font-size: 13px;
             color: #4a5568;
             border: 2px solid transparent;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover:not(.selected) {
+            border-color: #cbd5e1;
         }
 
         .card.selected {
@@ -338,10 +343,10 @@
         @media (max-width: 1024px) {
             .main-content {
                 flex-direction: column;
-                overflow-y: auto; /* Permite rolar a página inteira se necessário */
+                overflow-y: auto; 
             }
             .users-column, .roles-column {
-                height: 600px; /* Altura fixa para não achatar em telas menores */
+                height: 600px; 
                 flex: none;
             }
         }
@@ -371,14 +376,14 @@
             .menu-items {
                 flex-direction: row;
                 padding: 0;
-                overflow-x: auto; /* Menu horizontal rolável no mobile */
+                overflow-x: auto;
                 flex: 1;
                 margin: 0 16px;
-                scrollbar-width: none; /* Oculta scrollbar no Firefox */
+                scrollbar-width: none; 
             }
             
             .menu-items::-webkit-scrollbar {
-                display: none; /* Oculta scrollbar no Chrome/Safari */
+                display: none; 
             }
 
             .menu-items li a {
@@ -395,7 +400,7 @@
             }
 
             .menu-items li a span {
-                display: none; /* Oculta texto, mostra só ícones no mobile para poupar espaço */
+                display: none;
             }
 
             .user-profile {
@@ -405,7 +410,7 @@
             }
             
             .user-info-text {
-                display: none; /* Oculta nome no mobile */
+                display: none;
             }
 
             .main-content {
