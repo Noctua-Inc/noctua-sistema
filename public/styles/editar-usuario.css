@@ -1,0 +1,77 @@
+.popup-editar {
+    position: absolute;
+    top: 30%;
+    left: 25%;
+
+    background-color: #E2E8F0;
+    border: 5px solid #2563EB;
+    border-radius: 15px;
+    z-index: 100;
+
+    height: 50%;
+    width: 55%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+
+    padding: 2rem;
+}
+
+.popup-editar .titulo {
+    font-size: 22px;
+    color: #1A1F71;
+}
+
+.popup-editar form {
+    display: flex;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    gap: 2rem;
+    width: 80%;
+}
+
+.popup-editar form .input-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-editar form .input-form label {
+    color: 1E293B;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.popup-editar form .input-form input {
+    font-size: 16px;
+    border-radius: 15px;
+
+    width: 350px;
+    height: 40px;
+}
+
+.popup-editar .sessao-butoes {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.popup-editar .sessao-butoes .botao {
+    width: 25%;
+    height: 160%;
+    border-radius: 15px;
+    color: #FFF;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.5s;
+}
+
+.popup-editar .botao:hover {transform: scale(1.05);}
+
+.popup-editar .atualizar-conta {background-color: #2563EB;}
+.popup-editar .atualizar-conta:hover {background-color: rgba(37, 99, 235, 0.8);}
+
+.popup-editar .deletar-conta {background-color: #DC2626;}
+.popup-editar .deletar-conta:hover {background-color: rgba(220, 38, 38, 0.8);}

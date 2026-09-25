@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="../public/styles/dash-style.css">
+    <link rel="stylesheet" href="../public/styles/editar-usuario.css">
     <link rel="icon" href="/assets/icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -275,6 +276,66 @@
             </section>
         </main>
     </div>
+
+  <div class="popup-editar">
+    <h3 class="titulo">
+        Atualize as suas informações
+    </h3>
+
+    <form>
+        <div class="input-form">
+            <label for="ipt_nome_completo">
+                Nome Completo
+            </label>
+            <input 
+            type="text" 
+            id="ipt_nome_completo"
+            value="Ana Souza">
+        </div>
+
+        <div class="input-form">
+            <label for="ipt_email_corporativo">
+                E-mail Corporativo
+            </label>
+            <input 
+            type="email" 
+            id="ipt_email_corporativo"
+            value="ana@empresa.com.br">
+        </div>
+
+        <div class="input-form">
+            <label for="ipt_redefinir_senha">
+                Redefinir Senha
+            </label>
+            <input 
+            type="password" 
+            id="ipt_redefinir_senha"
+            value="">
+        </div>
+
+        <div class="input-form">
+            <label for="ipt_confirmar_senha">
+                Confirmar Senha
+            </label>
+            <input 
+            type="password" 
+            id="ipt_confirmar_senha"
+            value="">
+        </div>
+    </form>
+
+    <div class="sessao-butoes">
+        <button class="botao atualizar-conta">
+            Atualizar Informações
+        </button>
+
+        <button class="botao deletar-conta">
+            Deletar Conta
+        </button>
+    </div>
+
+  </div>
+
 </body>
 
 </html>
