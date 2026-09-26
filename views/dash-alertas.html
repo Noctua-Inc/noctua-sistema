@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="../public/styles/dash-style.css">
+    <link rel="stylesheet" href="../public/styles/editar-usuario.css">
     <link rel="icon" href="/assets/icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -36,7 +37,7 @@
                 <div class="user-avatar">
                     <span>AS</span>
                 </div>
-                <div class="user-info">
+                <div class="user-info" onclick="abrirEditarUsuario()"ss>
                     <span class="user-name">Ana Souza</span>
                     <span class="user-role">Analista</span>
                 </div>
@@ -48,7 +49,7 @@
     </aside>
 
     <!-- wrapper rolagem -->
-    <div class="main-wrapper">
+    <div class="main-wrapper" onclick="fecharEditarUsuario()" id="container_main">
 
 
         <main class="content">
@@ -143,12 +144,11 @@
                     </table>
                 </div>
             </section>
-
-
-
-
-        </main>
+        </main>   
     </div>
+    <div id="editar-usuario" style="display: none;"></div>
+
+    <script src="../public/js/editar-usuario.js"></script>
 </body>
 
 </html>

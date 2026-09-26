@@ -37,7 +37,7 @@
                 <div class="user-avatar">
                     <span>AS</span>
                 </div>
-                <div class="user-info">
+                <div class="user-info" onclick="abrirEditarUsuario()">
                     <span class="user-name">Ana Souza</span>
                     <span class="user-role">Analista</span>
                 </div>
@@ -49,7 +49,7 @@
     </aside>
 
     <!-- wrapper rolagem -->
-    <div class="main-wrapper">
+    <div class="main-wrapper" onclick="fecharEditarUsuario()" id="container_main">
 
         <header class="header">
             <h1 class="header-title">Visão Geral</h1>
@@ -277,65 +277,9 @@
         </main>
     </div>
 
-  <div class="popup-editar">
-    <h3 class="titulo">
-        Atualize as suas informações
-    </h3>
+    <div id="editar-usuario" style="display: none;"></div>
 
-    <form>
-        <div class="input-form">
-            <label for="ipt_nome_completo">
-                Nome Completo
-            </label>
-            <input 
-            type="text" 
-            id="ipt_nome_completo"
-            value="Ana Souza">
-        </div>
-
-        <div class="input-form">
-            <label for="ipt_email_corporativo">
-                E-mail Corporativo
-            </label>
-            <input 
-            type="email" 
-            id="ipt_email_corporativo"
-            value="ana@empresa.com.br">
-        </div>
-
-        <div class="input-form">
-            <label for="ipt_redefinir_senha">
-                Redefinir Senha
-            </label>
-            <input 
-            type="password" 
-            id="ipt_redefinir_senha"
-            value="">
-        </div>
-
-        <div class="input-form">
-            <label for="ipt_confirmar_senha">
-                Confirmar Senha
-            </label>
-            <input 
-            type="password" 
-            id="ipt_confirmar_senha"
-            value="">
-        </div>
-    </form>
-
-    <div class="sessao-butoes">
-        <button class="botao atualizar-conta">
-            Atualizar Informações
-        </button>
-
-        <button class="botao deletar-conta">
-            Deletar Conta
-        </button>
-    </div>
-
-  </div>
-
+    <script src="../public/js/editar-usuario.js"></script>
 </body>
 
 </html>

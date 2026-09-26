@@ -18,6 +18,14 @@
     padding: 2rem;
 }
 
+.popup-editar .fechar {
+    align-self: flex-end;
+    font-size: 200%;
+    font-weight: 800;
+    cursor: pointer;
+    margin-bottom: -6%;
+}
+
 .popup-editar .titulo {
     font-size: 22px;
     color: #1A1F71;

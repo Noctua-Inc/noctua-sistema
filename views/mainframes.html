@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NOCTUA — Mainframes</title>
   <link rel="stylesheet" href="../public/styles/mainframes.css">
+    <link rel="stylesheet" href="../public/styles/editar-usuario.css">
   <link rel="icon" href="/assets/icon.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -29,7 +30,7 @@
     <div class="sidebar-user">
       <a href="#">
         <div class="user-avatar"><span>AS</span></div>
-        <div class="user-info">
+        <div class="user-info" onclick="abrirEditarUsuario()">
           <span class="user-name">Ana Souza</span>
           <span class="user-role">Analista</span>
         </div>
@@ -38,7 +39,7 @@
     </div>
   </aside>
 
-  <main class="main">
+  <main class="main" onclick="fecharEditarUsuario()" id="container_main">
     <header class="action-bar">
       <div class="action-bar-left">
         <h1>Mainframes</h1>
@@ -78,7 +79,7 @@
   </main>
 
   <!-- Modal de Edição -->
-  <div class="modal-overlay hidden" id="modal-edit">
+  <div class="modal-overlay hidden" id="modal-edit" onclick="fecharEditarUsuario()">
     <div class="modal-card modal-edit-card">
       <div class="modal-header">
         <div>
@@ -269,8 +270,11 @@
     </div>
   </div>
 
+  <div id="editar-usuario" style="display: none;"></div>
+
   <script src="/js/api.js"></script>
   <script src="/js/mainframe.js"></script>
+  <script src="../public/js/editar-usuario.js"></script>
 </body>
 
 </html>
