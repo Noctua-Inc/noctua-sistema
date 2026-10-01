@@ -17,25 +17,30 @@
 <body>
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <a href="dash-alertas.html"><img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo" /></a>
+      <a href="dash-alertas.html">
+        <img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo">
+      </a>
     </div>
 
     <ul class="sidebar-menu">
       <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"></i>Alertas</a></li>
       <li><a href="dash-servidores.html"><i class="fa-solid fa-server"></i>Servidores</a></li>
-      <li><a href="#" class="active"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
-      <li><a href="#"><i class="fa-solid fa-gear"></i>Configurações</a></li>
+      <li><a href="mainframes.html" class="active"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
+      <li><a href="cargos.html"><i class="fa-solid fa-user-tag"></i>Cargos</a></li>
+      <li><a href="cadastro-func.html"><i class="fa-solid fa-users"></i>Usuários</a></li>
     </ul>
 
     <div class="sidebar-user">
-      <a href="#">
+      <a href="#" onclick="abrirEditarUsuario()">
         <div class="user-avatar"><span>AS</span></div>
-        <div class="user-info" onclick="abrirEditarUsuario()">
+        <div class="user-info">
           <span class="user-name">Ana Souza</span>
           <span class="user-role">Analista</span>
         </div>
       </a>
-      <a href="index.html"><i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);"></i></a>
+      <a href="index.html" aria-label="Sair">
+        <i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);"></i>
+      </a>
     </div>
   </aside>
 
@@ -278,7 +283,7 @@
 
   <script src="/js/api.js"></script>
   <script src="/js/mainframe.js"></script>
-  <script src="../public/js/editar-usuario.js"></script>
+  <script src="/js/editar-usuario.js"></script>
 </body>
 
 </html>
