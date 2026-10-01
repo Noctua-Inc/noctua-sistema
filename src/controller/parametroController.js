@@ -1,16 +1,16 @@
 import parametroModel from '../model/parametroModel.js';
 
 function validar(body) {
-  const { fk_mainframe, fk_componente } = body;
-  if (!fk_mainframe || !fk_componente) {
-    return 'Os campos fk_mainframe e fk_componente são obrigatórios.';
+  const { id_mainframe, id_componente } = body;
+  if (!id_mainframe || !id_componente) {
+    return 'Os campos id_mainframe e id_componente são obrigatórios.';
   }
   return null;
 }
 
 function tratarErroBanco(err, res, mensagemPadrao) {
   if (err.code === 'ER_NO_REFERENCED_ROW_2' || err.code === 'ER_NO_REFERENCED_ROW') {
-    return res.status(400).json({ erro: 'fk_mainframe ou fk_componente inválido.' });
+    return res.status(400).json({ erro: 'id_mainframe ou id_componente inválido.' });
   }
   console.error(err);
   return res.status(500).json({ erro: mensagemPadrao });
@@ -18,7 +18,7 @@ function tratarErroBanco(err, res, mensagemPadrao) {
 
 async function listar(req, res) {
   try {
-    const parametros = await parametroModel.listar(req.query.fk_mainframe);
+    const parametros = await parametroModel.listar(req.query.id_mainframe);
     res.json(parametros);
   } catch (err) {
     console.error(err);

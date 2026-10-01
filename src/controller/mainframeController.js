@@ -1,18 +1,18 @@
 import mainframeModel from '../model/mainframeModel.js';
 import parametroModel from '../model/parametroModel.js';
 
-const STATUS_VALIDOS = ['ativo', 'inativo', 'manut.'];
+const STATUS_VALIDOS = ['ativo', 'inativo', 'manutenção'];
 
 function validar(body) {
   const {
-    hostname, fabricante, modelo, numero_serie, status,
-    sis_operacional, versao_so, fk_usuario, fk_localizacao,
+    hostname, modelo, numero_serie, status,
+    sis_operacional, versao_so, fk_empresa, fk_localizacao,
   } = body;
 
-  if (!hostname || !fabricante || !modelo || !numero_serie || !status ||
+  if (!hostname || !modelo || !numero_serie || !status ||
       !sis_operacional || versao_so === undefined || versao_so === '' ||
-      !fk_usuario || !fk_localizacao) {
-    return 'Os campos hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_usuario e fk_localizacao são obrigatórios.';
+      !fk_empresa || !fk_localizacao) {
+    return 'Os campos hostname, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa e fk_localizacao são obrigatórios.';
   }
   if (String(numero_serie).length !== 6) {
     return 'O número de série deve ter exatamente 6 caracteres.';
