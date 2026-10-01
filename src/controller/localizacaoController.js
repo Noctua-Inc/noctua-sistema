@@ -1,13 +1,13 @@
 import localizacaoModel from '../model/localizacaoModel.js';
 
 function validar(body) {
-  const { nome, pais, estado, cidade, cod_regiao } = body;
+  const { nome, estado, cidade, cep } = body;
 
-  if (!nome || !pais || !estado || !cidade || !cod_regiao) {
-    return 'Os campos nome, pais, estado, cidade e cod_regiao (CEP) são obrigatórios.';
+  if (!nome || !pais || !estado || !cidade || !cep) {
+    return 'Os campos nome, pais, estado, cidade e cod_regiao (cep) são obrigatórios.';
   }
-  if (String(cod_regiao).length > 20) {
-    return 'O CEP deve ter no máximo 20 caracteres.';
+  if (String(cep).length !== 20) {
+    return 'O CEP deve ter 8 caracteres.';
   }
   return null;
 }

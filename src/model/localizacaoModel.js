@@ -13,18 +13,18 @@ async function buscarPorId(id) {
   return rows[0] || null;
 }
 
-async function criar({ nome, pais, estado, cidade, cod_regiao }) {
+async function criar({ nome, estado, cidade, cep }) {
   const [result] = await pool.execute(
-    'INSERT INTO localizacao (nome, pais, estado, cidade, cod_regiao) VALUES (?, ?, ?, ?, ?)',
-    [nome, pais, estado, cidade, cod_regiao]
+    'INSERT INTO localizacao (nome, estado, cidade, cod_regiao) VALUES (?, ?, ?, ?)',
+    [nome, estado, cidade, cep]
   );
   return result.insertId;
 }
 
-async function atualizar(id, { nome, pais, estado, cidade, cod_regiao }) {
+async function atualizar(id, { nome, estado, cidade, cep }) {
   const [result] = await pool.execute(
-    'UPDATE localizacao SET nome = ?, pais = ?, estado = ?, cidade = ?, cod_regiao = ? WHERE id_localizacao = ?',
-    [nome, pais, estado, cidade, cod_regiao, id]
+    'UPDATE localizacao SET nome = ?, estado = ?, cidade = ?, cod_regiao = ? WHERE id_localizacao = ?',
+    [nome, estado, cidade, cep, id]
   );
   return result.affectedRows;
 }

@@ -4,15 +4,25 @@ import parametroModel from './parametroModel.js';
 async function listar() {
   const [rows] = await pool.query(`
     SELECT
-      m.*,
-      l.nome AS localizacao_nome, l.pais, l.estado, l.cidade, l.cod_regiao,
-      GROUP_CONCAT(DISTINCT c.tipo ORDER BY c.tipo SEPARATOR ', ') AS componentes
+        m.*,
+        l.nome AS localizacao_nome,
+        l.estado,
+        l.cidade,
+        l.cep,
+        GROUP_CONCAT(
+            DISTINCT c.tipo
+            ORDER BY c.tipo
+            SEPARATOR ', '
+        ) AS componentes
     FROM mainframe m
-    LEFT JOIN localizacao l ON l.id_localizacao = m.fk_localizacao
-    LEFT JOIN parametro p ON p.fk_mainframe = m.id_mainframe
-    LEFT JOIN componente c ON c.id_componente = p.fk_componente
+    LEFT JOIN localizacao l
+        ON l.id_localizacao = m.fk_localizacao
+    LEFT JOIN parametro p
+        ON p.id_mainframe = m.id_mainframe
+    LEFT JOIN componente c
+        ON c.id_componente = p.id_componente
     GROUP BY m.id_mainframe
-    ORDER BY m.hostname
+    ORDER BY m.hostname;
   `);
   return rows;
 }
@@ -27,8 +37,8 @@ async function buscarPorId(id) {
 
 async function criar(dados) {
   const {
-    hostname, fabricante, modelo, numero_serie, status,
-    sis_operacional, versao_so, fk_usuario, fk_localizacao,
+    hostname, modelo, numero_serie, status,
+    sis_operacional, versao_so, fk_empresa, fk_localizacao,
     parametros = [],
   } = dados;
 
@@ -38,9 +48,9 @@ async function criar(dados) {
 
     const [result] = await conn.execute(
       `INSERT INTO mainframe
-        (hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_usuario, fk_localizacao)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_usuario, fk_localizacao]
+        (hostname, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [hostname, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao]
     );
 
     const id_mainframe = result.insertId;
@@ -61,8 +71,8 @@ async function criar(dados) {
 
 async function atualizar(id, dados) {
   const {
-    hostname, fabricante, modelo, numero_serie, status,
-    sis_operacional, versao_so, fk_usuario, fk_localizacao,
+    hostname, modelo, numero_serie, status,
+    sis_operacional, versao_so, fk_empresa, fk_localizacao,
     parametros = [],
   } = dados;
 
@@ -72,10 +82,10 @@ async function atualizar(id, dados) {
 
     const [result] = await conn.execute(
       `UPDATE mainframe SET
-        hostname = ?, fabricante = ?, modelo = ?, numero_serie = ?, status = ?,
-        sis_operacional = ?, versao_so = ?, fk_usuario = ?, fk_localizacao = ?
+        hostname = ?, modelo = ?, numero_serie = ?, status = ?,
+        sis_operacional = ?, versao_so = ?, fk_empresa = ?, fk_localizacao = ?
        WHERE id_mainframe = ?`,
-      [hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_usuario, fk_localizacao, id]
+      [hostname, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao, id]
     );
 
     if (result.affectedRows === 0) {
@@ -86,7 +96,7 @@ async function atualizar(id, dados) {
     await parametroModel.removerPorMainframeComConexao(conn, id);
 
     for (const p of parametros) {
-      await parametroModel.criarComConexao(conn, { ...p, fk_mainframe: id });
+      await parametroModel.criarComConexao(conn, { ...p, id_mainframe: id });
     }
 
     await conn.commit();
