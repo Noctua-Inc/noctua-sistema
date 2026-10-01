@@ -1,169 +1,145 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Noctua</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/styles/cadastro-func.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações - Funcionários</title>
+  <link rel="stylesheet" href="/styles/cadastro-func.css">
+  <link rel="stylesheet" href="/styles/editar-usuario.css">
+  <link rel="icon" href="/assets/icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
+
 <body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <a href="dash-alertas.html">
+        <img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo">
+      </a>
+    </div>
 
-    <aside class="sidebar">
-        <div style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-            <div class="logo-area">
-                <i class="fa-solid fa-network-wired"></i>
-                <span>Noctua</span>
-            </div>
+    <ul class="sidebar-menu">
+      <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"></i>Alertas</a></li>
+      <li><a href="dash-servidores.html"><i class="fa-solid fa-server"></i>Servidores</a></li>
+      <li><a href="mainframes.html"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
+      <li><a href="cargos.html"><i class="fa-solid fa-user-tag"></i>Cargos</a></li>
+      <li><a href="cadastro-func.html"class="active"><i class="fa-solid fa-users"></i>Usuários</a></li>
+    </ul>
 
-            <nav>
-                <ul class="menu-items">
-                    <li>
-                        <a href="#" class="active">
-                            <i class="fa-solid fa-border-all"></i>
-                            <span>Visão Geral</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa-solid fa-server"></i>
-                            <span>Servidores</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa-solid fa-code-branch"></i>
-                            <span>API Gateways</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa-regular fa-bell"></i>
-                            <span>Alertas</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa-regular fa-file-alt"></i>
-                            <span>Relatórios</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa-solid fa-gear"></i>
-                            <span>Configurações</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+    <div class="sidebar-user">
+      <a href="#">
+        <div class="user-avatar"><span>AS</span></div>
+        <div class="user-info" onclick="abrirEditarUsuario()">
+          <span class="user-name">Ana Souza</span>
+          <span class="user-role">Analista</span>
+        </div>
+      </a>
+      <a href="index.html" aria-label="Sair">
+        <i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);"></i>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main" id="container_main" onclick="fecharEditarUsuario()">
+    <section class="panel users-column" aria-label="Lista de usuários">
+      <h1 class="panel-title">Usuários</h1>
+
+      <div class="scrollable-area">
+        <div class="card">
+          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
+          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
+          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
+          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
+          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
         </div>
 
-        <div class="user-profile">
-            <div class="avatar">AS</div>
-            <div class="user-info-text">
-                <span class="user-name">Ana Souza</span>
-                <span class="user-role">Admin</span>
-            </div>
+        <div class="card selected">
+          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Carlos</span></div>
+          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">carlosdino15@carlos.eduardo</span></div>
+          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Lixosos</span></div>
+          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">Empresa Dinossauro 67</span></div>
+          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">(67) 67676-6767</span></div>
         </div>
-    </aside>
 
-    <main class="main-content">
-        
-        <section class="panel users-column">
-            <h2 class="panel-title">Usuários</h2>
-            
-            <div class="scrollable-area">
-                
-                <div class="card">
-                    <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-                    <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-                    <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-                    <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-                    <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-                </div>
+        <div class="card">
+          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
+          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
+          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
+          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
+          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
+        </div>
 
-                <div class="card selected">
-                    <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Carlos</span></div>
-                    <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">carlosdino15@carlos.eduardo</span></div>
-                    <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Lixosos</span></div>
-                    <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">Empresa Dinossauro 67</span></div>
-                    <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">(67) 67676-6767</span></div>
-                </div>
+        <div class="card">
+          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
+          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
+          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
+          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
+          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
+        </div>
 
-                <div class="card">
-                    <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-                    <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-                    <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-                    <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-                    <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-                </div>
+        <div class="card">
+          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
+          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
+          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
+          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
+          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
+        </div>
 
-                <div class="card">
-                    <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-                    <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-                    <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-                    <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-                    <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-                    <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-                    <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-                    <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-                    <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-                    <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-                    <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-                    <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-                    <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-                </div>
+        <div class="card">
+          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
+          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
+          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
+          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
+          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
+        </div>
+      </div>
+    </section>
 
+    <section class="roles-column" aria-label="Atribuição de cargos">
+      <div class="panel roles-panel">
+        <h2 class="panel-title">Atribuir Cargos</h2>
+
+        <div class="roles-panel-inner">
+          <div class="user-header-info">
+            <div class="info-line">
+              <span class="card-label">USUARIO:</span>
+              <span>Carlos</span>
             </div>
-        </section>
-
-        <section class="roles-column">
-            
-            <div class="panel" style="flex: 1; padding: 24px; display: flex; flex-direction: column;">
-                <h2 class="panel-title">Atribuir Cargos</h2>
-                
-                <div class="roles-panel-inner">
-                    <div class="user-header-info">
-                        <div class="info-line">
-                            <span class="card-label">USUARIO:</span> Carlos
-                        </div>
-                        <div class="info-line">
-                            <span class="card-label" style="text-transform: none;">Empresa:</span> Empresa Dinossauro 67
-                        </div>
-                        <div class="info-line">
-                            <span class="card-label">EMAIL:</span> carlosdino15@carlos.eduardo
-                        </div>
-                    </div>
-
-                    <hr class="divider">
-
-                    <div class="scrollable-area roles-list">
-                        <div class="role-card selected">Lixosos</div>
-                        <div class="role-card">CARGO X</div>
-                        <div class="role-card">CARGO X</div>
-                        <div class="role-card">CARGO X</div>
-                        <div class="role-card">CARGO X</div>
-                        <div class="role-card">CARGO X</div>
-                    </div>
-                </div>
+            <div class="info-line">
+              <span class="card-label">EMPRESA:</span>
+              <span>Empresa Dinossauro 67</span>
             </div>
-
-            <div class="action-buttons">
-                <button class="btn btn-delete">Deletar usuário</button>
-                <button class="btn btn-update">Atualizar Usuário</button>
+            <div class="info-line">
+              <span class="card-label">EMAIL:</span>
+              <span>carlosdino15@carlos.eduardo</span>
             </div>
+          </div>
 
-        </section>
+          <hr class="divider">
 
-    </main>
+          <div class="scrollable-area roles-list">
+            <div class="role-card selected">Lixosos</div>
+            <div class="role-card">CARGO X</div>
+            <div class="role-card">CARGO X</div>
+            <div class="role-card">CARGO X</div>
+            <div class="role-card">CARGO X</div>
+            <div class="role-card">CARGO X</div>
+          </div>
+        </div>
+      </div>
 
-    <script src="../public/js/cadastro-func.js"></script>
+      <div class="action-buttons">
+        <button type="button" class="btn btn-delete">Deletar usuário</button>
+        <button type="button" class="btn btn-update">Atualizar usuário</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="editar-usuario" style="display: none;"></div>
+  <script src="/js/editar-usuario.js"></script>
+  <script src="/js/cadastro-func.js"></script>
+</body>
+
+</html>
