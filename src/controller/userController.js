@@ -189,6 +189,59 @@ async function login(req, res) {
     }
 }
 
+async function atualizarConta(req, res){
+    var id = req.body.idServer;
+    var email = req.body.email_institucionalServer;
+    var senha = req.body.senhaServer;
+    var cargo = req.bodycargoServer;
+
+    // Faça as validações dos valores
+    if (email == undefined) {
+        res.status(400).send("Seu email está undefined!");
+    } else if (senha == undefined) {
+        res.status(400).send("Sua senha está undefined!");
+    } else if (cargo == undefined) {
+        res.status(400).send("Seu cargo está undefined!");
+    }  else {
+
+        userModel.editar(id, email, senha, cargo)
+            .then(
+                function (resultado) {
+                    res.json(resultado);
+                }
+            ).catch(
+                function (erro) {
+                    console.log(erro);
+                    console.log(
+                        "\nHouve um erro ao atualizar! Erro: ",
+                        erro.sqlMessage
+                    );
+                    res.status(500).json(erro.sqlMessage);
+                }
+            );
+    }
+}
+
+function excluirConta(req, res){
+    let id = req.body.idServer;
+
+        userModel.excluirConta(id)
+            .then(
+                function (resultado) {
+                    res.json(resultado);
+                }
+            ).catch(
+                function (erro) {
+                    console.log(erro);
+                    console.log(
+                        "\nHouve um erro ao deletar! Erro: ",
+                        erro.sqlMessage
+                    );
+                    res.status(500).json(erro.sqlMessage);
+                }
+            );
+}
+
 export default {
-    cadastrar, buscarPorId, login
+    cadastrar, buscarPorId, login, atualizarConta, excluirConta
 };

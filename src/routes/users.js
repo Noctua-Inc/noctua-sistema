@@ -12,4 +12,11 @@ router.get('/buscarUsuario/:id', userController.buscarPorId);
 
 router.get('/verificarEmail', verificacaoController.verificarEmail);
 
+router.put("/atualizarConta", function(req,res) {
+    userController.atualizarConta(req,res)
+})
+router.delete("/excluirConta", function(req,res) {
+    userController.excluirConta(req,res)
+})
+
 export default router;
