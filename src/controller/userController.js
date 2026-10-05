@@ -174,7 +174,9 @@ async function login(req, res) {
         return res.status(200).json({
             icon: '../../assets/sucesso.svg',
             mensagem: 'Login realizado com sucesso!',
-            descricao: 'Redirecionando para a dashboard...'
+            descricao: 'Redirecionando para a dashboard...',
+            usuario: usuario.id_usuario,
+            empresa : usuario.id_empresa
         });
 
     } catch (erro) {

@@ -44,6 +44,8 @@ async function buscarPorId(id) {
 async function buscarPorEmail(email_institucional) {
     const [resultado] = await pool.query(
         `SELECT
+            id_usuario,
+            fk_empresa as id_empresa,
             email_institucional,
             senha,
             verificado

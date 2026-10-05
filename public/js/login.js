@@ -17,9 +17,17 @@ function login(event) {
         .then(response => response.json())
         .then(data => {
             console.log(data.mensagem);
-            mensagem(data.icon, data.mensagem, data.descricao);
+            mensagem(data.icon, data.mensagem, data.descricao, data.id_usuario, data.id_empresa);
 
             if ((data.mensagem).includes('sucesso')) {
+
+                console.log("Dados recebidos:", data);
+                console.log("ID usuário:", data.usuario);
+                console.log("ID empresa:", data.empresa);
+
+                sessionStorage.setItem("idUsuario", data.usuario);
+                sessionStorage.setItem("idEmpresa", data.empresa);
+                
                 setTimeout(() => {
                     window.location = '/dash-alertas.html'
                 }, 2000);

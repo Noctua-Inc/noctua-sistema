@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  const id = sessionStorage.getItem("idUsuario");
+
   const STATUS_CSS = { ativo: "status-ativo", inativo: "status-inativo", "manut.": "status-manutencao" };
   const STATUS_NOME = { ativo: "Ativo", inativo: "Inativo", "manut.": "Manutenção" };
 
@@ -39,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const editVersaoSoInput = document.getElementById("edit-versao-so");
   const editStatusSelect = document.getElementById("edit-status");
   const editLocalizacaoSelect = document.getElementById("edit-localizacao");
-  const editPaisInput = document.getElementById("edit-pais");
+  //const editPaisInput = document.getElementById("edit-pais");
   const editEstadoInput = document.getElementById("edit-estado");
   const editCidadeInput = document.getElementById("edit-cidade");
   const editRegiaoInput = document.getElementById("edit-regiao");
@@ -59,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnDeletarLocalizacao = document.getElementById("btn-deletar");
   const btnSalvarAlteracoes = document.getElementById("btn-atualizar");
   const novaLocNome = document.getElementById("nova-loc-nome");
-  const novaLocPais = document.getElementById("nova-loc-pais");
+  //const novaLocPais = document.getElementById("nova-loc-pais");
   const novaLocEstado = document.getElementById("nova-loc-estado");
   const novaLocCidade = document.getElementById("nova-loc-cidade");
   const novaLocRegiao = document.getElementById("nova-loc-regiao");
@@ -142,14 +144,14 @@ function atualizarBotaoLocalizacao() {
   if (btnSalvarAlteracoes){
     btnSalvarAlteracoes.addEventListener("click", async () => {
       const nome = novaLocNome.value.trim();
-      const pais = novaLocPais.value.trim();
+      //const pais = novaLocPais.value.trim();
       const estado = novaLocEstado.value.trim();
       const cidade = novaLocCidade.value.trim();
-      const cod_regiao = novaLocRegiao.value.trim();
+      const cep = novaLocRegiao.value.trim();
 
       const id = Number(editLocalizacaoSelect.value);
       try {
-        await api.put(`/localizacao/${id}`, {nome, pais, estado, cidade, cod_regiao})
+        await api.put(`/localizacao/${id}`, {nome, estado, cidade, cep})
 
         await carregarLocalizacoes();
         editLocalizacaoSelect.value = id;
@@ -172,10 +174,10 @@ function atualizarBotaoLocalizacao() {
     const id = Number(editLocalizacaoSelect.value);
     const localizacao = localizacoes.find((l) => l.id_localizacao === id);
 
-    editPaisInput.value = localizacao ? localizacao.pais : "";
+    //editPaisInput.value = localizacao ? localizacao.pais : "";
     editEstadoInput.value = localizacao ? localizacao.estado : "";
     editCidadeInput.value = localizacao ? localizacao.cidade : "";
-    if (editRegiaoInput) editRegiaoInput.value = localizacao ? localizacao.cod_regiao : "";
+    if (editRegiaoInput) editRegiaoInput.value = localizacao ? localizacao.cep : "";
   }
 
   if (editLocalizacaoSelect) editLocalizacaoSelect.addEventListener("change", () => {
@@ -201,11 +203,11 @@ function atualizarBotaoLocalizacao() {
 
     if(!localizacao) return;
 
-    novaLocPais.value = localizacao.pais;
+    //novaLocPais.value = localizacao.pais;
     novaLocNome.value = localizacao.nome;
     novaLocEstado.value = localizacao.estado;
     novaLocCidade.value = localizacao.cidade;
-    novaLocRegiao.value = localizacao.cod_regiao;
+    novaLocRegiao.value = localizacao.cep;
 
   }
 
@@ -261,18 +263,18 @@ if (btnToggleEditarLocalizacao) {
   if (btnSalvarNovaLocalizacao) {
     btnSalvarNovaLocalizacao.addEventListener("click", async () => {
       const nome = novaLocNome.value.trim();
-      const pais = novaLocPais.value.trim();
+      //const pais = novaLocPais.value.trim();
       const estado = novaLocEstado.value.trim();
       const cidade = novaLocCidade.value.trim();
-      const cod_regiao = novaLocRegiao.value.trim();
+      const cep = novaLocRegiao.value.trim();
 
-      if (!nome || !pais || !estado || !cidade || !cod_regiao) {
+      if (!nome || !estado || !cidade || !cep) {
         alert("Preencha todos os campos da nova localização.");
         return;
       }
 
       try {
-        const nova = await api.post("/localizacao", { nome, pais, estado, cidade, cod_regiao });
+        const nova = await api.post("/localizacao", { nome, estado, cidade, cep });
         await carregarLocalizacoes();
         editLocalizacaoSelect.value = nova.id_localizacao;
         atualizarDadosLocalizacao();
@@ -435,7 +437,7 @@ if (btnToggleEditarLocalizacao) {
   }
   //  Tabela 
   async function carregarMainframes() {
-    mainframes = await api.get("/mainframe");
+    mainframes = await api.get(`/mainframe/${id}`);
     renderTable();
   }
 
@@ -444,7 +446,7 @@ if (btnToggleEditarLocalizacao) {
 
     const filtered = mainframes.filter((m) => {
       const componentesTexto = (m.componentes || "").toLowerCase();
-      const codRegiao = (m.cod_regiao || "").toLowerCase();
+      const codRegiao = (m.cep || "").toLowerCase();
 
       return (
         m.hostname.toLowerCase().includes(query) ||
@@ -474,7 +476,7 @@ if (btnToggleEditarLocalizacao) {
             <td style="color:#6b7280">${escapeHtml(m.sis_operacional)} ${escapeHtml(m.versao_so)}</td>
             <td style="color:#9ca3af;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(m.componentes)}</td>
             <td><span class="status ${STATUS_CSS[m.status] || ""}">${STATUS_NOME[m.status] || m.status}</span></td>
-            <td style="color:#9ca3af">${m.cod_regiao ? escapeHtml(m.cod_regiao) : "-"}</td>
+            <td style="color:#9ca3af">${m.cep ? escapeHtml(m.cep) : "-"}</td>
             <td>
               <div class="actions">
                 <button type="button" class="btn-edit" data-id="${m.id_mainframe}">Editar</button>
@@ -489,7 +491,7 @@ if (btnToggleEditarLocalizacao) {
     if (summary) {
       const ativos = mainframes.filter((m) => m.status === "ativo").length;
       const inativos = mainframes.filter((m) => m.status === "inativo").length;
-      const manutencao = mainframes.filter((m) => m.status === "manut.").length;
+      const manutencao = mainframes.filter((m) => m.status === "manutenção").length;
 
       summary.innerHTML = `
         <span><strong>${ativos}</strong> ativos</span>

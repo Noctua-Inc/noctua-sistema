@@ -1,10 +1,13 @@
 let cargos = [];
 let cargoSelecionado = null;
 
+const id = sessionStorage.getItem("idUsuario");
+const idEmpresa = sessionStorage.getItem("idEmpresa");
+
 async function carregarCargos() {
     // BACK-END: conferir se a rota GET /api/cargo retorna os cargos
     // no formato: [{ id_cargo, nome_cargo, permissoes: [1, 2, 3] }]
-    cargos = await api.get("/cargo");
+    cargos = await api.get(`/cargo/${idEmpresa}`);
 
     let container = document.getElementById("roles-list");
 
@@ -155,7 +158,7 @@ async function criarCargo() {
     // BACK-END: conferir se a rota POST /api/cargo aceita
     // { nome_cargo: nome, permissoes: [ids das permissões] }
     await api.post(
-        "/cargo",
+        `/cargo/${idEmpresa}`,
         {
             nome_cargo: nome,
             permissoes: permissoes
