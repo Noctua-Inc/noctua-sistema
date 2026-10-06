@@ -27,17 +27,17 @@ async function cadastrar(
 async function buscarPorId(id) {
     const [resultado] = await pool.query(
         `SELECT
-            id_usuario,
-            nome,
-            email_institucional,
-            cpf,
-            verificado,
-            fk_empresa
-         FROM usuario
-         WHERE id_usuario = ?`,
+            u.id_usuario,
+            u.nome AS nome_usuario,
+            u.email_institucional,
+            u.cpf,
+            c.nome AS nome_cargo
+        FROM usuario u JOIN cargo c
+			ON u.fk_cargo = c.id_cargo
+            WHERE id_usuario = ?;
+            `,
         [id]
     );
-
     return resultado[0];
 }
 

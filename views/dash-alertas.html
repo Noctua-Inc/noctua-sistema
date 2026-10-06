@@ -34,10 +34,10 @@
 
     <div class="sidebar-user">
       <a href="#" onclick="abrirEditarUsuario()">
-        <div class="user-avatar"><span>AS</span></div>
+        <div class="user-avatar"><span id="user-avatar">-</span></div>
         <div class="user-info">
-          <span class="user-name">Ana Souza</span>
-          <span class="user-role">Analista</span>
+          <span id="user-name">-</span>
+          <span id="user-role">-</span>
         </div>
       </a>
       <a href="index.html" aria-label="Sair">
@@ -146,6 +146,8 @@
     </div>
     <div id="editar-usuario" style="display: none;"></div>
 
+    <script src="/js/api.js"></script>
+    <script src="/js/user-sidebar.js"></script>
     <script src="/js/editar-usuario.js"></script>
 </body>
 

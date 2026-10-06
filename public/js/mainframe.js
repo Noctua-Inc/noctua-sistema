@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let localizacoes = [];
   let componentes = [];
   let mainframes = [];
+  let usuario = [];
 
   const tableBody = document.getElementById("table-body");
   if (!tableBody) return;
@@ -77,6 +78,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const novoCompSerie = document.getElementById("novo-comp-serie");
   const novoCompCapacidade = document.getElementById("novo-comp-capacidade");
 
+  // Usuário
+  // const nomeUsuario = document.getElementById("user-name");
+  // const cargoUsuario = document.getElementById("user-role");
+  // const avatarUsuario = document.getElementById("user-avatar")
+
   //  Localizações 
   function preencherSelectLocalizacoes() {
     if (!editLocalizacaoSelect) return;
@@ -88,6 +94,23 @@ document.addEventListener("DOMContentLoaded", () => {
       editLocalizacaoSelect.appendChild(option);
     });
   }
+
+  // async function preencherUsuario(){
+  //   try {
+  //     usuario = await api.get(`/buscarUsuario/${id}`)
+
+  //     nomeUsuario.innerText = usuario.nome_usuario;
+  //     cargoUsuario.innerText = usuario.nome_cargo;
+      
+  //     const iniciais = usuario.nome_usuario.split(" ").map(nome_usuario => nome_usuario[0]).join("").toUpperCase()
+
+  //     avatarUsuario.innerText = iniciais;
+
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+    
+  // }
 
 function atualizarBotaoLocalizacao() {
   if (!editLocalizacaoSelect) return;
@@ -644,7 +667,6 @@ if (btnToggleEditarLocalizacao) {
     try {
       await Promise.all([carregarLocalizacoes(), carregarComponentes()]);
       await carregarMainframes();
-      //await carregarUsuario();
     } catch (err) {
       console.error(err);
       alert("Não foi possível carregar os dados do servidor. Verifique se a API está no ar.");
