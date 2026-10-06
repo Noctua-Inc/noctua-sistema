@@ -15,7 +15,11 @@ CREATE TABLE permissao (
 
 CREATE TABLE cargo (
 	id_cargo INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL UNIQUE
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    fk_empresa INT,
+    CONSTRAINT cFkEmpresa
+		FOREIGN KEY (fk_empresa)
+        REFERENCES empresa (id_empresa)
 );
 
 CREATE TABLE cargo_permissao (
@@ -133,10 +137,10 @@ VALUES
 -- CARGOS
 -- ============================================
 
-INSERT INTO cargo (nome)
+INSERT INTO cargo (nome, fk_empresa)
 VALUES
-('Estagiário'),
-('Administrador');
+('Estagiário', null),
+('Administrador', null);
 
 
 -- ============================================

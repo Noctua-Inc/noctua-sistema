@@ -1,7 +1,7 @@
 import pool from '../database/config.js';
 import parametroModel from './parametroModel.js';
 
-async function listar() {
+async function listar(idEmpresa) {
   const [rows] = await pool.query(`
     SELECT
         m.*,
@@ -21,9 +21,10 @@ async function listar() {
         ON p.id_mainframe = m.id_mainframe
     LEFT JOIN componente c
         ON c.id_componente = p.id_componente
+    WHERE m.fk_empresa = ?
     GROUP BY m.id_mainframe
     ORDER BY m.hostname;
-  `);
+  `, [idEmpresa]);
   return rows;
 }
 

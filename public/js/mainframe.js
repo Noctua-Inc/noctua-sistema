@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   const id = sessionStorage.getItem("idUsuario");
+  const idEmpresa = sessionStorage.getItem("idEmpresa")
 
   const STATUS_CSS = { ativo: "status-ativo", inativo: "status-inativo", "manut.": "status-manutencao" };
   const STATUS_NOME = { ativo: "Ativo", inativo: "Inativo", "manut.": "Manutenção" };
@@ -61,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnDeletarLocalizacao = document.getElementById("btn-deletar");
   const btnSalvarAlteracoes = document.getElementById("btn-atualizar");
   const novaLocNome = document.getElementById("nova-loc-nome");
-  //const novaLocPais = document.getElementById("nova-loc-pais");
   const novaLocEstado = document.getElementById("nova-loc-estado");
   const novaLocCidade = document.getElementById("nova-loc-cidade");
   const novaLocRegiao = document.getElementById("nova-loc-regiao");
@@ -144,7 +144,6 @@ function atualizarBotaoLocalizacao() {
   if (btnSalvarAlteracoes){
     btnSalvarAlteracoes.addEventListener("click", async () => {
       const nome = novaLocNome.value.trim();
-      //const pais = novaLocPais.value.trim();
       const estado = novaLocEstado.value.trim();
       const cidade = novaLocCidade.value.trim();
       const cep = novaLocRegiao.value.trim();
@@ -188,7 +187,6 @@ function atualizarBotaoLocalizacao() {
 
   function limparFormNovaLocalizacao() {
     novaLocNome.value = "";
-    novaLocPais.value = "";
     novaLocEstado.value = "";
     novaLocCidade.value = "";
     novaLocRegiao.value = "";
@@ -203,7 +201,6 @@ function atualizarBotaoLocalizacao() {
 
     if(!localizacao) return;
 
-    //novaLocPais.value = localizacao.pais;
     novaLocNome.value = localizacao.nome;
     novaLocEstado.value = localizacao.estado;
     novaLocCidade.value = localizacao.cidade;
@@ -263,7 +260,6 @@ if (btnToggleEditarLocalizacao) {
   if (btnSalvarNovaLocalizacao) {
     btnSalvarNovaLocalizacao.addEventListener("click", async () => {
       const nome = novaLocNome.value.trim();
-      //const pais = novaLocPais.value.trim();
       const estado = novaLocEstado.value.trim();
       const cidade = novaLocCidade.value.trim();
       const cep = novaLocRegiao.value.trim();
@@ -437,7 +433,7 @@ if (btnToggleEditarLocalizacao) {
   }
   //  Tabela 
   async function carregarMainframes() {
-    mainframes = await api.get(`/mainframe/${id}`);
+    mainframes = await api.get(`/mainframe/empresa/${idEmpresa}`);
     renderTable();
   }
 

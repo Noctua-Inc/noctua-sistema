@@ -39,7 +39,8 @@ function tratarErroBanco(err, res) {
 
 async function listar(req, res) {
   try {
-    const mainframes = await mainframeModel.listar();
+    const idEmpresa = req.params.id;
+    const mainframes = await mainframeModel.listar(idEmpresa);
     res.json(mainframes);
   } catch (err) {
     console.error(err);
