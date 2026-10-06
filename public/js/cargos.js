@@ -1,7 +1,6 @@
 let cargos = [];
 let cargoSelecionado = null;
 
-const id = sessionStorage.getItem("idUsuario");
 const idEmpresa = sessionStorage.getItem("idEmpresa");
 
 async function carregarCargos() {

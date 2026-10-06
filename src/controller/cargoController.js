@@ -71,15 +71,9 @@ async function deletar(req, res) {
 
 async function criar(req, res) {
     try {
-        console.log('BODY:', req.body);
-        console.log('PARAMS:', req.params);
 
         const { nome_cargo, permissoes } = req.body;
         const idEmpresa = req.params.id;
-
-        console.log('NOME:', nome_cargo);
-        console.log('PERMISSOES:', permissoes);
-        console.log('EMPRESA:', idEmpresa);
 
         const idCargo = await cargoModel.criar(nome_cargo, permissoes, idEmpresa);
 
