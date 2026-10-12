@@ -1,154 +1,186 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="/styles/dash-style.css">
-    <link rel="stylesheet" href="/styles/editar-usuario.css">
+    <title>Central de alertas | Noctua</title>
     <link rel="icon" href="/assets/icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="/styles/dash-style.css">
+    <link rel="stylesheet" href="/styles/editar-usuario.css">
+    <link rel="stylesheet" href="/styles/dash-alertas.css">
 </head>
-
-<body>
-    <!-- Sidebar -->
+<body class="pagina-alertas">
     <aside class="sidebar">
-    <div class="sidebar-brand">
-      <a href="dash-alertas.html">
-        <img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo">
-      </a>
-    </div>
-
-    <ul class="sidebar-menu">
-      <li><a href="dash-alertas.html" class="active"><i class="fa-solid fa-triangle-exclamation"></i>Alertas</a></li>
-      <li><a href="dash-servidores.html"><i class="fa-solid fa-server"></i>Servidores</a></li>
-      <li><a href="mainframes.html"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
-      <li><a href="cargos.html"><i class="fa-solid fa-user-tag"></i>Cargos</a></li>
-      <li><a href="cadastro-func.html"><i class="fa-solid fa-users"></i>Usuários</a></li>
-    </ul>
-
-    <div class="sidebar-user">
-      <a href="#" onclick="abrirEditarUsuario()">
-        <div class="user-avatar"><span id="user-avatar">-</span></div>
-        <div class="user-info">
-          <span id="user-name">-</span>
-          <span id="user-role">-</span>
+        <div class="sidebar-brand">
+            <a href="dash-alertas.html">
+                <img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo">
+            </a>
         </div>
-      </a>
-      <a href="index.html" aria-label="Sair">
-        <i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);"></i>
-      </a>
-    </div>
-  </aside>
-
-    <!-- wrapper rolagem -->
-    <div class="main-wrapper" onclick="fecharEditarUsuario()" id="container_main">
-
-
-        <main class="content">
-            <p class="titulo">Alertas</p>
-            <section class="metrics-grid">
-                <div class="card-red">
-                    <span class="card-title">Alertas Ativos</span>
-                    <span class="card-value">2</span>
+        <ul class="sidebar-menu">
+            <li><a href="dash-alertas.html" class="active" aria-current="page"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Alertas</a></li>
+            <li><a href="dash-servidores.html"><i class="fa-solid fa-server" aria-hidden="true"></i>Servidores</a></li>
+            <li><a href="mainframes.html"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>Editar Servidores</a></li>
+            <li><a href="cargos.html"><i class="fa-solid fa-user-tag" aria-hidden="true"></i>Cargos</a></li>
+            <li><a href="cadastro-func.html"><i class="fa-solid fa-users" aria-hidden="true"></i>Usuários</a></li>
+        </ul>
+        <div class="sidebar-user">
+            <a href="#" onclick="abrirEditarUsuario(); return false;" aria-label="Editar meu perfil">
+                <div class="user-avatar"><span id="user-avatar">-</span></div>
+                <div class="user-info">
+                    <span id="user-name">-</span>
+                    <span id="user-role">-</span>
                 </div>
-                <div class="card">
-                    <span class="card-title">Componente Mais Ofensor</span>
-                    <span class="card-value">RAM</span>
-                    <span class="card-title">58% dos alertas</span>
-                </div>
-                <div class="card">
-                    <span class="card-title">Reincidência de Alertas</span>
-                    <span class="card-value">14%</span>
-                </div>
-                <div class="card">
-                    <span class="card-title">Tempo Médio Até Resolução</span>
-                    <span class="card-value">18min</span>
-                </div>
+            </a>
+            <a href="index.html" aria-label="Sair">
+                <i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);" aria-hidden="true"></i>
+            </a>
+        </div>
+    </aside>
 
-            </section>
+    <div class="main-wrapper alertas-wrapper" id="container_main" onclick="fecharEditarUsuario()">
+        <main class="dashboard-alertas" id="dashboard-alertas">
+            <header class="alertas-cabecalho">
+                <h1>Central de alertas</h1>
+                <p class="alertas-atualizacao">Atualizado em <time id="data-atualizacao"></time></p>
+            </header>
 
-            <section class="table-card">
-                <div class="table-card-header">
-                    <h3>Histórico de Alertas</h3>
-                    <div class="table-filters">
-                        <div class="input-container">
-                            <input type="text" class="filter-select" placeholder="Buscar Servidor">
-                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        </div>
-                        <select class="filter-select">
-                            <option value="">Status Alerta</option>
-                            <option value="aberto">Em Aberto</option>
-                            <option value="investigacao">Em Investigação</option>
-                            <option value="resolvido">Resolvido</option>
+            <section class="alertas-filtros" aria-label="Filtros gerais da dashboard">
+                <div class="alertas-campo">
+                    <label for="filtro-periodo">Período</label>
+                    <div class="alertas-controle">
+                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                        <select id="filtro-periodo">
+                            <option value="6">Últimas 6 horas</option>
+                            <option value="24" selected>Últimas 24 horas</option>
+                            <option value="168">Últimos 7 dias</option>
                         </select>
                     </div>
                 </div>
-
-                <!-- Tabela com Rolagem Interna -->
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Servidor</th>
-                                <th>Componente</th>
-                                <th>Mensagem do Alerta</th>
-                                <th>Data / Hora</th>
-                                <th>Status Alerta</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>db-primary</strong></td>
-                                <td>RAM</td>
-                                <td>Uso de memória atingiu 96% da capacidade.</td>
-                                <td>27/08/2026 - 10:42</td>
-                                <td><span class="badge-status-alert">Aberto</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>srv-prod-01</strong></td>
-                                <td>Disco</td>
-                                <td>Partição principal /var acima de 91%.</td>
-                                <td>27/08/2026 - 09:15</td>
-                                <td><span class="badge-status-attention">Em Investigação</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>srv-prod-02</strong></td>
-                                <td>RAM</td>
-                                <td>Consumo constante acima de 85%.</td>
-                                <td>27/08/2026 - 08:30</td>
-                                <td><span class="badge-status-attention">Em Investigação</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>srv-web-03</strong></td>
-                                <td>CPU</td>
-                                <td>Pico pontual de processamento (88%).</td>
-                                <td>26/08/2026 - 22:10</td>
-                                <td><span class="badge-status">Resolvido</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>db-secondary</strong></td>
-                                <td>CPU</td>
-                                <td>Uso contínuo de 98% por mais de 10 min.</td>
-                                <td>26/08/2026 - 14:02</td>
-                                <td><span class="badge-status">Resolvido</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="alertas-campo">
+                    <label for="filtro-localizacao">Localização</label>
+                    <div class="alertas-controle">
+                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                        <select id="filtro-localizacao"><option value="">Todas as localidades</option></select>
+                    </div>
+                </div>
+                <div class="alertas-campo">
+                    <label for="filtro-mainframe">Mainframe</label>
+                    <div class="alertas-controle">
+                        <i class="fa-solid fa-server" aria-hidden="true"></i>
+                        <select id="filtro-mainframe"><option value="">Todos os mainframes</option></select>
+                    </div>
                 </div>
             </section>
-        </main>   
+
+            <section class="alertas-indicadores" aria-label="Indicadores de alertas" aria-live="polite">
+                <article class="alertas-indicador alertas-indicador-critico">
+                    <span class="alertas-icone"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+                    <div class="alertas-indicador-conteudo">
+                        <div class="alertas-indicador-topo"><h2>Alertas ativos</h2><span class="alertas-escopo" title="Estado atual, independente do período selecionado">Agora</span></div>
+                        <p class="alertas-valor" id="kpi-ativos">—</p>
+                    </div>
+                </article>
+                <article class="alertas-indicador">
+                    <span class="alertas-icone"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
+                    <div class="alertas-indicador-conteudo">
+                        <div class="alertas-indicador-topo"><h2>Mainframes com alertas</h2><span class="alertas-escopo" title="Estado atual, independente do período selecionado">Agora</span></div>
+                        <p class="alertas-valor" id="kpi-mainframes">—</p>
+                    </div>
+                </article>
+                <article class="alertas-indicador">
+                    <span class="alertas-icone"><i class="fa-regular fa-clock" aria-hidden="true"></i></span>
+                    <div class="alertas-indicador-conteudo">
+                        <div class="alertas-indicador-topo"><h2>Tempo médio de resolução</h2><span class="alertas-escopo" title="Calculado pelos alertas resolvidos no período selecionado">No período</span></div>
+                        <p class="alertas-valor" id="kpi-resolucao">—</p>
+                    </div>
+                </article>
+                <article class="alertas-indicador">
+                    <span class="alertas-icone"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i></span>
+                    <div class="alertas-indicador-conteudo">
+                        <div class="alertas-indicador-topo"><h2>Reincidência</h2><span class="alertas-escopo" title="Percentual de alertas do período que repetem uma ocorrência já resolvida nas 24h anteriores">No período</span></div>
+                        <p class="alertas-valor" id="kpi-reincidencia">—</p>
+                        <p class="alertas-ajuda">Mesmo mainframe e componente nas últimas 24h</p>
+                    </div>
+                </article>
+            </section>
+
+            <p class="alertas-aviso" id="erro-graficos" role="alert" hidden>Não foi possível carregar os gráficos. Verifique sua conexão e recarregue a página.</p>
+            <section class="alertas-graficos" aria-label="Gráficos de alertas">
+                <article class="alertas-grafico alertas-grafico-fluxo">
+                    <div class="alertas-grafico-cabecalho">
+                        <h2>Abertos x resolvidos</h2>
+                        <div class="alertas-legenda" aria-label="Legenda">
+                            <span><i class="alertas-cor cor-indigo"></i>Abertos · <b id="total-abertos">0</b></span>
+                            <span><i class="alertas-cor cor-teal"></i>Resolvidos · <b id="total-resolvidos">0</b></span>
+                        </div>
+                    </div>
+                    <div class="alertas-canvas"><canvas id="grafico-fluxo" role="img" aria-label="Quantidade de alertas abertos e resolvidos por intervalo"></canvas></div>
+                    <p class="alertas-vazio-grafico" id="vazio-fluxo" hidden>Sem ocorrências no período.</p>
+                </article>
+                <article class="alertas-grafico">
+                    <div class="alertas-grafico-cabecalho"><h2>Alertas por componente</h2></div>
+                    <div class="alertas-canvas"><canvas id="grafico-componentes" role="img" aria-label="Quantidade de alertas por componente"></canvas></div>
+                    <p class="alertas-vazio-grafico" id="vazio-componentes" hidden>Sem ocorrências no período.</p>
+                </article>
+                <article class="alertas-grafico">
+                    <div class="alertas-grafico-cabecalho">
+                        <h2>Tempo dos alertas ativos</h2>
+                        <div class="alertas-legenda">
+                            <span><i class="alertas-cor cor-critica"></i>Crítica</span>
+                            <span><i class="alertas-cor cor-alta"></i>Alta</span>
+                            <span><i class="alertas-cor cor-moderada"></i>Moderada</span>
+                        </div>
+                    </div>
+                    <div class="alertas-canvas"><canvas id="grafico-tempo" role="img" aria-label="Alertas ativos por tempo desde a abertura e severidade"></canvas></div>
+                    <p class="alertas-vazio-grafico" id="vazio-tempo" hidden>Nenhum alerta ativo.</p>
+                </article>
+            </section>
+
+            <section class="alertas-historico" aria-labelledby="titulo-historico">
+                <div class="alertas-historico-cabecalho">
+                    <h2 id="titulo-historico">Histórico de alertas</h2>
+                    <div class="alertas-filtros-tabela">
+                        <div class="alertas-busca">
+                            <label class="alertas-sr-only" for="busca-mainframe">Buscar mainframe</label>
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                            <input id="busca-mainframe" type="search" placeholder="Buscar mainframe" autocomplete="off">
+                        </div>
+                        <label class="alertas-sr-only" for="filtro-severidade">Severidade</label>
+                        <select id="filtro-severidade"><option value="">Severidade</option><option value="critica">Crítica</option><option value="alta">Alta</option><option value="moderada">Moderada</option></select>
+                        <label class="alertas-sr-only" for="filtro-componente">Componente</label>
+                        <select id="filtro-componente"><option value="">Componente</option><option value="RAM">RAM</option><option value="CPU">CPU</option><option value="DISCO">Disco</option><option value="SWAP">Swap</option></select>
+                    </div>
+                </div>
+                <div class="alertas-abas" role="group" aria-label="Filtrar histórico por status">
+                    <button type="button" class="ativa" data-status="todos" aria-pressed="true">Todos <span id="contador-todos">0</span></button>
+                    <button type="button" data-status="aberto" aria-pressed="false">Abertos <span id="contador-aberto">0</span></button>
+                    <button type="button" data-status="investigacao" aria-pressed="false">Em investigação <span id="contador-investigacao">0</span></button>
+                    <button type="button" data-status="resolvido" aria-pressed="false">Resolvidos <span id="contador-resolvido">0</span></button>
+                </div>
+                <div class="alertas-tabela-scroll" tabindex="0" role="region" aria-label="Tabela de alertas, com rolagem horizontal em telas menores">
+                    <table class="alertas-tabela">
+                        <caption class="alertas-sr-only">Alertas do período. Ocorrências ativas primeiro, por severidade e data de abertura.</caption>
+                        <thead><tr><th scope="col">Mainframe</th><th scope="col">Severidade</th><th scope="col">Componente</th><th scope="col">Início</th><th scope="col">Tempo ativo</th><th scope="col">Status</th></tr></thead>
+                        <tbody id="corpo-alertas"></tbody>
+                    </table>
+                </div>
+                <div class="alertas-rodape-tabela">
+                    <p id="resumo-paginacao" role="status" aria-live="polite"></p>
+                    <nav class="alertas-paginacao" id="paginacao-alertas" aria-label="Páginas do histórico"></nav>
+                </div>
+            </section>
+            <noscript><p class="alertas-aviso">Ative o JavaScript para visualizar os dados da dashboard.</p></noscript>
+        </main>
     </div>
     <div id="editar-usuario" style="display: none;"></div>
 
     <script src="/js/api.js"></script>
     <script src="/js/user-sidebar.js"></script>
     <script src="/js/editar-usuario.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+    <script src="/js/dash-alertas.js"></script>
 </body>
-
 </html>
