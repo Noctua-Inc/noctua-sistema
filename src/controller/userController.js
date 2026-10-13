@@ -1,194 +1,297 @@
-import dotenv from 'dotenv'; dotenv.config();
-import bcrypt from 'bcrypt';
-import userModel from '../model/userModel.js';
-import empresaModel from '../model/empresaModel.js';
-import crypto from 'crypto';
-import verificacaoModel from '../model/verificacaoModel.js';
-import emailService from '../service/emailService.js';
+import dotenv from "dotenv";
+dotenv.config();
+import bcrypt from "bcrypt";
+import userModel from "../model/userModel.js";
+import empresaModel from "../model/empresaModel.js";
+import crypto from "crypto";
+import verificacaoModel from "../model/verificacaoModel.js";
+import emailService from "../service/emailService.js";
 
 async function cadastrar(req, res) {
-    try {
-        const {
-            nome,
-            email_institucional,
-            cpf,
-            senha,
-            confirmacao_senha
-        } = req.body;
+  try {
+    const { nome, email_institucional, cpf, senha, confirmacao_senha } =
+      req.body;
 
-        let regex_email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let regex_email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (!regex_email.test(email_institucional)) {
-            return res.status(400).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Digite um email válido!',
-                descricao: 'O e-mail digitado não está no formato correto. Certifique-se de incluir o "@" e um domínio válido'
-            })
-        }
-
-        const dominio = email_institucional.split('@')[1];
-        const empresa = await empresaModel.buscarDominio(dominio);
-
-        if (!empresa) {
-            return res.status(404).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Domínio de empresa não encontrado!',
-                descricao: 'Empresa e email corporativo indefinidos'
-            });
-        }
-
-        let cpf_regex = /^\d{11}$/;
-
-        if (!cpf_regex.test(cpf)) {
-            return res.status(400).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Digite um CPF válido!',
-                descricao: 'O CPF deve ter obrigatoriamente 11 dígitos!'
-            })
-        }
-
-        let senha_regex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
-
-        if (!senha_regex.test(senha)) {
-            return res.status(400).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Digite uma senha válida!',
-                descricao: 'A senha deve conter ao menos 8 caracteres, uma letra maiúscula, um número e um caractere especial!'
-            })
-        }
-
-        if (senha !== confirmacao_senha) {
-            return res.status(400).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Confirmação de senha inválida!',
-                descricao: 'As senhas digitadas não estão correspondendo'
-            })
-        }
-
-        const senhaHash = await bcrypt.hash(senha, 10);
-
-        const resultado = await userModel.cadastrar(
-            nome,
-            email_institucional,
-            cpf,
-            senhaHash,
-            empresa.id_empresa
-        );
-
-        const token = crypto.randomBytes(32).toString('hex');
-
-        const dt_expiracao = new Date(
-            Date.now() + 15 * 60 * 1000
-        );
-
-        await verificacaoModel.criarToken(
-            token,
-            dt_expiracao,
-            resultado.insertId
-        );
-
-        await emailService.enviarEmail(
-            email_institucional,
-            token
-        );
-
-        res.status(201).json({
-            icon: '../../assets/sucesso.svg',
-            mensagem: 'Usuário cadastrado com sucesso!',
-            descricao: ''
-        });
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        res.status(500).json({
-            icon: '../../assets/erro.svg',
-            mensagem: 'Erro ao cadastrar usuário!',
-            descricao: ''
-        });
+    if (!regex_email.test(email_institucional)) {
+      return res.status(400).json({
+        icon: "../../assets/erro.svg",
+        mensagem: "Digite um email válido!",
+        descricao:
+          'O e-mail digitado não está no formato correto. Certifique-se de incluir o "@" e um domínio válido',
+      });
     }
+
+    const dominio = email_institucional.split("@")[1];
+    const empresa = await empresaModel.buscarDominio(dominio);
+
+    if (!empresa) {
+      return res.status(404).json({
+        icon: "../../assets/erro.svg",
+        mensagem: "Domínio de empresa não encontrado!",
+        descricao: "Empresa e email corporativo indefinidos",
+      });
+    }
+
+    let cpf_regex = /^\d{11}$/;
+
+    if (!cpf_regex.test(cpf)) {
+      return res.status(400).json({
+        icon: "../../assets/erro.svg",
+        mensagem: "Digite um CPF válido!",
+        descricao: "O CPF deve ter obrigatoriamente 11 dígitos!",
+      });
+    }
+
+    let senha_regex =
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+
+    if (!senha_regex.test(senha)) {
+      return res.status(400).json({
+        icon: "../../assets/erro.svg",
+        mensagem: "Digite uma senha válida!",
+        descricao:
+          "A senha deve conter ao menos 8 caracteres, uma letra maiúscula, um número e um caractere especial!",
+      });
+    }
+
+    if (senha !== confirmacao_senha) {
+      return res.status(400).json({
+        icon: "../../assets/erro.svg",
+        mensagem: "Confirmação de senha inválida!",
+        descricao: "As senhas digitadas não estão correspondendo",
+      });
+    }
+
+    const senhaHash = await bcrypt.hash(senha, 10);
+
+    const resultado = await userModel.cadastrar(
+      nome,
+      email_institucional,
+      cpf,
+      senhaHash,
+      empresa.id_empresa,
+    );
+
+    const token = crypto.randomBytes(32).toString("hex");
+
+    const dt_expiracao = new Date(Date.now() + 15 * 60 * 1000);
+
+    await verificacaoModel.criarToken(token, dt_expiracao, resultado.insertId);
+
+    await emailService.enviarEmail(email_institucional, token);
+
+    res.status(201).json({
+      icon: "../../assets/sucesso.svg",
+      mensagem: "Usuário cadastrado com sucesso!",
+      descricao: "",
+    });
+  } catch (erro) {
+    console.error(erro);
+
+    res.status(500).json({
+      icon: "../../assets/erro.svg",
+      mensagem: "Erro ao cadastrar usuário!",
+      descricao: "",
+    });
+  }
 }
 
 async function buscarPorId(req, res) {
-    try {
-        const id = req.params.id;
+  try {
+    const id = req.params.id;
 
-        const usuario = await userModel.buscarPorId(id);
+    const usuario = await userModel.buscarPorId(id);
 
-        if (!usuario) {
-            return res.status(404).json({
-                mensagem: 'Usuário não encontrado'
-            });
-        }
-
-        res.status(200).json(usuario);
-
-    } catch (erro) {
-        console.error(erro);
-
-        res.status(500).json({
-            mensagem: 'Erro ao buscar usuário'
-        });
+    if (!usuario) {
+      return res.status(404).json({
+        mensagem: "Usuário não encontrado",
+      });
     }
+
+    res.status(200).json(usuario);
+  } catch (erro) {
+    console.error(erro);
+
+    res.status(500).json({
+      mensagem: "Erro ao buscar usuário",
+    });
+  }
 }
 
 async function login(req, res) {
+  try {
+    const { email_institucional, senha } = req.body;
+
+    const usuario = await userModel.buscarPorEmail(email_institucional);
+
+    if (!usuario) {
+      return res.status(401).json({
+        icon: "../../assets/erro.svg",
+        mensagem: "Email ou senha inválidas!",
+        descricao: "",
+      });
+    }
+
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+
+    if (!senhaValida) {
+      return res.status(401).json({
+        icon: "../../assets/erro.svg",
+        mensagem: "Email ou senha inválidas!",
+        descricao: "",
+      });
+    }
+
+    if (!usuario.verificado) {
+      return res.status(403).json({
+        icon: "../../assets/erro.svg",
+        mensagem: "Email ainda não verificado!",
+        descricao:
+          "Atenção! É necessário verificar seu email para ter acesso aos nossos recursos. Verifique sua caixa de email!",
+      });
+    }
+
+    return res.status(200).json({
+      icon: "../../assets/sucesso.svg",
+      mensagem: "Login realizado com sucesso!",
+      descricao: "Redirecionando para a dashboard...",
+      usuario: {
+        id_usuario: usuario.id_usuario,
+        nome: usuario.nome,
+        email_institucional: usuario.email_institucional,
+      },
+    });
+  } catch (erro) {
+    console.error(erro);
+
+    res.status(500).json({
+      icon: "../../assets/erro.svg",
+      mensagem: "Erro ao tentar login!",
+      descricao: "",
+    });
+  }
+}
+
+async function listar(req, res) {
     try {
-        const {
-            email_institucional,
-            senha
-        } = req.body;
-
-        const usuario = await userModel.buscarPorEmail(email_institucional);
-
-        if (!usuario) {
-            return res.status(401).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Email ou senha inválidas!',
-                descricao: ''
-            });
-        }
-
-        const senhaValida = await bcrypt.compare(
-            senha,
-            usuario.senha
-        );
-
-        if (!senhaValida) {
-            return res.status(401).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Email ou senha inválidas!',
-                descricao: ''
-            });
-        }
-
-        if (!usuario.verificado) {
-            return res.status(403).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Email ainda não verificado!',
-                descricao: 'Atenção! É necessário verificar seu email para ter acesso aos nossos recursos. Verifique sua caixa de email!'
-            });
-        }
-
-        return res.status(200).json({
-            icon: '../../assets/sucesso.svg',
-            mensagem: 'Login realizado com sucesso!',
-            descricao: 'Redirecionando para a dashboard...'
-        });
-
+        const usuarios = await userModel.listar();
+        res.status(200).json(usuarios);
     } catch (erro) {
-
         console.error(erro);
+        res.status(500).json({ mensagem: 'Erro ao listar usuários' });
+    }
+}
 
-        res.status(500).json({
-            icon: '../../assets/erro.svg',
-            mensagem: 'Erro ao tentar login!',
-            descricao: ''
+async function listarCargos(req, res) {
+    try {
+        const cargos = await userModel.listarCargos();
+        res.status(200).json(cargos);
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).json({ mensagem: 'Erro ao listar cargos' });
+    }
+}
+
+async function atualizarConta(req, res) {
+    try {
+        const { id, fk_cargo } = req.body;
+
+        if (!id || !fk_cargo) {
+            return res.status(400).json({ mensagem: 'Informe o usuário e o cargo!' });
+        }
+
+        const resultado = await userModel.atualizarConta(id, fk_cargo);
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+        }
+
+        res.status(200).json({ mensagem: 'Usuário atualizado com sucesso!' });
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).json({ mensagem: 'Erro ao atualizar usuário' });
+    }
+}
+
+async function atualizarPerfil(req, res) {
+    try {
+        const { id, nome, email_institucional, senha, confirmacao_senha } = req.body;
+
+        if (!id || !nome || !email_institucional) {
+            return res.status(400).json({ mensagem: 'Preencha nome e e-mail!' });
+        }
+
+        const regex_email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regex_email.test(email_institucional)) {
+            return res.status(400).json({ mensagem: 'Digite um e-mail válido!' });
+        }
+
+        const atual = await userModel.buscarPorId(id);
+        if (!atual) {
+            return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+        }
+
+        // não deixa trocar para o e-mail de outra empresa
+        if (atual.email_institucional.split('@')[1] !== email_institucional.split('@')[1]) {
+            return res.status(400).json({ mensagem: 'O e-mail deve manter o domínio da sua empresa!' });
+        }
+
+        let senhaHash = null;
+
+        if (senha) {
+            const senha_regex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+
+            if (!senha_regex.test(senha)) {
+                return res.status(400).json({
+                    mensagem: 'A senha deve ter ao menos 8 caracteres, uma maiúscula, um número e um caractere especial!'
+                });
+            }
+            if (senha !== confirmacao_senha) {
+                return res.status(400).json({ mensagem: 'As senhas não correspondem!' });
+            }
+
+            senhaHash = await bcrypt.hash(senha, 10);
+        }
+
+        await userModel.atualizarPerfil(id, nome, email_institucional, senhaHash);
+
+        res.status(200).json({
+            mensagem: 'Informações atualizadas com sucesso!',
+            usuario: { id_usuario: id, nome, email_institucional }
         });
+    } catch (erro) {
+        if (erro.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ mensagem: 'Este e-mail já está em uso!' });
+        }
+        console.error(erro);
+        res.status(500).json({ mensagem: 'Erro ao atualizar informações' });
+    }
+}
+
+async function excluirConta(req, res) {
+    try {
+        const resultado = await userModel.excluirConta(req.params.id);
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+        }
+
+        res.status(200).json({ mensagem: 'Usuário excluído com sucesso!' });
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).json({ mensagem: 'Erro ao excluir usuário' });
     }
 }
 
 export default {
-    cadastrar, buscarPorId, login
+    cadastrar,
+    buscarPorId,
+    login,
+    listar,
+    listarCargos,
+    atualizarConta,
+    atualizarPerfil,
+    excluirConta
 };
