@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Nome Servidor</title>
+    <link rel="stylesheet" href="/styles/dash-especifica.css">
+    <link rel="icon" href="/assets/icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <a href="dash-alertas.html"><img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo" /></a>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"
+                        style="color:white;"></i>Alertas</a></li>
+            <li><a href="dash-servidores.html" class="active"><i class="fa-solid fa-server"
+                        style="color:white;"></i>Servidores</a></li>
+            <li><a href="./mainframes.html"><i class="fa-regular fa-pen-to-square" style="color:white;"></i>Editar
+                    Servidores</a></li>
+            <li><a href="#"><i class="fa-solid fa-gear" style="color:white;"></i>Configurações</a></li>
+        </ul>
+
+        <div class="sidebar-user">
+            <a href="#">
+                <div class="user-avatar">
+                    <span>AS</span>
+                </div>
+                <div class="user-info">
+                    <span id="user-name">Ana Souza</span>
+                    <span id="user-role">Analista</span>
+                </div>
+            </a>
+            <a href="index.html">
+                <i class="fa-solid fa-right-from-bracket" style="color:rgb(255, 102, 102);"></i>
+            </a>
+        </div>
+    </aside>
+
+    <main>
+        <nav>
+            <h1 class="tituto-servidor">
+                Detalhes do Servidor: srv-prod-01
+            </h1>
+    
+            <p class="estado-servidor">
+                <i class="fa-sharp fa-solid fa-circle"></i>
+                Em Alerta
+            </p>
+    
+            <div class="monitorar-servidor">
+                <p>Monitoramento</p>
+    
+            </div>
+    
+            <button class="desativar-servidor">
+                <i class="fa-regular fa-wrench"></i>
+                Desativer
+            </button>
+        </nav>
+
+        <section class="kpis">
+            <div class="kpi">
+                <p class="titulo-kpi">
+                    Uso Médio CPU (últimos 10 registros)
+                </p>
+                <h2 class="componente">
+                    CPU: 67%
+                </h2>
+                <p class="observacao">
+                    Aumentou +8.2% nos últimos 10 registros
+                </p>
+            </div>
+            <div class="kpi">
+                <p class="titulo-kpi">
+                    Uso Médio RAM (últimos 10 registros)
+                </p>
+                <h2 class="componente">
+                    RAM: 42%
+                </h2>
+                <p class="observacao">
+                    Diminuiu +1% nos últimos 10 registros
+                </p>
+            </div>
+            <div class="kpi">
+                <p class="titulo-kpi">
+                    Uso Médio Disco (últimos 10 registros)
+                </p>
+                <h2 class="componente">
+                    Disco: 82%
+                </h2>
+                <p class="observacao">
+                    Aumentou +4% nos últimos 10 registros
+                </p>
+            </div>
+            <div class="kpi">
+                <p class="titulo-kpi">
+                    Previsão de Riso
+                </p>
+                <h2 class="componente">
+                    Risco: Alto
+                </h2>
+                <p class="observacao">
+                    3 Componentes Excedidos
+                </p>
+            </div>
+        </section>
+
+        <section class="grafico">
+            <div class="sessao-acima">
+                <h2 class="titulo-sessao">
+                    Monitoramento de Componentes
+                </h2>
+
+                <div class="butoes-tempo">
+                    <button class="botao-tempo botao-escolhido">
+                        1h
+                    </button>
+
+                    <button class="botao-tempo">
+                        12h
+                    </button>
+
+                    <button class="botao-tempo">
+                        24h
+                    </button>
+                    
+                    <button class="botao-tempo">
+                        7 dias
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grafico">
+
+            </div>
+
+        </section>
+
+        <section class="historico">
+            <h2 class="titulo-sessao">
+                Histórico Detalhado de Métricas
+            </h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data e Hora</th>
+                        <th>CPU(%)</th>
+                        <th>RAM(%)</th>
+                        <th>Disco(%)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                    </tr>
+                    <tr>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                    </tr>
+                    <tr>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                    </tr>
+                    <tr>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                    </tr>
+                    <tr>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                    </tr>
+                    <tr>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                        <th>DadoMocado</th>
+                    </tr>
+                </tbody>
+            </table>            
+        </section>
+    </main>
+
+
+
+</body>
+</html>
