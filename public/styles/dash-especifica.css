@@ -324,4 +324,6 @@ main .sessao-grafico .botoes-tempo .botao-escolhido:hover{
     text-align: left;
     border-bottom: 1px solid #E7EAF0;
     padding: 10px 20px;
+    font-weight: normal;
+    color: #667085;
 }
