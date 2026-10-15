@@ -42,59 +42,10 @@
     </div>
   </aside>
 
-  <main class="main" id="container_main" onclick="fecharEditarUsuario()">
+   <main class="main" id="container_main" onclick="fecharEditarUsuario()">
     <section class="panel users-column" aria-label="Lista de usuários">
       <h1 class="panel-title">Usuários</h1>
-
-      <div class="scrollable-area">
-        <div class="card">
-          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-        </div>
-
-        <div class="card selected">
-          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Carlos</span></div>
-          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">carlosdino15@carlos.eduardo</span></div>
-          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Lixosos</span></div>
-          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">Empresa Dinossauro 67</span></div>
-          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">(67) 67676-6767</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-field"><span class="card-label">USUARIO:</span> <span class="card-value">Usuario</span></div>
-          <div class="card-field"><span class="card-label">EMAIL:</span> <span class="card-value">email</span></div>
-          <div class="card-field"><span class="card-label">CARGO:</span> <span class="card-value">Cargo</span></div>
-          <div class="card-field"><span class="card-label">EMPRESA:</span> <span class="card-value">empresa</span></div>
-          <div class="card-field col-span-2"><span class="card-label">CONTATO:</span> <span class="card-value">ctt</span></div>
-        </div>
-      </div>
+      <div class="scrollable-area" id="lista_usuarios"></div>
     </section>
 
     <section class="roles-column" aria-label="Atribuição de cargos">
@@ -105,34 +56,27 @@
           <div class="user-header-info">
             <div class="info-line">
               <span class="card-label">USUARIO:</span>
-              <span>Carlos</span>
+              <span id="sel_nome">-</span>
             </div>
             <div class="info-line">
               <span class="card-label">EMPRESA:</span>
-              <span>Empresa Dinossauro 67</span>
+              <span id="sel_empresa">-</span>
             </div>
             <div class="info-line">
               <span class="card-label">EMAIL:</span>
-              <span>carlosdino15@carlos.eduardo</span>
+              <span id="sel_email">-</span>
             </div>
           </div>
 
           <hr class="divider">
 
-          <div class="scrollable-area roles-list">
-            <div class="role-card selected">Lixosos</div>
-            <div class="role-card">CARGO X</div>
-            <div class="role-card">CARGO X</div>
-            <div class="role-card">CARGO X</div>
-            <div class="role-card">CARGO X</div>
-            <div class="role-card">CARGO X</div>
-          </div>
+          <div class="scrollable-area roles-list" id="lista_cargos"></div>
         </div>
       </div>
 
       <div class="action-buttons">
-        <button type="button" class="btn btn-delete">Deletar usuário</button>
-        <button type="button" class="btn btn-update">Atualizar usuário</button>
+        <button type="button" class="btn btn-delete" id="excluirConta">Deletar usuário</button>
+        <button type="button" class="btn btn-update" id="atualizarConta">Atualizar usuário</button>
       </div>
     </section>
   </main>
