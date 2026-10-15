@@ -25,15 +25,16 @@
       <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"></i>Alertas</a></li>
       <li><a href="dash-servidores.html"><i class="fa-solid fa-server"></i>Servidores</a></li>
       <li><a href="mainframes.html" class="active"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
-      <li><a href="#"><i class="fa-solid fa-gear"></i>Configurações</a></li>
+      <li><a href="cargos.html"><i class="fa-solid fa-user-tag"></i>Cargos</a></li>
+      <li><a href="cadastro-func.html"><i class="fa-solid fa-users"></i>Usuários</a></li>
     </ul>
 
     <div class="sidebar-user">
       <a href="#" onclick="abrirEditarUsuario()">
-        <div class="user-avatar"><span>AS</span></div>
+        <div class="user-avatar"><span id="user-avatar">-</span></div>
         <div class="user-info">
-          <span class="user-name">Ana Souza</span>
-          <span class="user-role">Analista</span>
+          <span id="user-name">-</span>
+          <span id="user-role">-</span>
         </div>
       </a>
       <a href="index.html"><i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);"></i></a>
@@ -87,10 +88,9 @@
                     class="fa-solid fa-plus"></i> Nova localização</button>
               </div>
               <div class="form-grid">
-                <div class="field"><label for="pais">País</label><input type="text" id="pais" readonly></div>
+                <div class="field"><label for="regiao">CEP</label><input type="text" id="regiao" readonly></div>
                 <div class="field"><label for="estado">Estado</label><input type="text" id="estado" readonly></div>
                 <div class="field"><label for="cidade">Cidade</label><input type="text" id="cidade" readonly></div>
-                <div class="field"><label for="regiao">CEP</label><input type="text" id="regiao" readonly></div>
               </div>
 
               <div class="inline-new-form hidden" id="form-nova-localizacao">
@@ -104,14 +104,12 @@
                 <div class="form-grid">
                   <div class="field"><label for="nova-loc-nome">Nome</label><input type="text" id="nova-loc-nome"
                       maxlength="100"></div>
-                  <div class="field"><label for="nova-loc-pais">País</label><input type="text" id="nova-loc-pais"
-                      maxlength="100"></div>
-                  <div class="field"><label for="nova-loc-estado">Estado</label><input type="text" id="nova-loc-estado"
-                      maxlength="100"></div>
-                  <div class="field"><label for="nova-loc-cidade">Cidade</label><input type="text" id="nova-loc-cidade"
-                      maxlength="100"></div>
                   <div class="field"><label for="nova-loc-regiao">CEP</label><input type="text" id="nova-loc-regiao"
                       maxlength="9" placeholder="Ex: 01310-100"></div>
+                  <div class="field"><label for="nova-loc-estado">Estado</label><select name="select-estado" 
+                      id="nova-loc-estado">Selecione o estado</select></div>
+                  <div class="field"><label for="nova-loc-cidade">Cidade</label><select name="select-cidade" 
+                      id="nova-loc-cidade">Selecione a cidade</select></div>
                 </div>
                 <div class="inline-form-actions">
                   <button type="button" class="btn-cancel" id="btn-cancelar-nova-localizacao">Cancelar</button>
@@ -253,6 +251,7 @@
   </main>
 
   <script src="/js/api.js"></script>
+  <script src="/js/user-sidebar.js"></script>
   <script src="/js/cadastro-mainframe.js"></script>
   <script src="/js/editar-usuario.js"></script>
 </body>

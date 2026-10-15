@@ -129,12 +129,12 @@
                   class="fa-solid fa-plus"></i> Nova localização</button>
             </div>
             <div class="form-grid hidden" id="form-grid-read">
-              <div class="field"><label for="edit-pais">País</label><input type="text" id="edit-pais" readonly></div>
+              <div class="field"><label for="edit-regiao">CEP</label><input type="text" id="edit-regiao" readonly>
+              </div>
               <div class="field"><label for="edit-estado">Estado</label><input type="text" id="edit-estado" readonly>
               </div>
               <div class="field"><label for="edit-cidade">Cidade</label><input type="text" id="edit-cidade" readonly>
               </div>
-              <div class="field"><label for="edit-regiao">CEP</label><input type="text" id="edit-regiao" readonly></div>
             </div>  
 
             <div class="inline-new-form hidden" id="form-nova-localizacao">
@@ -148,14 +148,12 @@
               <div class="form-grid">
                 <div class="field"><label for="nova-loc-nome">Nome</label><input type="text" id="nova-loc-nome"
                     maxlength="100"></div>
-                <div class="field"><label for="nova-loc-pais">País</label><input type="text" id="nova-loc-pais"
-                    maxlength="100"></div>
-                <div class="field"><label for="nova-loc-estado">Estado</label><input type="text" id="nova-loc-estado"
-                    maxlength="100"></div>
-                <div class="field"><label for="nova-loc-cidade">Cidade</label><input type="text" id="nova-loc-cidade"
-                    maxlength="100"></div>
                 <div class="field"><label for="nova-loc-regiao">CEP</label><input type="text" id="nova-loc-regiao"
                     maxlength="9" placeholder="Ex: 01310-100"></div>
+                <div class="field"><label for="nova-loc-estado">Estado</label><select name="select-estado" 
+                      id="nova-loc-estado">Selecione o estado</select></div>
+                  <div class="field"><label for="nova-loc-cidade">Cidade</label><select name="select-cidade" 
+                      id="nova-loc-cidade">Selecione a cidade</select></div>
               </div>
               <div class="inline-form-actions">
                 <button type="button" class="btn-cancel" id="btn-cancelar-nova-localizacao">Cancelar</button>

@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const statusSelect = document.getElementById("status-mainframe");
 
   const localizacaoSelect = document.getElementById("localizacao");
-  const paisInput = document.getElementById("pais");
   const estadoInput = document.getElementById("estado");
   const cidadeInput = document.getElementById("cidade");
   const regiaoInput = document.getElementById("regiao");
@@ -40,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSalvarNovaLocalizacao = document.getElementById("btn-salvar-nova-localizacao");
   const formNovaLocalizacao = document.getElementById("form-nova-localizacao");
   const novaLocNome = document.getElementById("nova-loc-nome");
-  const novaLocPais = document.getElementById("nova-loc-pais");
   const novaLocEstado = document.getElementById("nova-loc-estado");
   const novaLocCidade = document.getElementById("nova-loc-cidade");
   const novaLocRegiao = document.getElementById("nova-loc-regiao");
@@ -67,6 +65,94 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+async function carregarEstado() {
+  novaLocEstado.innerHTML = '<option value="">Selecione o estado</option>';
+
+  const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados");
+
+  const estados = await res.json();
+
+  estados.sort((a, b) =>
+        a.nome.localeCompare(b.nome, "pt-BR")
+  );
+
+  estados.forEach(estado => {
+    const option = document.createElement("option");
+
+    option.value = estado.sigla;
+    option.textContent = estado.nome;
+
+    novaLocEstado.appendChild(option);
+  });
+}
+
+async function carregarCidade(uf, cidadeSelecionada = "") {
+  novaLocCidade.innerHTML = '<option value="">Selecione a cidade</option>';
+
+  novaLocCidade.disabled = true;
+
+  if (!uf) {
+    return;
+  }
+
+  const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
+
+  const cidades = await res.json();
+
+  cidades.sort((a, b) =>
+        a.nome.localeCompare(b.nome, "pt-BR")
+  );
+
+  cidades.forEach(cidade => {
+    const option = document.createElement("option");
+
+    option.value = cidade.nome;
+    option.textContent = cidade.nome;
+
+    novaLocCidade.appendChild(option);
+
+    if (cidade.nome === cidadeSelecionada) {
+      option.selected = true;
+    }
+
+  });
+
+  novaLocCidade.disabled = false;
+}
+
+novaLocEstado.addEventListener("change", async () => {
+  await carregarCidade(novaLocEstado.value);
+})
+
+novaLocRegiao.addEventListener("blur", async () => {
+  const cep = novaLocRegiao.value.replace(/\D/g, "");
+
+  if (cep.length !== 8){
+    alert("O cep deve conter 8 dígitos!")
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+
+    const endereco = await res.json();
+
+    if (endereco.erro){
+      alert("Endereço não encontrado");
+      return; 
+    }
+
+    novaLocEstado.value = endereco.uf;
+
+    await carregarCidade(novaLocEstado.value, endereco.localidade);
+
+  }
+  catch (erro){
+    console.error("Erro ao consultar o CEP:", erro);
+  }
+
+})
+
   async function carregarLocalizacoes() {
     localizacoes = await api.get("/localizacao");
     preencherSelectLocalizacoes();
@@ -76,17 +162,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const id = Number(localizacaoSelect.value);
     const localizacao = localizacoes.find((l) => l.id_localizacao === id);
 
-    paisInput.value = localizacao ? localizacao.pais : "";
     estadoInput.value = localizacao ? localizacao.estado : "";
     cidadeInput.value = localizacao ? localizacao.cidade : "";
-    regiaoInput.value = localizacao ? localizacao.cod_regiao : "";
+    regiaoInput.value = localizacao ? localizacao.cep : "";
   }
 
   localizacaoSelect.addEventListener("change", atualizarDadosLocalizacao);
 
   function limparFormNovaLocalizacao() {
     novaLocNome.value = "";
-    novaLocPais.value = "";
     novaLocEstado.value = "";
     novaLocCidade.value = "";
     novaLocRegiao.value = "";
@@ -105,18 +189,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnSalvarNovaLocalizacao.addEventListener("click", async () => {
     const nome = novaLocNome.value.trim();
-    const pais = novaLocPais.value.trim();
     const estado = novaLocEstado.value.trim();
     const cidade = novaLocCidade.value.trim();
-    const cod_regiao = novaLocRegiao.value.trim();
+    const cep = novaLocRegiao.value.trim();
 
-    if (!nome || !pais || !estado || !cidade || !cod_regiao) {
+    if (!nome || !estado || !cidade || !cep) {
       alert("Preencha todos os campos da nova localização.");
       return;
     }
 
     try {
-      const nova = await api.post("/localizacao", { nome, pais, estado, cidade, cod_regiao });
+      const nova = await api.post("/localizacao", { nome, estado, cidade, cep });
       await carregarLocalizacoes();
       localizacaoSelect.value = nova.id_localizacao;
       atualizarDadosLocalizacao();
@@ -330,7 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
   //  Inicialização 
   (async function iniciar() {
     try {
-      await Promise.all([carregarLocalizacoes(), carregarComponentes()]);
+      await Promise.all([carregarLocalizacoes(), carregarComponentes(), carregarEstado()]);
       renderComponentesAdicionados();
     } catch (err) {
       console.error(err);

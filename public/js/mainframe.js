@@ -43,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const editVersaoSoInput = document.getElementById("edit-versao-so");
   const editStatusSelect = document.getElementById("edit-status");
   const editLocalizacaoSelect = document.getElementById("edit-localizacao");
-  //const editPaisInput = document.getElementById("edit-pais");
   const editEstadoInput = document.getElementById("edit-estado");
   const editCidadeInput = document.getElementById("edit-cidade");
   const editRegiaoInput = document.getElementById("edit-regiao");
@@ -78,11 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const novoCompSerie = document.getElementById("novo-comp-serie");
   const novoCompCapacidade = document.getElementById("novo-comp-capacidade");
 
-  // Usuário
-  // const nomeUsuario = document.getElementById("user-name");
-  // const cargoUsuario = document.getElementById("user-role");
-  // const avatarUsuario = document.getElementById("user-avatar")
-
   //  Localizações 
   function preencherSelectLocalizacoes() {
     if (!editLocalizacaoSelect) return;
@@ -95,22 +89,95 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // async function preencherUsuario(){
-  //   try {
-  //     usuario = await api.get(`/buscarUsuario/${id}`)
+  
+async function carregarEstado() {
+  novaLocEstado.innerHTML = '<option value="">Selecione o estado</option>';
 
-  //     nomeUsuario.innerText = usuario.nome_usuario;
-  //     cargoUsuario.innerText = usuario.nome_cargo;
-      
-  //     const iniciais = usuario.nome_usuario.split(" ").map(nome_usuario => nome_usuario[0]).join("").toUpperCase()
+  const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados");
 
-  //     avatarUsuario.innerText = iniciais;
+  const estados = await res.json();
 
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-    
-  // }
+  estados.sort((a, b) =>
+        a.nome.localeCompare(b.nome, "pt-BR")
+  );
+
+  estados.forEach(estado => {
+    const option = document.createElement("option");
+
+    option.value = estado.sigla;
+    option.textContent = estado.nome;
+
+    novaLocEstado.appendChild(option);
+  });
+}
+
+async function carregarCidade(uf, cidadeSelecionada = "") {
+  novaLocCidade.innerHTML = '<option value="">Selecione a cidade</option>';
+
+  novaLocCidade.disabled = true;
+
+  if (!uf) {
+    return;
+  }
+
+  const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
+
+  const cidades = await res.json();
+
+  cidades.sort((a, b) =>
+        a.nome.localeCompare(b.nome, "pt-BR")
+  );
+
+  cidades.forEach(cidade => {
+    const option = document.createElement("option");
+
+    option.value = cidade.nome;
+    option.textContent = cidade.nome;
+
+    novaLocCidade.appendChild(option);
+
+    if (cidade.nome === cidadeSelecionada) {
+      option.selected = true;
+    }
+
+  });
+
+  novaLocCidade.disabled = false;
+}
+
+novaLocEstado.addEventListener("change", async () => {
+  await carregarCidade(novaLocEstado.value);
+})
+
+novaLocRegiao.addEventListener("blur", async () => {
+  const cep = novaLocRegiao.value.replace(/\D/g, "");
+
+  if (cep.length !== 8){
+    alert("O cep deve conter 8 dígitos!")
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+
+    const endereco = await res.json();
+
+    if (endereco.erro){
+      alert("Endereço não encontrado");
+      return; 
+    }
+
+    novaLocEstado.value = endereco.uf;
+
+    await carregarCidade(novaLocEstado.value, endereco.localidade);
+
+  }
+  catch (erro){
+    console.error("Erro ao consultar o CEP:", erro);
+  }
+
+})
+
 
 function atualizarBotaoLocalizacao() {
   if (!editLocalizacaoSelect) return;
@@ -196,7 +263,6 @@ function atualizarBotaoLocalizacao() {
     const id = Number(editLocalizacaoSelect.value);
     const localizacao = localizacoes.find((l) => l.id_localizacao === id);
 
-    //editPaisInput.value = localizacao ? localizacao.pais : "";
     editEstadoInput.value = localizacao ? localizacao.estado : "";
     editCidadeInput.value = localizacao ? localizacao.cidade : "";
     if (editRegiaoInput) editRegiaoInput.value = localizacao ? localizacao.cep : "";
@@ -567,6 +633,7 @@ if (btnToggleEditarLocalizacao) {
       atualizarDadosLocalizacao();
       atualizarBotaoLocalizacao();
       esconderFormGrid();
+      carregarEstado();
 
       editParametros = target.parametros.map((p) => ({
         fk_componente: p.fk_componente, pico_max: p.pico_max, pico_min: p.pico_min, percentual: p.percentual,
