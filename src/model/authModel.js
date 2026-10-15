@@ -22,24 +22,22 @@ class AuthModel {
     }
 
 
-    static async buscarMainframe(hostname, idEmpresa) {
+    static async buscarMainframe(idEmpresa) {
 
         const [resultado] = await pool.query(
             `
             SELECT 
-            m.id_mainframe,
-            m.hostname,
-            m.sis_operacional,
-            u.fk_empresa
-        FROM mainframe m
-        INNER JOIN usuario u ON m.fk_usuario = u.id_usuario
-        WHERE m.hostname = ? 
-          AND u.fk_empresa = ?
+                id_mainframe,
+                hostname,
+                sis_operacional,
+                fk_empresa AS id_empresa
+            FROM mainframe
+            WHERE fk_empresa = ?
         `,
-        [hostname, idEmpresa]
+        [idEmpresa]
         );
 
-        return resultado[0];
+        return resultado;
     }
 
 
@@ -49,14 +47,18 @@ class AuthModel {
         `
         SELECT 
             c.id_componente, 
-            c.tipo, 
-            c.modelo,
+            c.tipo,
+            c.capacidade,
+            f.nome_fabricante,
             p.percentual,
             p.pico_min,
             p.pico_max
         FROM parametro p
-        INNER JOIN componente c ON c.id_componente = p.fk_componente
-        WHERE p.fk_mainframe = ?
+        INNER JOIN componente c 
+            ON c.id_componente = p.id_componente
+        INNER JOIN fabricante f
+            ON f.id_fabricante = c.fk_fabricante
+        WHERE p.id_mainframe = ?;
         `,
         [idMainframe]
     );

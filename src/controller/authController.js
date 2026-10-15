@@ -9,7 +9,7 @@ class AuthController {
 
             const { email, senha, hostname } = req.body;
 
-            if (!email || !senha || !hostname) {
+            if (!email || !senha) {
 
                 return res.status(400).json({
                     mensagem: 'Email, senha e hostname são obrigatórios'
@@ -34,17 +34,27 @@ class AuthController {
                 });
             }
 
-            const mainframe = await authModel.buscarMainframe(
-                hostname,
+            const mainframes = await authModel.buscarMainframe(
                 usuario.id_empresa
             );
 
-            if (!mainframe) {
-
+            if (mainframes.length === 0) {
                 return res.status(401).json({
                     mensagem: 'Mainframe não encontrado ou não pertence à empresa do usuário'
                 });
             }
+
+
+            if (!hostname) {
+                return res.status(200).json({
+                    autenticado: true,
+                    mainframe: mainframes
+                });
+            }
+
+            const mainframe = await mainframes.find(mf => {
+                return mf.hostname === hostname
+            });
 
             const componentes = await authModel.buscarComponentes(
                 mainframe.id_mainframe
