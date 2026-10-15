@@ -17,6 +17,7 @@ body {
     width: 240px;
     height: 100vh;
     background-color: #1A1F71;
+    position: fixed;
     color: white;
     display: flex;
     flex-direction: column;
@@ -124,6 +125,7 @@ main {
     width: 100%;
     display: flex;
     flex-direction: column;
+    margin-left: 240px;
 
     background-color: #F8F9FA;
 }
@@ -244,3 +246,55 @@ main .kpis .kpi .observacao {
 
 main .kpis .kpi .excedeu {color: #F44336;}
 main .kpis .kpi .normal {color: #27AE60;}
+
+main .sessao-grafico {
+    width: 90%;
+    height: 500px;
+    border: 10px;
+    background-color: #FFF;
+    padding: 30px 40px;
+
+    align-self: center;
+}
+
+main .sessao-grafico .sessao-acima {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+main .sessao-grafico .botoes-tempo {
+    display: flex;
+    background-color: #E0E0E0;
+    width: 250px;
+    height: 30px;
+    border-radius: 10px;
+    gap: 0.75rem;
+}
+
+main .sessao-grafico .botoes-tempo .botao-tempo {
+    width: 45px;
+    height: 30px;
+    color: #667085;
+    background-color: #E0E0E0;
+    border: none;
+}
+
+main .sessao-grafico .botoes-tempo .botao-tempo:hover{
+    background-color: #D2D2D2;
+}
+
+main .sessao-grafico .botoes-tempo .botao-escolhido {
+    background-color: #FFF;
+    color: #2196F3;
+    font-weight: bold;
+}
+
+main .sessao-grafico .botoes-tempo .botao-escolhido:hover{
+    background-color: rgb(248, 248, 248);
+}
+
+.titulo-sessao {
+    font-size: 18px;
+    font-weight: normal;
+}
