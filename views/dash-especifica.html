@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Sidebar -->
@@ -45,25 +47,33 @@
     </aside>
 
     <main>
-        <nav>
-            <h1 class="tituto-servidor">
-                Detalhes do Servidor: srv-prod-01
-            </h1>
-    
-            <p class="estado-servidor">
-                <i class="fa-sharp fa-solid fa-circle"></i>
-                Em Alerta
-            </p>
-    
-            <div class="monitorar-servidor">
-                <p>Monitoramento</p>
-    
+        <nav class="navbar">
+            <div class="parte-esquerda">
+                <h1 class="tituto-servidor">
+                    Detalhes do Servidor: srv-prod-01
+                </h1>
+            </div>
+
+            <div class="parte-direita">
+                <p class="estado-servidor">
+                    Em Alerta
+                </p>
+        
+                <div class="monitorar-servidor">
+                    <p>Monitoramento</p>
+
+                    <div class="cor-fundo-botao">
+                        <div class="botao"></div>
+                    </div>
+        
+                </div>
+        
+                <button class="desativar-servidor">
+                    <i class="fa-solid fa-wrench"></i>
+                    Desativer
+                </button>
             </div>
     
-            <button class="desativar-servidor">
-                <i class="fa-regular fa-wrench"></i>
-                Desativer
-            </button>
         </nav>
 
         <section class="kpis">
