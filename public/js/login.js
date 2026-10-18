@@ -22,11 +22,11 @@ function login(event) {
             if ((data.mensagem).includes('sucesso')) {
 
                 console.log("Dados recebidos:", data);
-                console.log("ID usuário:", data.usuario);
-                console.log("ID empresa:", data.empresa);
+                console.log("ID usuário:", data.usuario.id_usuario);
+                console.log("ID empresa:", data.usuario.empresa);
 
-                sessionStorage.setItem("idUsuario", data.usuario);
-                sessionStorage.setItem("idEmpresa", data.empresa);
+                sessionStorage.setItem("idUsuario", data.usuario.id_usuario);
+                sessionStorage.setItem("idEmpresa", data.usuario.id_empresa);
                 
                 setTimeout(() => {
                     window.location = '/dash-alertas.html'

@@ -161,6 +161,7 @@ async function login(req, res) {
         id_usuario: usuario.id_usuario,
         nome: usuario.nome,
         email_institucional: usuario.email_institucional,
+        id_empresa: usuario.id_empresa
       },
     });
   } catch (erro) {
@@ -176,53 +177,15 @@ async function login(req, res) {
 
 async function listar(req, res) {
     try {
-        const {
-            email_institucional,
-            senha
-        } = req.body;
+        const usuarios = await userModel.listar();
 
-        const usuario = await userModel.buscarPorEmail(email_institucional);
-
-        if (!usuario) {
-            return res.status(401).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Email ou senha inválidas!',
-                descricao: ''
-            });
-        }
-
-        const senhaValida = await bcrypt.compare(
-            senha,
-            usuario.senha
-        );
-
-        if (!senhaValida) {
-            return res.status(401).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Email ou senha inválidas!',
-                descricao: ''
-            });
-        }
-
-        if (!usuario.verificado) {
-            return res.status(403).json({
-                icon: '../../assets/erro.svg',
-                mensagem: 'Email ainda não verificado!',
-                descricao: 'Atenção! É necessário verificar seu email para ter acesso aos nossos recursos. Verifique sua caixa de email!'
-            });
-        }
-
-        return res.status(200).json({
-            icon: '../../assets/sucesso.svg',
-            mensagem: 'Login realizado com sucesso!',
-            descricao: 'Redirecionando para a dashboard...',
-            usuario: usuario.id_usuario,
-            empresa : usuario.id_empresa
-        });
-
+        return res.status(200).json(usuarios);
     } catch (erro) {
         console.error(erro);
-        res.status(500).json({ mensagem: 'Erro ao listar usuários' });
+
+        return res.status(500).json({
+            mensagem: 'Erro ao listar usuários'
+        });
     }
 }
 

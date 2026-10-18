@@ -12,6 +12,7 @@ async function cadastrar(nome, email_institucional, cpf, senha, fk_empresa) {
 }
 
 async function buscarPorId(id) {
+    console.log(id)
     const [resultado] = await pool.query(
         `SELECT
             u.id_usuario,
