@@ -376,6 +376,10 @@ body {
   background: #1D4ED8;
 }
 
+.hidden {
+  display: none !important;
+}
+
 @media (max-width: 1050px) {
   .main {
     grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);

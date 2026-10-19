@@ -2,6 +2,18 @@ let cargos = [];
 let cargoSelecionado = null;
 
 const idEmpresa = sessionStorage.getItem("idEmpresa");
+const idUsuario = sessionStorage.getItem("idUsuario");
+
+let verificar = []
+
+async function verificarPermissao() {
+    verificar = await api.get(`/buscarUsuario/${idUsuario}`)
+
+    if (verificar.nome_cargo !== "Administrador") {
+        window.location.href = '/proibir.html'
+        return;
+    }
+} 
 
 async function carregarCargos() {
     // BACK-END: conferir se a rota GET /api/cargo retorna os cargos
@@ -210,4 +222,5 @@ document.getElementById("btn-editar-cargo").addEventListener("click", editarCarg
 document.getElementById("btn-cancelar-exclusao").addEventListener("click", fecharPopup);
 document.getElementById("btn-confirmar-exclusao").addEventListener("click", excluirCargo);
 
+verificarPermissao();
 carregarCargos();

@@ -83,3 +83,7 @@
 
 .popup-editar .deletar-conta {background-color: #DC2626;}
 .popup-editar .deletar-conta:hover {background-color: rgba(220, 38, 38, 0.8);}
+
+.hidden {
+  display: none !important;
+}

@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
-<body>
+<body onload="verificarPermissao()">
   <aside class="sidebar">
     <div class="sidebar-brand">
       <a href="dash-alertas.html">
@@ -24,8 +24,8 @@
       <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"></i>Alertas</a></li>
       <li><a href="dash-servidores.html"><i class="fa-solid fa-server"></i>Servidores</a></li>
       <li><a href="mainframes.html"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
-      <li><a href="cargos.html" class="active"><i class="fa-solid fa-user-tag"></i>Cargos</a></li>
-      <li><a href="cadastro-func.html"><i class="fa-solid fa-users"></i>Usuários</a></li>
+      <li id="cargos-html" class="hidden"><a href="cargos.html"><i class="fa-solid fa-user-tag" aria-hidden="true"></i>Cargos</a></li>
+      <li id="funcionarios-html" class="hidden"><a href="cadastro-func.html"><i class="fa-solid fa-users" aria-hidden="true"></i>Usuários</a></li>
     </ul>
 
     <div class="sidebar-user">

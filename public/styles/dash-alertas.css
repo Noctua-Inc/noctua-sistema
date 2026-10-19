@@ -597,6 +597,10 @@
     border: 0;
 }
 
+.hidden {
+  display: none !important;
+}
+
 @media (max-width: 1450px) {
     .alertas-indicador {
         gap: 9px;

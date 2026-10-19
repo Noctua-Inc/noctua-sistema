@@ -8,6 +8,19 @@ let cargoSelecionado = null;
 const listaUsuarios = document.getElementById('lista_usuarios');
 const listaCargos = document.getElementById('lista_cargos');
 
+const idUsuario = sessionStorage.getItem("idUsuario");
+
+let verificar = []
+
+async function verificarPermissao() {
+    verificar = await api.get(`/buscarUsuario/${idUsuario}`)
+
+    if (verificar.nome_cargo !== "Administrador") {
+        window.location.href = '/proibir.html'
+        return;
+    }
+} 
+
 function campo(label, valor, extraClass = '') {
   const div = document.createElement('div');
   div.className = `card-field ${extraClass}`.trim();

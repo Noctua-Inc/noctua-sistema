@@ -38,7 +38,7 @@ async function listar(req, res) {
 async function atualizar(req, res) {
     try {
         const idCargo = req.params.id;
-        console.log(idCargo)
+
         const {nome_cargo, permissoes} = req.body;
 
         await cargoModel.atualizar(idCargo, nome_cargo, permissoes)
