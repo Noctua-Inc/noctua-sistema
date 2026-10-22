@@ -18,6 +18,8 @@ async function buscarPorId(id) {
             u.nome AS nome_usuario,
             u.email_institucional,
             u.cpf,
+            u.fk_empresa,
+            c.id_cargo,
             c.nome AS nome_cargo
         FROM usuario u JOIN cargo c
 			ON u.fk_cargo = c.id_cargo

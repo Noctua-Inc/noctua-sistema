@@ -28,19 +28,19 @@ async function carregarCargos() {
         let cargo = cargos[i];
         let permissoes = "";
 
-        if (cargo.permissoes.includes(3)) {
+        if (cargo.permissoes.includes(1)) {
             permissoes += `<span class="permission-tag">Criação</span>`;
         }
 
-        if (cargo.permissoes.includes(1)) {
-            permissoes += `<span class="permission-tag">Visualização</span>`;
-        }
+        // if (cargo.permissoes.includes(1)) {
+        //     permissoes += `<span class="permission-tag">Visualização</span>`;
+        // }
 
         if (cargo.permissoes.includes(2)) {
             permissoes += `<span class="permission-tag">Edição</span>`;
         }
 
-        if (cargo.permissoes.includes(4)) {
+        if (cargo.permissoes.includes(3)) {
             permissoes +=`<span class="permission-tag">Exclusão</span>`;
         }
 
@@ -85,6 +85,11 @@ async function carregarCargos() {
 }
 
 function selecionarCargo(idCargo) {
+    if (idCargo == 1 || idCargo == 2) {
+        alert("Cargo padrão não pode ser editado!");
+        return;
+    }
+
     for (let i = 0; i < cargos.length; i++) {
         if (cargos[i].id_cargo == idCargo) {
             cargoSelecionado = cargos[i];
@@ -161,6 +166,8 @@ async function criarCargo() {
         }
     }
 
+    console.log(nome, checkboxes, permissoes)
+
     if (nome == "") {
         alert("Digite o nome do cargo.");
         return;
@@ -199,6 +206,11 @@ async function excluirCargo() {
 
     // BACK-END: conferir se a rota DELETE /api/cargo/:id
     // remove o cargo e suas permissões relacionadas.
+    if(cargoExcluindo == 1 || cargoExcluindo == 2){
+        alert("Cargos padrões não podem ser excluídos!")
+        return;
+    }
+
     await api.delete(
         `/cargo/${cargoExcluindo}`
     );

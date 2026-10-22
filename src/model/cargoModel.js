@@ -21,15 +21,31 @@ async function listar(idEmpresa) {
     return rows;
 }
 
+async function buscarPermissoes(idCargo, idEmpresa) {
+    const [rows] = await pool.execute(
+        `SELECT
+            c.id_cargo,
+            c.nome AS nome_cargo,
+            p.id_permissao,
+            p.nome AS permissao
+        FROM cargo c
+        LEFT JOIN cargo_permissao cp
+            ON c.id_cargo = cp.id_cargo
+        LEFT JOIN permissao p
+            ON cp.id_permissao = p.id_permissao
+        WHERE c.id_cargo = ?
+        AND (c.fk_empresa = ? OR c.fk_empresa IS NULL);`,
+        [idCargo, idEmpresa]
+    );
+
+    return rows;
+}
+
 async function deletar(idCargo){
     const conexao = await pool.getConnection();
 
     try {
         await conexao.beginTransaction();
-
-        if (idCargo == 1 || idCargo == 2) {
-            throw new Error('O cargo padrão não pode ser excluído.');
-        }
 
         await conexao.execute(`
             UPDATE usuario SET fk_cargo = 1 WHERE fk_cargo = ?`,
@@ -132,4 +148,4 @@ async function atualizar(idCargo, nome_cargo, permissoes) {
             await conexao.release();
         }
     }
-export default { listar, deletar, criar, atualizar};
+export default { listar, buscarPermissoes, deletar, criar, atualizar};

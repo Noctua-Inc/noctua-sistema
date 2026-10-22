@@ -38,7 +38,6 @@ async function listar(req, res) {
 async function atualizar(req, res) {
     try {
         const idCargo = req.params.id;
-
         const {nome_cargo, permissoes} = req.body;
 
         await cargoModel.atualizar(idCargo, nome_cargo, permissoes)
@@ -91,4 +90,31 @@ async function criar(req, res) {
     }
 }
 
-export default { listar, deletar, criar, atualizar};
+async function buscarPermissoes(req, res) {
+    try {
+        const {idCargo, idEmpresa} = req.params;
+
+        const rows = await cargoModel.buscarPermissoes(idCargo, idEmpresa);
+        const permissoes = [];
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            permissoes.push(row.id_permissao)
+        }
+
+        res.status(200).json({
+            mensagem: 'Permissões enviadas!',
+            permissao: permissoes
+        })
+
+        console.log(permissoes)
+    } catch (error) {
+        console.error(error)
+
+        res.status(500).json({
+            erro: 'Erro ao listar permissões'
+        })
+    }
+}
+
+export default { listar, deletar, criar, atualizar, buscarPermissoes};

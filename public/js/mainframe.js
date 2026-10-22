@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const id = sessionStorage.getItem("idUsuario");
   const idEmpresa = sessionStorage.getItem("idEmpresa")
 
-  const STATUS_CSS = { ativo: "status-ativo", inativo: "status-inativo", "manut.": "status-manutencao" };
+  const STATUS_CSS = { ativo: "status-ativo", inativo: "status-inativo", "manutenção": "status-manutencao" };
   const STATUS_NOME = { ativo: "Ativo", inativo: "Inativo", "manut.": "Manutenção" };
 
   function escapeHtml(str) {
@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let componentes = [];
   let mainframes = [];
   let usuario = [];
+  let per = [];
 
   const tableBody = document.getElementById("table-body");
   if (!tableBody) return;
@@ -52,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnCloseModal = document.getElementById("btn-close-modal");
   const btnCancelModal = document.getElementById("btn-cancel-modal");
   const formLocalizacaoRead = document.getElementById("form-grid-read");
+  
 
   // Nova localização
   const btnToggleNovaLocalizacao = document.getElementById("btn-toggle-nova-localizacao");
@@ -89,7 +91,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  
+  let podeEditar = false;
+  let podeCriar = false;
+  let podeExcluir = false;
+
+  async function carregarCargo() {
+    usuario = await api.get(`/buscarUsuario/${id}`);
+    const idCargo = usuario.id_cargo;
+
+    per = await api.get(`/cargo/${idCargo}/${idEmpresa}`);
+
+    console.log(per)
+
+    podeCriar = per.permissao.includes(1);;
+    podeEditar = per.permissao.includes(2);
+    podeExcluir = per.permissao.includes(3);
+
+    document.getElementById("btn-create").classList.toggle("hidden", !podeCriar);
+  }
+
+  if (!podeCriar) {
+    document.getElementById("btn-create").classList.add("hidden");
+  }
+
 async function carregarEstado() {
   novaLocEstado.innerHTML = '<option value="">Selecione o estado</option>';
 
@@ -555,6 +579,8 @@ if (btnToggleEditarLocalizacao) {
              <button type="button" class="btn-cancel">Cancelar</button>`
           : `<button type="button" class="btn-delete" data-ask-id="${m.id_mainframe}">Excluir</button>`;
 
+
+
         return `
           <tr>
             <td>${escapeHtml(m.hostname)}</td>
@@ -564,8 +590,8 @@ if (btnToggleEditarLocalizacao) {
             <td style="color:#9ca3af">${m.cep ? escapeHtml(m.cep) : "-"}</td>
             <td>
               <div class="actions">
-                <button type="button" class="btn-edit" data-id="${m.id_mainframe}">Editar</button>
-                ${acoesConfirmacao}
+                ${podeEditar ? `<button type="button" class="btn-edit" data-id="${m.id_mainframe}">Editar</button>` : ""}
+                ${podeExcluir ? acoesConfirmacao : ""}
               </div>
             </td>
           </tr>
@@ -729,10 +755,11 @@ if (btnToggleEditarLocalizacao) {
   if (modalEdit) modalEdit.addEventListener("click", (e) => { if (e.target === modalEdit) closeModal(); });
   if (searchInput) searchInput.addEventListener("input", renderTable);
 
+  const btnEditar = document.getElementById("btn-edit");
   // Inicialização
   (async function iniciar() {
     try {
-      await Promise.all([carregarLocalizacoes(), carregarComponentes()]);
+      await Promise.all([carregarLocalizacoes(), carregarComponentes(), carregarCargo()]);
       await carregarMainframes();
     } catch (err) {
       console.error(err);
@@ -740,3 +767,4 @@ if (btnToggleEditarLocalizacao) {
     }
   })();
 });
+

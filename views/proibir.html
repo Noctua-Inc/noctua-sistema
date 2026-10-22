@@ -1,11 +1,127 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Acesso Negado | Noctua</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 40px;
+            font-weight: 700;
+            color: #1D4ED8;
+            margin-bottom: 20px;
+        }
+
+        .descricao {
+            font-size: 18px;
+            line-height: 1.7;
+            color: #4B5563;
+            margin-bottom: 32px;
+        }
+
+        .botao {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 24px;
+            background-color: #1D4ED8;
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            border: 2px solid #1D4ED8;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .botao:hover {
+            background-color: #1E40AF;
+            border-color: #1E40AF;
+            transform: translateY(-2px);
+        }
+
+        .botao:focus-visible {
+            outline: 3px solid #93C5FD;
+            outline-offset: 4px;
+        }
+
+        .seta {
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .rodape {
+            margin-top: 48px;
+            color: #9CA3AF;
+            font-size: 13px;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            .descricao {
+                font-size: 16px;
+            }
+
+            .botao {
+                width: 100%;
+                padding: 15px 12px;
+                font-size: 15px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h1 style="display: flex; align-items: center; flex-direction: center;">PROIBIDO</h1>
+    <main class="container">
+
+        <h1>Acesso Negado</h1>
+
+        <p class="descricao">
+            Você não tem permissão para acessar esta página
+            ou realizar esta ação.
+            <br>
+            Entre em contato com o administrador caso
+            acredite que isso seja um engano.
+        </p>
+
+        <a href="./index.html" class="botao">
+            <span class="seta" aria-hidden="true">&larr;</span>
+            Voltar para a página inicial
+        </a>
+
+        <p class="rodape">
+            Noctua &copy; 2026 — Todos os direitos reservados.
+        </p>
+
+    </main>
 </body>
 </html>
