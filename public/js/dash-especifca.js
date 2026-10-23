@@ -1,3 +1,30 @@
+let kpiRisco = document.querySelector("#kpiRisco");
+let kpiHorario = document.querySelector("#kpiHorario");
+let kpiCPUPor = document.querySelector("#kpiCPUPor");
+let kpiCPUFreq = document.querySelector("#kpiCPUFreq");
+let kpiRAMPor = document.querySelector("#kpiRAMPor");
+let kpiSWAPPor = document.querySelector("#kpiSWAPPor");
+let kpiRAMUso = document.querySelector("#kpiRAMUso");
+let kpiDiscoPor = document.querySelector("#kpiDiscoPor");
+let kpiDiscoUso = document.querySelector("#kpiDiscoUso");
+
+let teste = document.querySelectorAll(".botao-tempo")
+
+
+
+console.log(teste);
+
+function trocarTempo(indice) {
+    for(let i = 0; i < teste.length; i++) {
+        if(teste[i].className == "botao-tempo botao-escolhido") {
+            teste[i].classList.remove("botao-escolhido");
+            break;
+        }
+    }
+
+    teste[indice].classList.add("botao-escolhido");
+}
+
 const ctx = document.getElementById('grafico').getContext('2d');
 
 const grafico = new Chart(ctx, {

@@ -198,7 +198,10 @@ main .kpis .kpi {
     padding: 13px;
 }
 
-main .kpis .kpi .componente {font-weight: normal;}
+main .kpis .kpi .componente {
+    font-weight: normal;
+    color: #27AE60;
+}
 main .kpis .kpi .horario {font-size: 32px;}
 
 main .kpis .kpi .titulo-kpi,
@@ -207,7 +210,6 @@ main .kpis .kpi .observacao {
 }
 
 main .kpis .kpi .excedeu {color: #F44336;}
-main .kpis .kpi .normal {color: #27AE60;}
 
 main .sessao-grafico {
     width: 90%;
@@ -244,6 +246,7 @@ main .sessao-grafico .botoes-tempo .botao-tempo {
     color: #667085;
     background-color: #E0E0E0;
     border: none;
+    cursor: pointer;
 }
 
 main .sessao-grafico .botoes-tempo .botao-tempo:hover{
@@ -254,6 +257,7 @@ main .sessao-grafico .botoes-tempo .botao-escolhido {
     background-color: #FFF;
     color: #2196F3;
     font-weight: bold;
+    cursor: default;
 }
 
 main .sessao-grafico .botoes-tempo .botao-escolhido:hover{

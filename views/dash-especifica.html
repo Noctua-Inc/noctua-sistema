@@ -67,8 +67,8 @@
                 <p class="titulo-kpi">
                     Previsão de Riso
                 </p>
-                <h2 class="componente excedeu">
-                    Risco: Alto
+                <h2 class="componente" id="kpiRisco">
+                    Risco: 
                 </h2>
                 <p class="observacao">
                     3 Componentes Excedidos
@@ -79,8 +79,8 @@
                 <p class="titulo-kpi">
                     Momento mais utilizado
                 </p>
-                <h2 class="componente horario excedeu">
-                    12:32
+                <h2 class="componente horario" id="kpiHorario">
+
                 </h2>
             </div>
 
@@ -88,8 +88,8 @@
                 <p class="titulo-kpi">
                     Uso Médio CPU
                 </p>
-                <h2 class="componente excedeu">
-                    CPU: 67%
+                <h2 class="componente" id="kpiCPUPor">
+                    CPU: 
                 </h2>
                 <p class="observacao">
                     Aumentou 8.2% nos 
@@ -100,8 +100,8 @@
                 <p class="titulo-kpi">
                     Frequência Médio CPU
                 </p>
-                <h2 class="componente excedeu">
-                    Freq CPU: 2.2 Ghz
+                <h2 class="componente" id="kpiCPUFreq">
+                    Freq CPU:
                 </h2>
                 <p class="observacao">
                     Aumentou 8.2% nos 
@@ -112,8 +112,8 @@
                 <p class="titulo-kpi">
                     Uso Médio RAM
                 </p>
-                <h2 class="componente normal">
-                    RAM: 42%
+                <h2 class="componente" id="kpiRAMPor">
+                    RAM: 
                 </h2>
                 <p class="observacao">
                     Diminuiu 1% nos 
@@ -124,8 +124,8 @@
                 <p class="titulo-kpi">
                     Uso Médio SWAP
                 </p>
-                <h2 class="componente normal">
-                    SWAP: 49%
+                <h2 class="componente" id="kpiSWAPPor">
+                    SWAP:
                 </h2>
                 <p class="observacao">
                     Diminuiu 5% nos 
@@ -136,8 +136,8 @@
                 <p class="titulo-kpi">
                     Quantidade Média RAM Livre
                 </p>
-                <h2 class="componente normal">
-                    RAM: 3 GB
+                <h2 class="componente" id="kpiRAMUso">
+                    RAM: 
                 </h2>
                 <p class="observacao">
                     Diminuiu 1GM nos 
@@ -148,8 +148,8 @@
                 <p class="titulo-kpi">
                     Uso Médio Disco
                 </p>
-                <h2 class="componente excedeu">
-                    Disco: 82%
+                <h2 class="componente" id="kpiDiscoPor">
+                    Disco:
                 </h2>
                 <p class="observacao">
                     Aumentou 4% nos 
@@ -160,8 +160,8 @@
                 <p class="titulo-kpi">
                     Quantidade Média Disco Livre
                 </p>
-                <h2 class="componente normal">
-                    Disco: 20 GB
+                <h2 class="componente" id="kpiDiscoUso">
+                    Disco:
                 </h2>
                 <p class="observacao">
                     Aumentou 2GM nos 
@@ -176,19 +176,19 @@
                 </h2>
 
                 <div class="botoes-tempo">
-                    <button class="botao-tempo">
+                    <button class="botao-tempo" onclick="trocarTempo(0)">
                         1h
                     </button>
 
-                    <button class="botao-tempo">
+                    <button class="botao-tempo" onclick="trocarTempo(1)">
                         12h
                     </button>
 
-                    <button class="botao-tempo botao-escolhido">
+                    <button class="botao-tempo botao-escolhido" onclick="trocarTempo(2)">
                         24h
                     </button>
                     
-                    <button class="botao-tempo">
+                    <button class="botao-tempo" onclick="trocarTempo(3)">
                         7 dias
                     </button>
                 </div>
