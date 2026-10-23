@@ -286,6 +286,8 @@ main .sessao-grafico .botoes-tempo .botao-escolhido:hover{
     align-self: center;
 
     margin-bottom: 2rem;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .historico table {
