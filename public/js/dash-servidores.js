@@ -6,8 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabela = document.getElementById('lista-mainframes');
     const atualizacao = document.getElementById('data-atualizacao');
     const aviso = document.getElementById('erro-servidores');
+    const todosComponentes = ["CPU", "DISCO", "RAM", "SWAP"]
     let mainframes = [];
     let carregando = false;
+
+    contador = 1;
 
     const nomesStatus = { ativo: 'Ativo', inativo: 'Inativo', 'manutenção': 'Manutenção' };
     const classesStatus = { ativo: 'ativo', inativo: 'inativo', 'manutenção': 'manutencao' };
@@ -46,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function criarCelula(linha, texto) {
         const celula = document.createElement('td');
-        celula.textContent = texto;
+        celula.innerHTML = texto;
         linha.appendChild(celula);
         return celula;
     }
@@ -73,6 +76,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const linha = document.createElement('tr');
             linha.className = 'servidores-linha';
             criarCelula(linha, mainframe.hostname);
+
+            let estruturaUsoComponente = `
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 60%;"></div>
+                </div>
+                <span>60%</span>
+            `
+           
+            let componentesMainframe = String(mainframe.componentes).replaceAll(" ", "").split(",");            
+            
+            for(let i = 0; i < todosComponentes.length; i++){
+               if(componentesMainframe.includes(todosComponentes[i])) {
+                    criarCelula(linha, estruturaUsoComponente);
+                } else {
+                    criarCelula(linha, "Não Monitorado");
+                }
+            }
+            
             criarCelula(linha, `${mainframe.sis_operacional} ${mainframe.versao_so}`);
             criarCelula(linha, mainframe.componentes || 'Nenhum componente');
 
