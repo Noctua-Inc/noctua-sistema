@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Servidores | Noctua</title>
     <link rel="stylesheet" href="/styles/dash-style.css">
     <link rel="stylesheet" href="/styles/editar-usuario.css">
+    <link rel="stylesheet" href="/styles/dash-servidores.css">
     <link rel="icon" href="/assets/icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -15,7 +16,7 @@
 
 </head>
 
-<body>
+<body class="pagina-servidores">
     <!-- Sidebar -->
     <aside class="sidebar">
     <div class="sidebar-brand">
@@ -25,7 +26,7 @@
     </div>
 
     <ul class="sidebar-menu">
-      <li><a href="dash-servidores.html" class="active"><i class="fa-solid fa-server"></i>Servidores</a></li>
+      <li><a href="dash-servidores.html" class="active" aria-current="page"><i class="fa-solid fa-server"></i>Servidores</a></li>
       <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"></i>Alertas</a></li>
       <li><a href="mainframes.html"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
       <li id="cargos-html" class="hidden"><a href="cargos.html"><i class="fa-solid fa-user-tag" aria-hidden="true"></i>Cargos</a></li>
@@ -33,7 +34,7 @@
     </ul>
 
     <div class="sidebar-user">
-      <a href="#" onclick="abrirEditarUsuario()">
+      <a href="#" onclick="abrirEditarUsuario(); return false;" aria-label="Editar meu perfil">
         <div class="user-avatar"><span id="user-avatar">-</span></div>
         <div class="user-info">
           <span id="user-name">-</span>
@@ -46,229 +47,57 @@
     </div>
   </aside>
 
-    <!-- wrapper rolagem -->
-    <div class="main-wrapper" onclick="fecharEditarUsuario()" id="container_main">
+    <div class="main-wrapper" id="container_main" onclick="fecharEditarUsuario()">
+        <main class="dashboard-servidores">
+            <header class="servidores-cabecalho">
+                <h1>Visão geral das mainframes</h1>
+                <p class="servidores-atualizacao">Última atualização: <time id="data-atualizacao" title="Horário da última consulta dos cadastros">—</time></p>
+            </header>
 
-        <header class="header">
-            <h1 class="header-title">Visão Geral</h1>
-            <div class="filter-group">
-                <select class="filter-select">
-                    <option value="todos">Visão Geral</option>
-                    <option value="alerta">Mainframe01</option>
-                    <option value="operacional">Mainframe02</option>
-                </select>
-            </div>
-        </header>
-
-        <main class="content">
-            <section class="metrics-grid">
-                <div class="card">
-                    <span class="card-title">Total Servidores Monitorados</span>
-                    <span class="card-value">5</span>
-                </div>
-                <div class="card">
-                    <span class="card-title">Taxa de Disponibilidade</span>
-                    <span class="card-value">99.8%</span>
-                </div>
-                <div class="card-red">
-                    <span class="card-title">Alertas</span>
-                    <span class="card-value">1</span>
-                </div>
-                <div class="card-yellow">
-                    <span class="card-title">Servidores em Estado de Atenção</span>
-                    <span class="card-value">2</span>
-                </div>
+            <section class="servidores-indicadores" aria-label="Resumo das mainframes" aria-live="polite">
+                <article class="servidores-indicador">
+                    <h2>Mainframes cadastradas</h2>
+                    <p class="servidores-total" id="total-mainframes">—</p>
+                </article>
+                <article class="servidores-indicador">
+                    <h2>Status cadastral</h2>
+                    <div class="servidores-status-resumo">
+                        <div><span class="status-marcador marcador-ativo" aria-hidden="true"></span><p><strong id="total-ativas">—</strong><span>Ativas</span></p></div>
+                        <div><span class="status-marcador marcador-inativo" aria-hidden="true"></span><p><strong id="total-inativas">—</strong><span>Inativas</span></p></div>
+                        <div><span class="status-marcador marcador-manutencao" aria-hidden="true"></span><p><strong id="total-manutencao">—</strong><span>Em manutenção</span></p></div>
+                    </div>
+                </article>
             </section>
 
-            <div class="chart-card">
-                <div class="card-header">
-                    <div>
-                        <h3>Uso de Recursos — 24h</h3>
-                        <span class="card-subtitle">Média de CPU entre todos os servidores ativos</span>
+            <section class="servidores-listagem" aria-labelledby="titulo-listagem">
+                <div class="servidores-filtros">
+                    <h2 id="titulo-listagem">Mainframes</h2>
+                    <div class="servidores-controles">
+                        <div class="servidores-busca">
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                            <input type="search" id="busca-hostname" placeholder="Buscar hostname" aria-label="Buscar hostname">
+                        </div>
+                        <select id="filtro-localizacao" aria-label="Filtrar por localização"><option value="">Todas as localizações</option></select>
+                        <select id="filtro-status" aria-label="Filtrar por status">
+                            <option value="">Todos os status</option>
+                            <option value="ativo">Ativo</option>
+                            <option value="inativo">Inativo</option>
+                            <option value="manutenção">Manutenção</option>
+                        </select>
                     </div>
                 </div>
-                <div class="chart-placeholder">
-
-                </div>
-                <div class="chart-labels">
-                    <span>00h</span><span>04h</span><span>08h</span><span>12h</span><span>16h</span><span>20h</span><span>23h</span>
-                </div>
-            </div>
-
-            <section class="table-card">
-                <div class="table-card-header">
-                    <div class="table-header-title">Mainframes monitorados</div>
-
-                    <div class="table-filters">
-                        <div class="filter-group">
-                            <div class="input-container">
-                                <input type="text" class="filter-select" placeholder="Buscar Servidor">
-                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                            </div>
-                        </div>
-                        <div class="filter-group">
-                            <select class="filter-select">
-                                <option value="todos">Todos Status</option>
-                                <option value="alerta">Em Alerta</option>
-                                <option value="operacional">Operacional</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <select class="filter-select">
-                                <option value="todos">Ordenar por</option>
-                                <option value="cpu">Maior uso de CPU</option>
-                                <option value="ram">Maior uso de RAM</option>
-                                <option value="disco">Maior uso de Disco</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Servidor</th>
-                                <th>CPU</th>
-                                <th>RAM</th>
-                                <th>Disco</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>srv-prod-01</strong></td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 60%;"></div>
-                                    </div>
-                                    <span>60%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 72%;"></div>
-                                    </div>
-                                    <span>72%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill-alert" style="width: 91%;"></div>
-                                    </div>
-                                    <span>91%</span>
-                                </td>
-                                <td><span class="badge-status-alert">Em Alerta</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>srv-prod-02</strong></td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 59%;"></div>
-                                    </div>
-                                    <span>59%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 68%;"></div>
-                                    </div>
-                                    <span>68%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 58%;"></div>
-                                    </div>
-                                    <span>58%</span>
-                                </td>
-                                <td><span class="badge-status">Operacional</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>db-primary</strong></td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 54%;"></div>
-                                    </div>
-                                    <span>54%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill-alert" style="width: 96%;"></div>
-                                    </div>
-                                    <span>96%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 45%;"></div>
-                                    </div>
-                                    <span>45%</span>
-                                </td>
-                                <td><span class="badge-status-alert">Em Alerta</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>db-primary</strong></td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 54%;"></div>
-                                    </div>
-                                    <span>54%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill-attention" style="width: 85%;"></div>
-                                    </div>
-                                    <span>85%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 45%;"></div>
-                                    </div>
-                                    <span>45%</span>
-                                </td>
-                                <td><span class="badge-status-attention">Atenção</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>db-primary</strong></td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 54%;"></div>
-                                    </div>
-                                    <span>54%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill-alert" style="width: 96%;"></div>
-                                    </div>
-                                    <span>96%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 45%;"></div>
-                                    </div>
-                                    <span>45%</span>
-                                </td>
-                                <td><span class="badge-status-alert">Em Alerta</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>db-primary</strong></td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 54%;"></div>
-                                    </div>
-                                    <span>54%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill-alert" style="width: 96%;"></div>
-                                    </div>
-                                    <span>96%</span>
-                                </td>
-                                <td>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: 45%;"></div>
-                                    </div>
-                                    <span>45%</span>
-                                </td>
-                                <td><span class="badge-status-alert">Em Alerta</span></td>
-                            </tr>
-                        </tbody>
+                <p class="servidores-erro" id="erro-servidores" role="alert" hidden></p>
+                <div class="servidores-tabela">
+                    <table aria-label="Mainframes da empresa">
+                        <thead><tr>
+                            <th scope="col">Hostname</th>
+                            <th scope="col">Sistema operacional</th>
+                            <th scope="col">Componentes</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Localização</th>
+                            <th scope="col">Ações</th>
+                        </tr></thead>
+                        <tbody id="lista-mainframes"><tr><td colspan="6" class="servidores-vazio">Carregando mainframes...</td></tr></tbody>
                     </table>
                 </div>
             </section>
@@ -280,6 +109,7 @@
     <script src="/js/api.js"></script>
     <script src="/js/user-sidebar.js"></script>
     <script src="/js/editar-usuario.js"></script>
+    <script src="/js/dash-servidores.js"></script>
 </body>
 
 </html>

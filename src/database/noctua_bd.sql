@@ -118,345 +118,67 @@ CREATE TABLE parametro (
         REFERENCES componente(id_componente)
 );
 
-USE noctua_bd;
+-- Dados fictícios para demonstração. Os IDs também são usados em dados-alertas.js.
+-- Todos os usuários usam o mesmo hash de senha da Ana Souza da base anterior.
+SET @senha_demo = '$2b$10$F5URwsnCnQc5TIv9oWweheTzawJUh8u3FgoxMUV3soPzV1Jl23Dta';
 
--- ============================================
--- EMPRESAS
--- ============================================
+INSERT INTO empresa (id_empresa, razao_social, cnpj, dominio) VALUES
+(1, 'São Paulo Tech School', '99765432000199', 'sptech.school'),
+(2, 'Nexus Sistemas LTDA', '98765432000199', 'nexussistemas.com.br');
 
-INSERT INTO empresa (razao_social, cnpj, dominio)
-VALUES
-('Tech Solutions LTDA', '12345678000101', 'techsolutions.com.br'),
-('São Paulo Tech School', '99765432000199', 'sptech.school'),
-('Nexus Sistemas LTDA', '98765432000199', 'nexussistemas.com.br'),
-('Alpha Digital LTDA', '45678912000155', 'alphadigital.com.br');
+-- Cargos padrão compartilhados. Cada empresa também tem um cargo próprio.
+INSERT INTO cargo (id_cargo, nome, fk_empresa) VALUES
+(1, 'Estagiário', NULL),
+(2, 'Administrador', NULL),
+(3, 'Analista SPTech', 1),
+(4, 'Operador Nexus', 2);
 
+-- IDs compatíveis com as permissões usadas na tela de mainframes.
+INSERT INTO permissao (id_permissao, nome) VALUES
+(1, 'Criar'), (2, 'Editar'), (3, 'Excluir'), (4, 'Visualizar');
 
--- ============================================
--- CARGOS
--- ============================================
+INSERT INTO cargo_permissao (id_cargo, id_permissao) VALUES
+(1, 4),
+(2, 1), (2, 2), (2, 3), (2, 4),
+(3, 2), (3, 4),
+(4, 4);
 
-INSERT INTO cargo (nome, fk_empresa)
-VALUES
-('Estagiário', null),
-('Administrador', null);
+INSERT INTO usuario (id_usuario, nome, email_institucional, cpf, senha, verificado, fk_empresa, fk_cargo) VALUES
+(1, 'Ana Souza', 'ana.souza@sptech.school', '45678901234', @senha_demo, 1, 1, 2),
+(2, 'Augusto', 'augusto@sptech.school', '12345678901', @senha_demo, 1, 1, 2),
+(3, 'Bianca', 'bianca@sptech.school', '23456789012', @senha_demo, 1, 1, 3),
+(4, 'Pedro Costa', 'pedro.costa@nexussistemas.com.br', '56789012345', @senha_demo, 1, 2, 2),
+(5, 'Marina Santos', 'marina.santos@nexussistemas.com.br', '67890123456', @senha_demo, 1, 2, 4);
 
+INSERT INTO localizacao (id_localizacao, nome, estado, cidade, cep) VALUES
+(1, 'Data Center São Paulo', 'SP', 'São Paulo', '01310100'),
+(2, 'Data Center Osasco', 'SP', 'Osasco', '06016020'),
+(3, 'Data Center Campinas', 'SP', 'Campinas', '13010000'),
+(4, 'Data Center Rio de Janeiro', 'RJ', 'Rio de Janeiro', '20040002'),
+(5, 'Data Center Curitiba', 'PR', 'Curitiba', '80010000');
 
--- ============================================
--- PERMISSÕES
--- ============================================
+INSERT INTO mainframe (id_mainframe, hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao) VALUES
+(1, 'MF-SPTECH-001', 'IBM', 'z16', 'IBM001', 'ativo', 'Linux', '9.2', 1, 1),
+(2, 'MF-SPTECH-002', 'Dell', 'PowerEdge R750', 'DEL001', 'ativo', 'Linux', '22.04', 1, 2),
+(3, 'MF-SPTECH-003', 'Lenovo', 'ThinkSystem SR650', 'LEN001', 'ativo', 'Linux', '24.04', 1, 3),
+(4, 'MF-SPTECH-004', 'IBM', 'z15', 'IBM002', 'manutenção', 'Linux', '8.8', 1, 1),
+(5, 'MF-SPTECH-005', 'HPE', 'ProLiant DL380', 'HPE001', 'inativo', 'Windows Server', '2022', 1, 3),
+(6, 'MF-NEXUS-001', 'Dell', 'PowerEdge R760', 'DEL002', 'ativo', 'Linux', '22.04.1', 2, 4),
+(7, 'MF-NEXUS-002', 'IBM', 'z16', 'IBM003', 'inativo', 'Linux', '9.2', 2, 5);
 
-INSERT INTO permissao (nome)
-VALUES
-('Criar'),
-('Visualizar'),
-('Editar'),
-('Excluir');
+INSERT INTO fabricante (id_fabricante, nome_fabricante) VALUES
+(1, 'Intel'), (2, 'AMD'), (3, 'Samsung'), (4, 'Kingston'), (5, 'Western Digital');
 
+INSERT INTO componente (id_componente, tipo, fk_fabricante) VALUES
+(1, 'CPU', 1), (2, 'CPU', 2), (3, 'RAM', 3),
+(4, 'RAM', 4), (5, 'DISCO', 5), (6, 'SWAP', 4);
 
--- ============================================
--- CARGO x PERMISSÃO
--- ============================================
-
--- Estagiário
--- Pode apenas visualizar
-INSERT INTO cargo_permissao (id_cargo, id_permissao)
-VALUES
-(1, 2);
-
--- Administrador
--- Possui todas as permissões
-INSERT INTO cargo_permissao (id_cargo, id_permissao)
-VALUES
-(2, 1),
-(2, 2),
-(2, 3),
-(2, 4);
-
-
--- ============================================
--- USUÁRIOS
--- ============================================
-
--- senha padrão: 123456
-INSERT INTO usuario
-(nome, email_institucional, cpf, senha, verificado, fk_empresa, fk_cargo)
-VALUES
-(
-    'Carlos Almeida',
-    'carlos.almeida@techsolutions.com.br',
-    '12345678901',
-    '$2b$10$F5URwsnCnQc5TIv9oWweheTzawJUh8u3FgoxMUV3soPzV1Jl23Dta',
-    1,
-    1,
-    1
-),
-(
-    'Mariana Santos',
-    'mariana.santos@techsolutions.com.br',
-    '23456789012',
-    '$2b$10$F5URwsnCnQc5TIv9oWweheTzawJUh8u3FgoxMUV3soPzV1Jl23Dta',
-    1,
-    1,
-    2
-),
-(
-    'Ana Souza',
-    'ana.souza@sptech.school',
-    '45678901234',
-    '$2b$10$F5URwsnCnQc5TIv9oWweheTzawJUh8u3FgoxMUV3soPzV1Jl23Dta',
-    1,
-    2,
-    2
-),
-(
-    'Pedro Costa',
-    'pedro.costa@nexussistemas.com.br',
-    '56789012345',
-    '$2b$10$F5URwsnCnQc5TIv9oWweheTzawJUh8u3FgoxMUV3soPzV1Jl23Dta',
-    1,
-    3,
-    1
-),
-(
-    'Lucas Ferreira',
-    'lucas.ferreira@alphadigital.com.br',
-    '67890123456',
-    '$2b$10$F5URwsnCnQc5TIv9oWweheTzawJUh8u3FgoxMUV3soPzV1Jl23Dta',
-    0,
-    4,
-    1
-);
-
-
--- ============================================
--- LOCALIZAÇÕES
--- ============================================
-
-INSERT INTO localizacao
-(nome, estado, cidade, cep)
-VALUES
-(
-    'Data Center São Paulo',
-    'São Paulo',
-    'São Paulo',
-    '01310100'
-),
-(
-    'Data Center Osasco',
-    'São Paulo',
-    'Osasco',
-    '06016020'
-),
-(
-    'Data Center Campinas',
-    'São Paulo',
-    'Campinas',
-    '13010000'
-),
-(
-    'Data Center Rio de Janeiro',
-    'Rio de Janeiro',
-    'Rio de Janeiro',
-    '20040002'
-),
-(
-    'Data Center Curitiba',
-    'Paraná',
-    'Curitiba',
-    '80010000'
-),
-(
-    'Data Center Belo Horizonte',
-    'Minas Gerais',
-    'Belo Horizonte',
-    '30130000'
-);
-
-
--- ============================================
--- MAINFRAMES
--- ============================================
-
-INSERT INTO mainframe
-(
-    hostname,
-    fabricante,
-    modelo,
-    numero_serie,
-    status,
-    sis_operacional,
-    versao_so,
-    fk_empresa,
-    fk_localizacao
-)
-VALUES
-(
-    'MF-TECH-001',
-    'IBM',
-    'z16',
-    'IBM001',
-    'ativo',
-    'Linux',
-    '9.2',
-    1,
-    1
-),
-(
-    'MF-TECH-002',
-    'Dell',
-    'PowerEdge R760',
-    'DEL001',
-    'ativo',
-    'Windows Server',
-    '2022',
-    1,
-    2
-),
-(
-    'MF-SPTECH-001',
-    'IBM',
-    'z15',
-    'IBM002',
-    'ativo',
-    'Linux',
-    '8.8',
-    2,
-    1
-),
-(
-    'MF-SPTECH-002',
-    'Dell',
-    'PowerEdge R750',
-    'DEL002',
-    'manutenção',
-    'Linux',
-    '22.04',
-    2,
-    3
-),
-(
-    'MF-NEXUS-001',
-    'Lenovo',
-    'ThinkSystem SR650',
-    'LEN001',
-    'ativo',
-    'Linux',
-    '20.04',
-    3,
-    4
-),
-(
-    'MF-NEXUS-002',
-    'HPE',
-    'ProLiant DL380',
-    'HPE001',
-    'inativo',
-    'Windows Server',
-    '2019',
-    3,
-    5
-),
-(
-    'MF-ALPHA-001',
-    'Dell',
-    'PowerEdge R650',
-    'DEL003',
-    'ativo',
-    'Linux',
-    '24.04',
-    4,
-    6
-),
-(
-    'MF-ALPHA-002',
-    'HPE',
-    'ProLiant DL360',
-    'HPE002',
-    'manutenção',
-    'Linux',
-    '22.04',
-    4,
-    1
-);
-
-
--- ============================================
--- FABRICANTES
--- ============================================
-
-INSERT INTO fabricante (nome_fabricante)
-VALUES
-('Intel'),
-('AMD'),
-('NVIDIA'),
-('Samsung'),
-('Kingston'),
-('Western Digital');
-
-
--- ============================================
--- COMPONENTES
--- ============================================
-
-INSERT INTO componente
-(tipo, fk_fabricante)
-VALUES
-('CPU', 1),
-('CPU', 2),
-('RAM', 4),
-('RAM', 5),
-('DISCO', 6),
-('DISCO', 4),
-('SWAP', 3),
-('SWAP', 3),
-('DISCO', 6);
-
--- ============================================
--- PARÂMETROS DOS MAINFRAMES
--- ============================================
-
-INSERT INTO parametro
-(
-    id_mainframe,
-    id_componente,
-    pico_min,
-    pico_max
-)
-VALUES
-
--- Mainframe 1
-(1, 1, 10, 100),
-(1, 3, 20, 90),
-(1, 5, 30, 95),
-
--- Mainframe 2
-(2, 2, 15, 100),
-(2, 4, 20, 90),
-(2, 6, 30, 95),
-
--- Mainframe 3
-(3, 1, 10, 100),
-(3, 4, 20, 90),
-
--- Mainframe 4
-(4, 2, 15, 100),
-(4, 5, 30, 95),
-
--- Mainframe 5
-(5, 2, 20, 100),
-(5, 3, 20, 90),
-(5, 7, 30, 95),
-
--- Mainframe 6
-(6, 1, 10, 100),
-(6, 6, 30, 95),
-
--- Mainframe 7
-(7, 2, 20, 100),
-(7, 4, 20, 90),
-(7, 8, 30, 95),
-
--- Mainframe 8
-(8, 1, 10, 100),
-(8, 9, 30, 95);
+-- Cada vínculo define os limites daquela mainframe.
+INSERT INTO parametro (id_mainframe, id_componente, pico_min, pico_max) VALUES
+(1, 1, 10, 90), (1, 3, 20, 85), (1, 5, 10, 90),
+(2, 2, 10, 90), (2, 4, 20, 85), (2, 6, 0, 80),
+(3, 3, 20, 85), (3, 5, 10, 90),
+(4, 1, 10, 90), (4, 3, 20, 85),
+(5, 2, 10, 90), (5, 5, 10, 90),
+(6, 2, 10, 90), (6, 4, 20, 85), (6, 5, 10, 90),
+(7, 1, 10, 90), (7, 3, 20, 85), (7, 6, 0, 80);

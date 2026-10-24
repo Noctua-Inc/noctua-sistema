@@ -81,7 +81,7 @@ async function listar(idEmpresa) {
 // lista de cargos para atribuir
 async function listarCargos(idEmpresa) {
   const [resultado] = await pool.query(
-    `SELECT id_cargo, nome FROM cargo WHERE fk_empresa = ? ORDER BY nome`,
+    `SELECT id_cargo, nome FROM cargo WHERE fk_empresa = ? OR fk_empresa IS NULL ORDER BY nome`,
     [idEmpresa]
   );
   return resultado;
@@ -90,7 +90,7 @@ async function listarCargos(idEmpresa) {
 // atribui cargo a um usuário (tela de usuários)
 async function atualizarConta(id, fk_cargo, idEmpresa) {
   const [resultado] = await pool.query(
-    `UPDATE usuario u JOIN cargo c ON c.id_cargo = ? AND c.fk_empresa = u.fk_empresa
+    `UPDATE usuario u JOIN cargo c ON c.id_cargo = ? AND (c.fk_empresa = u.fk_empresa OR c.fk_empresa IS NULL)
      SET u.fk_cargo = c.id_cargo WHERE u.id_usuario = ? AND u.fk_empresa = ?`,
     [fk_cargo, id, idEmpresa]
   );
