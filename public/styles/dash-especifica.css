@@ -149,9 +149,9 @@ main .navbar .parte-direita {
 main .navbar .parte-direita .estado-servidor {
     background-color: #FEEDEC;
     color: #F44336;
-    width: 130px;
-    height: 40px;
-    font-size: 16px;
+    width: 180px;
+    height: 45px;
+    font-size: 24px;
     border-radius: 30px;
 
     display: flex;
@@ -170,46 +170,6 @@ main .navbar .parte-direita .estado-servidor:hover {
 main .navbar .parte-direita .monitorar-servidor {
     display: flex;
     gap: 0.5rem;
-}
-
-main .navbar .parte-direita .monitorar-servidor .cor-fundo-botao {
-    width: 50px;
-    height: 25px;
-    background-color: #2196F3;
-    border-radius: 20px;
-
-    display: flex;
-    align-items: center;
-    justify-content: end;
-    cursor: pointer;
-    transition: all 5s;
-}
-
-main .navbar .parte-direita .monitorar-servidor .cor-fundo-botao:hover {
-    transform: scale(1.01);
-    justify-content: start;
-}
-
-main .navbar .parte-direita .monitorar-servidor .cor-fundo-botao .botao {
-    width: 20px;
-    height: 20px;
-    background-color: #FFF;
-    border-radius: 100%;
-    margin: 0px 5px;
-}
-
-main .navbar .parte-direita .desativar-servidor {
-    border: 2px solid #E7EAF0;
-    font-size: 14px;
-    background-color: #FFF;
-
-    width: 120px;
-    height: 40px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
 }
 
 main .navbar .parte-esquerda .tituto-servidor {
@@ -238,7 +198,11 @@ main .kpis .kpi {
     padding: 13px;
 }
 
-main .kpis .kpi .componente {font-weight: normal;}
+main .kpis .kpi .componente {
+    font-weight: normal;
+    color: #27AE60;
+}
+main .kpis .kpi .horario {font-size: 32px;}
 
 main .kpis .kpi .titulo-kpi,
 main .kpis .kpi .observacao {
@@ -246,7 +210,6 @@ main .kpis .kpi .observacao {
 }
 
 main .kpis .kpi .excedeu {color: #F44336;}
-main .kpis .kpi .normal {color: #27AE60;}
 
 main .sessao-grafico {
     width: 90%;
@@ -283,6 +246,7 @@ main .sessao-grafico .botoes-tempo .botao-tempo {
     color: #667085;
     background-color: #E0E0E0;
     border: none;
+    cursor: pointer;
 }
 
 main .sessao-grafico .botoes-tempo .botao-tempo:hover{
@@ -293,6 +257,7 @@ main .sessao-grafico .botoes-tempo .botao-escolhido {
     background-color: #FFF;
     color: #2196F3;
     font-weight: bold;
+    cursor: default;
 }
 
 main .sessao-grafico .botoes-tempo .botao-escolhido:hover{
@@ -321,6 +286,8 @@ main .sessao-grafico .botoes-tempo .botao-escolhido:hover{
     align-self: center;
 
     margin-bottom: 2rem;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .historico table {
