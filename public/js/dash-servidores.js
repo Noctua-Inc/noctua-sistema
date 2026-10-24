@@ -120,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
             status.className = `servidores-status ${classesStatus[mainframe.status] || ''}`;
             status.textContent = nomesStatus[mainframe.status] || mainframe.status;
             criarCelula(linha, '').appendChild(status);
-            criarCelula(linha, mainframe.localizacao_nome || mainframe.cidade || '—');
 
             const destino = `dash-especifica.html?id_mainframe=${encodeURIComponent(mainframe.id_mainframe)}`;
             const link = document.createElement('a');
@@ -181,4 +180,55 @@ document.addEventListener('DOMContentLoaded', () => {
     filtroStatus.addEventListener('change', atualizarTabela);
     carregarMainframes();
     setInterval(carregarMainframes, 60000);
+
+    setInterval(() => {
+        let linhas = tabela.getElementsByClassName('servidores-linha');
+
+        for (let l = 0; l < linhas.length; l++) {
+            let linhaAtual = linhas[l];
+            let mainframeObj = mainframes[l];
+
+            let componentesMainframe = String(mainframeObj.componentes).replaceAll(" ", "").split(",");
+            let parametrosMainframe = String(mainframeObj.parametros).replaceAll(" ", "").split(",");
+            let celulas = linhaAtual.getElementsByTagName('td');
+
+            for (let i = 0; i < todosComponentes.length; i++) {
+                let celulaAtual = celulas[i + 1];
+                let componenteAtual = todosComponentes[i];
+
+                if (componentesMainframe.includes(componenteAtual) && celulaAtual) {
+                    let spanValor = celulaAtual.querySelector('span');
+                    let barraProcresso = celulaAtual.querySelector('.progress-bar-bg div');
+
+                    if (spanValor && barraProcresso) {
+                        let valorAtual = Number(spanValor.textContent.replace('%', ''));
+                        
+                        let variacao = 0;
+                        if (componenteAtual != "DISCO") {
+                            variacao = Number((Math.random() * (10 - (-10)) + (-10)).toFixed(0));
+                        } 
+
+                        usoComponente = Number((valorAtual + variacao).toFixed(0));
+
+                        if (usoComponente > 100) usoComponente = 100;
+                        if (usoComponente < 0) usoComponente = 0;
+
+                        barraProcresso.style.width = usoComponente + '%';
+                        spanValor.textContent = usoComponente + '%';
+
+                        barraProcresso.className = "progress-bar-fill";
+
+                        let indexMainframe = componentesMainframe.indexOf(componenteAtual);
+                        let parametroAtual = Number(parametrosMainframe[indexMainframe]);
+
+                        if (parametroAtual <= usoComponente) {
+                            barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-alert");
+                        } else if (Math.abs(parametroAtual - usoComponente) <= 15) {
+                            barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-attention");
+                        }
+                    }
+                }
+            }
+        }
+    }, 5000);
 });
