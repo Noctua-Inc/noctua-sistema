@@ -70,6 +70,7 @@ CREATE TABLE localizacao (
 CREATE TABLE mainframe (
     id_mainframe INT PRIMARY KEY AUTO_INCREMENT,
     hostname VARCHAR(100) NOT NULL UNIQUE,
+    fabricante VARCHAR(100),
     modelo VARCHAR(100) NOT NULL,
     numero_serie CHAR(6) NOT NULL,
     status VARCHAR(20) NOT NULL,
@@ -95,7 +96,6 @@ CREATE TABLE fabricante (
 CREATE TABLE componente (
 	id_componente INT PRIMARY KEY AUTO_INCREMENT,
     tipo VARCHAR(100) NOT NULL,
-    capacidade INT NOT NULL,
     fk_fabricante INT NOT NULL,
     CONSTRAINT cFkComponenteFabricante
 		FOREIGN KEY (fk_fabricante)
@@ -107,7 +107,6 @@ CREATE TABLE parametro (
     id_componente INT NOT NULL,
     pico_min INT,
 	pico_max INT,
-    percentual INT,
     
     PRIMARY KEY (id_mainframe ,id_componente),
     
@@ -282,6 +281,7 @@ VALUES
 INSERT INTO mainframe
 (
     hostname,
+    fabricante,
     modelo,
     numero_serie,
     status,
@@ -293,6 +293,7 @@ INSERT INTO mainframe
 VALUES
 (
     'MF-TECH-001',
+    'IBM',
     'z16',
     'IBM001',
     'ativo',
@@ -303,6 +304,7 @@ VALUES
 ),
 (
     'MF-TECH-002',
+    'Dell',
     'PowerEdge R760',
     'DEL001',
     'ativo',
@@ -313,6 +315,7 @@ VALUES
 ),
 (
     'MF-SPTECH-001',
+    'IBM',
     'z15',
     'IBM002',
     'ativo',
@@ -323,6 +326,7 @@ VALUES
 ),
 (
     'MF-SPTECH-002',
+    'Dell',
     'PowerEdge R750',
     'DEL002',
     'manutenção',
@@ -333,6 +337,7 @@ VALUES
 ),
 (
     'MF-NEXUS-001',
+    'Lenovo',
     'ThinkSystem SR650',
     'LEN001',
     'ativo',
@@ -343,6 +348,7 @@ VALUES
 ),
 (
     'MF-NEXUS-002',
+    'HPE',
     'ProLiant DL380',
     'HPE001',
     'inativo',
@@ -353,6 +359,7 @@ VALUES
 ),
 (
     'MF-ALPHA-001',
+    'Dell',
     'PowerEdge R650',
     'DEL003',
     'ativo',
@@ -363,6 +370,7 @@ VALUES
 ),
 (
     'MF-ALPHA-002',
+    'HPE',
     'ProLiant DL360',
     'HPE002',
     'manutenção',
@@ -392,17 +400,17 @@ VALUES
 -- ============================================
 
 INSERT INTO componente
-(tipo, capacidade, fk_fabricante)
+(tipo, fk_fabricante)
 VALUES
-('CPU', 16, 1),
-('CPU', 32, 2),
-('RAM', 64, 4),
-('RAM', 128, 5),
-('DISCO', 1000, 6),
-('DISCO', 2000, 4),
-('SWAP', 24, 3),
-('SWAP', 48, 3),
-('DISCO', 4000, 6);
+('CPU', 1),
+('CPU', 2),
+('RAM', 4),
+('RAM', 5),
+('DISCO', 6),
+('DISCO', 4),
+('SWAP', 3),
+('SWAP', 3),
+('DISCO', 6);
 
 -- ============================================
 -- PARÂMETROS DOS MAINFRAMES
@@ -413,43 +421,42 @@ INSERT INTO parametro
     id_mainframe,
     id_componente,
     pico_min,
-    pico_max,
-    percentual
+    pico_max
 )
 VALUES
 
 -- Mainframe 1
-(1, 1, 10, 100, 80),
-(1, 3, 20, 90, 75),
-(1, 5, 30, 95, 85),
+(1, 1, 10, 100),
+(1, 3, 20, 90),
+(1, 5, 30, 95),
 
 -- Mainframe 2
-(2, 2, 15, 100, 80),
-(2, 4, 20, 90, 75),
-(2, 6, 30, 95, 85),
+(2, 2, 15, 100),
+(2, 4, 20, 90),
+(2, 6, 30, 95),
 
 -- Mainframe 3
-(3, 1, 10, 100, 80),
-(3, 4, 20, 90, 80),
+(3, 1, 10, 100),
+(3, 4, 20, 90),
 
 -- Mainframe 4
-(4, 2, 15, 100, 80),
-(4, 5, 30, 95, 85),
+(4, 2, 15, 100),
+(4, 5, 30, 95),
 
 -- Mainframe 5
-(5, 2, 20, 100, 85),
-(5, 3, 20, 90, 75),
-(5, 7, 30, 95, 90),
+(5, 2, 20, 100),
+(5, 3, 20, 90),
+(5, 7, 30, 95),
 
 -- Mainframe 6
-(6, 1, 10, 100, 80),
-(6, 6, 30, 95, 85),
+(6, 1, 10, 100),
+(6, 6, 30, 95),
 
 -- Mainframe 7
-(7, 2, 20, 100, 85),
-(7, 4, 20, 90, 80),
-(7, 8, 30, 95, 90),
+(7, 2, 20, 100),
+(7, 4, 20, 90),
+(7, 8, 30, 95),
 
 -- Mainframe 8
-(8, 1, 10, 100, 80),
-(8, 9, 30, 95, 85);
+(8, 1, 10, 100),
+(8, 9, 30, 95);

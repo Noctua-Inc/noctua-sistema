@@ -18,18 +18,18 @@ async function buscarPorId(id_mainframe, id_componente) {
   return rows[0] || null;
 }
 
-async function criar({ id_mainframe, id_componente, pico_max, pico_min, percentual }) {
+async function criar({ id_mainframe, id_componente, pico_max, pico_min }) {
   const [result] = await pool.execute(
-    'INSERT INTO parametro (id_mainframe, id_componente, pico_max, pico_min, percentual) VALUES (?, ?, ?, ?, ?)',
-    [id_mainframe, id_componente, pico_max ?? null, pico_min ?? null, percentual ?? null]
+    'INSERT INTO parametro (id_mainframe, id_componente, pico_max, pico_min) VALUES (?, ?, ?, ?)',
+    [id_mainframe, id_componente, pico_max ?? null, pico_min ?? null]
   );
   return result.affectedRows;
 }
 
-async function atualizar({ id_mainframe, id_componente, pico_max, pico_min, percentual }) {
+async function atualizar({ id_mainframe, id_componente, pico_max, pico_min }) {
   const [result] = await pool.execute(
-    'UPDATE parametro SET pico_max = ?, pico_min = ?, percentual = ? WHERE id_mainframe = ? AND id_componente = ?',
-    [pico_max ?? null, pico_min ?? null, percentual ?? null, id_mainframe, id_componente]
+    'UPDATE parametro SET pico_max = ?, pico_min = ? WHERE id_mainframe = ? AND id_componente = ?',
+    [pico_max ?? null, pico_min ?? null, id_mainframe, id_componente]
   );
   return result.affectedRows;
 }
@@ -44,8 +44,8 @@ async function remover(id) {
 
 async function listarComComponentePorMainframe(id_mainframe) {
   const [rows] = await pool.execute(`
-    SELECT p.id_mainframe, p.id_componente, p.pico_max, p.pico_min, p.percentual,
-           c.tipo, c.capacidade
+    SELECT p.id_mainframe, p.id_componente, p.pico_max, p.pico_min,
+           c.tipo
     FROM parametro p
     JOIN componente c ON c.id_componente = p.id_componente
     WHERE p.id_mainframe = ?
@@ -57,10 +57,10 @@ async function removerPorMainframeComConexao(conn, id_mainframe) {
   await conn.execute('DELETE FROM parametro WHERE id_mainframe = ?', [id_mainframe]);
 }
 
-async function criarComConexao(conn, { id_mainframe, id_componente, pico_max, pico_min, percentual }) {
+async function criarComConexao(conn, { id_mainframe, id_componente, pico_max, pico_min }) {
   await conn.execute(
-    'INSERT INTO parametro (id_mainframe, id_componente, pico_max, pico_min, percentual) VALUES (?, ?, ?, ?, ?)',
-    [id_mainframe, id_componente, pico_max ?? null, pico_min ?? null, percentual ?? null]
+    'INSERT INTO parametro (id_mainframe, id_componente, pico_max, pico_min) VALUES (?, ?, ?, ?)',
+    [id_mainframe, id_componente, pico_max ?? null, pico_min ?? null]
   );
 }
 

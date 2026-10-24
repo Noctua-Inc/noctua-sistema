@@ -48,9 +48,7 @@ class AuthModel {
         SELECT 
             c.id_componente, 
             c.tipo,
-            c.capacidade,
             f.nome_fabricante,
-            p.percentual,
             p.pico_min,
             p.pico_max
         FROM parametro p

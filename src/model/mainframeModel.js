@@ -38,7 +38,7 @@ async function buscarPorId(id) {
 
 async function criar(dados) {
   const {
-    hostname, modelo, numero_serie, status,
+    hostname, fabricante, modelo, numero_serie, status,
     sis_operacional, versao_so, fk_empresa, fk_localizacao,
     parametros = [],
   } = dados;
@@ -49,15 +49,15 @@ async function criar(dados) {
 
     const [result] = await conn.execute(
       `INSERT INTO mainframe
-        (hostname, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [hostname, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao]
+        (hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao]
     );
 
     const id_mainframe = result.insertId;
 
     for (const p of parametros) {
-      await parametroModel.criarComConexao(conn, { ...p, fk_mainframe: id_mainframe });
+      await parametroModel.criarComConexao(conn, { ...p, id_mainframe: id_mainframe });
     }
 
     await conn.commit();
@@ -72,9 +72,9 @@ async function criar(dados) {
 
 async function atualizar(id, dados) {
   const {
-    hostname, modelo, numero_serie, status,
+    hostname, fabricante, modelo, numero_serie, status,
     sis_operacional, versao_so, fk_empresa, fk_localizacao,
-    parametros = [],
+    parametros,
   } = dados;
 
   const conn = await pool.getConnection();
@@ -83,10 +83,10 @@ async function atualizar(id, dados) {
 
     const [result] = await conn.execute(
       `UPDATE mainframe SET
-        hostname = ?, modelo = ?, numero_serie = ?, status = ?,
+        hostname = ?, fabricante = ?, modelo = ?, numero_serie = ?, status = ?,
         sis_operacional = ?, versao_so = ?, fk_empresa = ?, fk_localizacao = ?
        WHERE id_mainframe = ?`,
-      [hostname, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao, id]
+      [hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao, id]
     );
 
     if (result.affectedRows === 0) {
@@ -94,10 +94,12 @@ async function atualizar(id, dados) {
       return 0;
     }
 
-    await parametroModel.removerPorMainframeComConexao(conn, id);
-
-    for (const p of parametros) {
-      await parametroModel.criarComConexao(conn, { ...p, id_mainframe: id });
+    // Só altera os componentes quando a tela envia essa lista.
+    if (parametros) {
+      await parametroModel.removerPorMainframeComConexao(conn, id);
+      for (const p of parametros) {
+        await parametroModel.criarComConexao(conn, { ...p, id_mainframe: id });
+      }
     }
 
     await conn.commit();

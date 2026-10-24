@@ -1,13 +1,10 @@
 import componenteModel from '../model/componenteModel.js';
 
 function validar(body) {
-  const { tipo, fabricante, capacidade } = body;
+  const { tipo, fabricante } = body;
 
-  if (!tipo || !fabricante || capacidade === undefined || capacidade === null || capacidade === '') {
-    return 'Os campos tipo, fabricante, e capacidade são obrigatórios.';
-  }
-  if (!Number.isInteger(Number(capacidade)) || Number(capacidade) < 0) {
-    return 'A capacidade deve ser um número inteiro maior ou igual a zero.';
+  if (!tipo || !fabricante) {
+    return 'Os campos tipo e fabricante são obrigatórios.';
   }
   return null;
 }

@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }[m]));
   }
 
+  const idEmpresa = sessionStorage.getItem("idEmpresa");
+
   let localizacoes = [];
   let componentes = [];
   let componentesAdicionados = [];
@@ -50,9 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const formNovoComponente = document.getElementById("form-novo-componente");
   const novoCompTipo = document.getElementById("novo-comp-tipo");
   const novoCompFabricante = document.getElementById("novo-comp-fabricante");
-  const novoCompModelo = document.getElementById("novo-comp-modelo");
-  const novoCompSerie = document.getElementById("novo-comp-serie");
-  const novoCompCapacidade = document.getElementById("novo-comp-capacidade");
 
   //  Localizações 
   function preencherSelectLocalizacoes() {
@@ -215,7 +214,7 @@ novaLocRegiao.addEventListener("blur", async () => {
     componentes.forEach((c) => {
       const option = document.createElement("option");
       option.value = c.id_componente;
-      option.textContent = `${c.tipo} — ${c.fabricante} ${c.modelo}`;
+      option.textContent = `${c.tipo} — ${c.nome_fabricante}`;
       compSelect.appendChild(option);
     });
   }
@@ -232,7 +231,7 @@ novaLocRegiao.addEventListener("blur", async () => {
     }
 
     compContainer.innerHTML = componentesAdicionados.map((parametro, index) => {
-      const componente = componentes.find((c) => c.id_componente === parametro.fk_componente);
+      const componente = componentes.find((c) => c.id_componente === parametro.id_componente);
       if (!componente) return "";
 
       return `
@@ -240,13 +239,9 @@ novaLocRegiao.addEventListener("blur", async () => {
           <div class="edit-component-header">
             <div>
               <strong>${escapeHtml(componente.tipo)}</strong>
-              <span>${escapeHtml(componente.fabricante)} ${escapeHtml(componente.modelo)}</span>
+              <span>${escapeHtml(componente.nome_fabricante)}</span>
             </div>
             <button type="button" class="remover-componente" data-index="${index}">×</button>
-          </div>
-          <div class="component-info">
-            <small>Série: ${escapeHtml(componente.num_serie)}</small>
-            <small>Capacidade: ${escapeHtml(componente.capacidade)}</small>
           </div>
           <div class="component-parametros">
             <div class="field">
@@ -257,10 +252,6 @@ novaLocRegiao.addEventListener("blur", async () => {
               <label>Pico máximo</label>
               <input type="number" class="parametro-input" data-index="${index}" data-field="pico_max" value="${parametro.pico_max ?? ""}" min="0">
             </div>
-            <div class="field">
-              <label>Percentual</label>
-              <input type="number" class="parametro-input" data-index="${index}" data-field="percentual" value="${parametro.percentual ?? ""}" min="0" max="100">
-            </div>
           </div>
         </div>
       `;
@@ -269,10 +260,10 @@ novaLocRegiao.addEventListener("blur", async () => {
 
   function adicionarComponente(id) {
     if (!id) return;
-    const jaExiste = componentesAdicionados.some((p) => p.fk_componente === id);
+    const jaExiste = componentesAdicionados.some((p) => p.id_componente === id);
     if (jaExiste) return;
 
-    componentesAdicionados.push({ fk_componente: id, pico_max: 100, pico_min: 0, percentual: 80 });
+    componentesAdicionados.push({ id_componente: id, pico_max: 100, pico_min: 0 });
     renderComponentesAdicionados();
   }
 
@@ -292,15 +283,12 @@ novaLocRegiao.addEventListener("blur", async () => {
   compContainer.addEventListener("input", (e) => {
     const input = e.target.closest(".parametro-input");
     if (!input) return;
-    componentesAdicionados[Number(input.dataset.index)][input.dataset.field] = Number(input.value);
+    componentesAdicionados[Number(input.dataset.index)][input.dataset.field] = input.value === "" ? null : Number(input.value);
   });
 
   function limparFormNovoComponente() {
     novoCompTipo.value = "";
     novoCompFabricante.value = "";
-    novoCompModelo.value = "";
-    novoCompSerie.value = "";
-    novoCompCapacidade.value = "";
   }
 
   function toggleFormNovoComponente(mostrar) {
@@ -317,25 +305,14 @@ novaLocRegiao.addEventListener("blur", async () => {
   btnSalvarNovoComponente.addEventListener("click", async () => {
     const tipo = novoCompTipo.value.trim();
     const fabricante = novoCompFabricante.value.trim();
-    const modelo = novoCompModelo.value.trim();
-    const num_serie = novoCompSerie.value.trim();
-    const capacidade = Number(novoCompCapacidade.value);
 
-    if (!tipo || !fabricante || !modelo || !num_serie || !novoCompCapacidade.value) {
+    if (!tipo || !fabricante) {
       alert("Preencha todos os campos do novo componente.");
-      return;
-    }
-    if (num_serie.length !== 6) {
-      alert("O número de série do componente deve ter exatamente 6 caracteres.");
-      return;
-    }
-    if (!Number.isInteger(capacidade) || capacidade < 0) {
-      alert("A capacidade deve ser um número inteiro maior ou igual a zero.");
       return;
     }
 
     try {
-      const novo = await api.post("/componente", { tipo, fabricante, modelo, num_serie, capacidade });
+      const novo = await api.post("/componente", { tipo, fabricante });
       await carregarComponentes();
       adicionarComponente(novo.id_componente);
       toggleFormNovoComponente(false);
@@ -380,10 +357,14 @@ novaLocRegiao.addEventListener("blur", async () => {
     const modelo = modeloInput.value.trim();
     const numero_serie = numeroSerieInput.value.trim();
     const sis_operacional = soSelect.value;
-    const versao_so = Number(versaoSoInput.value);
+    const versao_so = versaoSoInput.value.trim();
     const status = statusSelect.value;
     const fk_localizacao = Number(localizacaoSelect.value);
 
+    if (!idEmpresa) {
+      alert("Faça login novamente para identificar a empresa do cadastro.");
+      return;
+    }
     if (!fk_localizacao) {
       alert("Selecione uma localização.");
       return;
@@ -395,7 +376,7 @@ novaLocRegiao.addEventListener("blur", async () => {
 
     const corpo = {
       hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so,
-      fk_usuario: 1,
+      fk_empresa: Number(idEmpresa),
       fk_localizacao,
       parametros: componentesAdicionados,
     };

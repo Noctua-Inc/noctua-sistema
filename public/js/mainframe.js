@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const idEmpresa = sessionStorage.getItem("idEmpresa")
 
   const STATUS_CSS = { ativo: "status-ativo", inativo: "status-inativo", "manutenção": "status-manutencao" };
-  const STATUS_NOME = { ativo: "Ativo", inativo: "Inativo", "manut.": "Manutenção" };
+  const STATUS_NOME = { ativo: "Ativo", inativo: "Inativo", "manutenção": "Manutenção" };
 
   function escapeHtml(str) {
     if (str === null || str === undefined) return "";
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let deleteConfirmId = null;
   let editParametros = [];
-  let editFkUsuario = 1;
+  let editFkEmpresa = null;
   let currentStep = 1;
 
   const emptyState = document.getElementById("empty-state");
@@ -75,9 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const formNovoComponente = document.getElementById("form-novo-componente");
   const novoCompTipo = document.getElementById("novo-comp-tipo");
   const novoCompFabricante = document.getElementById("novo-comp-fabricante");
-  const novoCompModelo = document.getElementById("novo-comp-modelo");
-  const novoCompSerie = document.getElementById("novo-comp-serie");
-  const novoCompCapacidade = document.getElementById("novo-comp-capacidade");
 
   //  Localizações 
   function preencherSelectLocalizacoes() {
@@ -402,7 +399,7 @@ if (btnToggleEditarLocalizacao) {
     componentes.forEach((c) => {
       const option = document.createElement("option");
       option.value = c.id_componente;
-      option.textContent = `${c.tipo} — ${c.fabricante} ${c.modelo}`;
+      option.textContent = `${c.tipo} — ${c.nome_fabricante}`;
       editCompSelect.appendChild(option);
     });
   }
@@ -421,7 +418,7 @@ if (btnToggleEditarLocalizacao) {
     }
 
     editCompContainer.innerHTML = editParametros.map((parametro, index) => {
-      const componente = componentes.find((c) => c.id_componente === parametro.fk_componente);
+      const componente = componentes.find((c) => c.id_componente === parametro.id_componente);
       if (!componente) return "";
 
       return `
@@ -429,13 +426,9 @@ if (btnToggleEditarLocalizacao) {
           <div class="edit-component-header">
             <div>
               <strong>${escapeHtml(componente.tipo)}</strong>
-              <span>${escapeHtml(componente.fabricante)} ${escapeHtml(componente.modelo)}</span>
+              <span>${escapeHtml(componente.nome_fabricante)}</span>
             </div>
             <button type="button" class="remover-componente" data-index="${index}">×</button>
-          </div>
-          <div class="component-info">
-            <small>Série: ${escapeHtml(componente.num_serie)}</small>
-            <small>Capacidade: ${escapeHtml(componente.capacidade)}</small>
           </div>
           <div class="component-parametros">
             <div class="field">
@@ -445,10 +438,6 @@ if (btnToggleEditarLocalizacao) {
             <div class="field">
               <label>Pico máximo</label>
               <input type="number" class="parametro-input" data-index="${index}" data-field="pico_max" value="${parametro.pico_max ?? ""}" min="0">
-            </div>
-            <div class="field">
-              <label>Percentual</label>
-              <input type="number" class="parametro-input" data-index="${index}" data-field="percentual" value="${parametro.percentual ?? ""}" min="0" max="100">
             </div>
           </div>
         </div>
@@ -461,11 +450,11 @@ if (btnToggleEditarLocalizacao) {
       const id = Number(editCompSelect.value);
       if (!id) return;
 
-      const jaExiste = editParametros.some((p) => p.fk_componente === id);
+      const jaExiste = editParametros.some((p) => p.id_componente === id);
       editCompSelect.value = "";
       if (jaExiste) return;
 
-      editParametros.push({ fk_componente: id, pico_max: 100, pico_min: 0, percentual: 80 });
+      editParametros.push({ id_componente: id, pico_max: 100, pico_min: 0 });
       renderEditComponentes();
     });
   }
@@ -473,9 +462,6 @@ if (btnToggleEditarLocalizacao) {
   function limparFormNovoComponente() {
     novoCompTipo.value = "";
     novoCompFabricante.value = "";
-    novoCompModelo.value = "";
-    novoCompSerie.value = "";
-    novoCompCapacidade.value = "";
   }
 
   function toggleFormNovoComponente(mostrar) {
@@ -499,28 +485,17 @@ if (btnToggleEditarLocalizacao) {
     btnSalvarNovoComponente.addEventListener("click", async () => {
       const tipo = novoCompTipo.value.trim();
       const fabricante = novoCompFabricante.value.trim();
-      const modelo = novoCompModelo.value.trim();
-      const num_serie = novoCompSerie.value.trim();
-      const capacidade = Number(novoCompCapacidade.value);
 
-      if (!tipo || !fabricante || !modelo || !num_serie || !novoCompCapacidade.value) {
+      if (!tipo || !fabricante) {
         alert("Preencha todos os campos do novo componente.");
-        return;
-      }
-      if (num_serie.length !== 6) {
-        alert("O número de série do componente deve ter exatamente 6 caracteres.");
-        return;
-      }
-      if (!Number.isInteger(capacidade) || capacidade < 0) {
-        alert("A capacidade deve ser um número inteiro maior ou igual a zero.");
         return;
       }
 
       try {
-        const novo = await api.post("/componente", { tipo, fabricante, modelo, num_serie, capacidade });
+        const novo = await api.post("/componente", { tipo, fabricante });
         await carregarComponentes();
 
-        editParametros.push({ fk_componente: novo.id_componente, pico_max: 100, pico_min: 0, percentual: 80 });
+        editParametros.push({ id_componente: novo.id_componente, pico_max: 100, pico_min: 0 });
         renderEditComponentes();
 
         toggleFormNovoComponente(false);
@@ -541,7 +516,7 @@ if (btnToggleEditarLocalizacao) {
     editCompContainer.addEventListener("input", (e) => {
       const input = e.target.closest(".parametro-input");
       if (!input) return;
-      editParametros[Number(input.dataset.index)][input.dataset.field] = Number(input.value);
+      editParametros[Number(input.dataset.index)][input.dataset.field] = input.value === "" ? null : Number(input.value);
     });
   }
   //  Tabela 
@@ -647,9 +622,9 @@ if (btnToggleEditarLocalizacao) {
       const target = await api.get(`/mainframe/${id}`);
 
       editIdInput.value = target.id_mainframe;
-      editFkUsuario = target.fk_usuario;
+      editFkEmpresa = target.fk_empresa;
       editHostnameInput.value = target.hostname;
-      editFabricanteInput.value = target.fabricante;
+      editFabricanteInput.value = target.fabricante || "";
       editModeloInput.value = target.modelo;
       editNumeroSerieInput.value = target.numero_serie;
       editSoInput.value = target.sis_operacional;
@@ -659,10 +634,10 @@ if (btnToggleEditarLocalizacao) {
       atualizarDadosLocalizacao();
       atualizarBotaoLocalizacao();
       esconderFormGrid();
-      carregarEstado();
+      carregarEstado().catch(() => alert("Não foi possível carregar os estados para editar a localização."));
 
       editParametros = target.parametros.map((p) => ({
-        fk_componente: p.fk_componente, pico_max: p.pico_max, pico_min: p.pico_min, percentual: p.percentual,
+        id_componente: p.id_componente, pico_max: p.pico_max, pico_min: p.pico_min,
       }));
       renderEditComponentes();
 
@@ -721,7 +696,7 @@ if (btnToggleEditarLocalizacao) {
       const modelo = editModeloInput.value.trim();
       const numero_serie = editNumeroSerieInput.value.trim();
       const sis_operacional = editSoInput.value.trim();
-      const versao_so = Number(editVersaoSoInput.value);
+      const versao_so = editVersaoSoInput.value.trim();
       const status = editStatusSelect.value;
       const fk_localizacao = Number(editLocalizacaoSelect.value);
 
@@ -736,16 +711,20 @@ if (btnToggleEditarLocalizacao) {
 
       const corpo = {
         hostname, fabricante, modelo, numero_serie, sis_operacional, versao_so, status, fk_localizacao,
-        fk_usuario: editFkUsuario,
+        fk_empresa: editFkEmpresa,
         parametros: editParametros,
       };
 
+      const btnSalvar = formEdit.querySelector('button[type="submit"]');
+      btnSalvar.disabled = true;
       try {
         await api.put(`/mainframe/${id}`, corpo);
         await carregarMainframes();
         closeModal();
       } catch (err) {
         alert(err.message);
+      } finally {
+        btnSalvar.disabled = false;
       }
     });
   }

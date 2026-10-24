@@ -184,22 +184,22 @@
               <div class="field"><label for="edit-hostname">Hostname</label><input type="text" id="edit-hostname"
                   maxlength="100" required></div>
               <div class="field"><label for="edit-fabricante">Fabricante</label><input type="text" id="edit-fabricante"
-                  maxlength="100" required></div>
+                  maxlength="100" placeholder="Ex: IBM" required></div>
               <div class="field"><label for="edit-modelo">Modelo</label><input type="text" id="edit-modelo"
                   maxlength="100" required></div>
               <div class="field"><label for="edit-numero-serie">Número de série (6 caracteres)</label><input type="text"
                   id="edit-numero-serie" maxlength="6" required></div>
               <div class="field"><label for="edit-so">Sistema operacional</label><input type="text" id="edit-so"
                   maxlength="100" required></div>
-              <div class="field"><label for="edit-versao-so">Versão do SO</label><input type="number"
-                  id="edit-versao-so" step="0.1" min="0" required></div>
+              <div class="field"><label for="edit-versao-so">Versão do SO</label><input type="text"
+                  id="edit-versao-so" maxlength="20" placeholder="Ex: 22.04.1" required></div>
               <div class="field">
                 <label for="edit-status">Status</label>
                 <div class="select-wrap">
                   <select id="edit-status" required>
                     <option value="ativo">Ativo</option>
                     <option value="inativo">Inativo</option>
-                    <option value="manut.">Manutenção</option>
+                    <option value="manutenção">Manutenção</option>
                   </select>
                 </div>
               </div>
@@ -252,12 +252,6 @@
                     maxlength="100" placeholder="Ex: CPU"></div>
                 <div class="field"><label for="novo-comp-fabricante">Fabricante</label><input type="text"
                     id="novo-comp-fabricante" maxlength="100" placeholder="Ex: Intel"></div>
-                <div class="field"><label for="novo-comp-modelo">Modelo</label><input type="text" id="novo-comp-modelo"
-                    maxlength="100"></div>
-                <div class="field"><label for="novo-comp-serie">Nº de série (6 caracteres)</label><input type="text"
-                    id="novo-comp-serie" maxlength="6" placeholder="Ex: CPU002"></div>
-                <div class="field"><label for="novo-comp-capacidade">Capacidade</label><input type="number"
-                    id="novo-comp-capacidade" min="0" step="1"></div>
               </div>
               <div class="inline-form-actions">
                 <button type="button" class="btn-cancel" id="btn-cancelar-novo-componente">Cancelar</button>
