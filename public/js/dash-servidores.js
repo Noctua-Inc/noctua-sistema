@@ -10,10 +10,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let mainframes = [];
     let carregando = false;
 
-    contador = 1;
+    let usoComponente = 0;
 
     const nomesStatus = { ativo: 'Ativo', inativo: 'Inativo', 'manutenção': 'Manutenção' };
     const classesStatus = { ativo: 'ativo', inativo: 'inativo', 'manutenção': 'manutencao' };
+
+    function gerarEstrutura(usoComponente) {
+        const estruturaUsoComponente = `
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: ${usoComponente}%;"></div>
+            </div>
+            <span>${usoComponente}%</span>
+        `
+
+        return estruturaUsoComponente;
+    }
 
     function atualizarIndicadores() {
         let ativas = 0;
@@ -76,19 +87,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const linha = document.createElement('tr');
             linha.className = 'servidores-linha';
             criarCelula(linha, mainframe.hostname);
-
-            let estruturaUsoComponente = `
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" style="width: 60%;"></div>
-                </div>
-                <span>60%</span>
-            `
            
-            let componentesMainframe = String(mainframe.componentes).replaceAll(" ", "").split(",");            
-            
-            for(let i = 0; i < todosComponentes.length; i++){
-               if(componentesMainframe.includes(todosComponentes[i])) {
-                    criarCelula(linha, estruturaUsoComponente);
+            let componentesMainframe = String(mainframe.componentes).replaceAll(" ", "").split(",");
+            let parametrosMainframe = String(mainframe.parametros).replaceAll(" ", "").split(",");            
+
+            for (let i = 0; i < todosComponentes.length; i++) {
+                let usoComponente = Number((Math.random() * (100 - 60) + 60).toFixed(0));
+                let componenteAtual = todosComponentes[i];
+
+                if (componentesMainframe.includes(componenteAtual)) {
+                    let celulaCriada = criarCelula(linha, gerarEstrutura(usoComponente));
+
+                    let barraProcresso = celulaCriada.querySelector(".progress-bar-fill");
+
+                    let indexMainframe = componentesMainframe.indexOf(componenteAtual);
+                    let parametroAtual = Number(parametrosMainframe[indexMainframe]);
+
+                    if (parametroAtual <= usoComponente) {
+                        barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-alert");
+                    } else if(Math.abs(parametroAtual - usoComponente) <= 15) {
+                        barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-attention");
+                    }
                 } else {
                     criarCelula(linha, "Não Monitorado");
                 }
