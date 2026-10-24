@@ -1,13 +1,10 @@
 import componenteModel from '../model/componenteModel.js';
 
 function validar(body) {
-  const { tipo, fabricante, modelo, num_serie, capacidade } = body;
+  const { tipo, fabricante, capacidade } = body;
 
-  if (!tipo || !fabricante || !modelo || !num_serie || capacidade === undefined || capacidade === null || capacidade === '') {
-    return 'Os campos tipo, fabricante, modelo, num_serie e capacidade são obrigatórios.';
-  }
-  if (String(num_serie).length !== 6) {
-    return 'O número de série deve ter exatamente 6 caracteres.';
+  if (!tipo || !fabricante || capacidade === undefined || capacidade === null || capacidade === '') {
+    return 'Os campos tipo, fabricante, e capacidade são obrigatórios.';
   }
   if (!Number.isInteger(Number(capacidade)) || Number(capacidade) < 0) {
     return 'A capacidade deve ser um número inteiro maior ou igual a zero.';
@@ -28,6 +25,16 @@ async function listar(req, res) {
 async function buscarPorId(req, res) {
   try {
     const componente = await componenteModel.buscarPorId(req.params.id);
+    res.json(componente);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar componente.' });
+  }
+}
+
+async function listarPorEmpresa(req, res){
+  try {
+    const componente = await componenteModel.listarPorEmpresa(req.params.id);
     if (!componente) return res.status(404).json({ erro: 'Componente não encontrado.' });
     res.json(componente);
   } catch (err) {
@@ -77,4 +84,4 @@ async function remover(req, res) {
   }
 }
 
-export default { listar, buscarPorId, criar, atualizar, remover };
+export default { listar, buscarPorId, listarPorEmpresa, criar, atualizar, remover };
