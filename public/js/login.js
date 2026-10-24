@@ -29,7 +29,7 @@ function login(event) {
                 sessionStorage.setItem("idEmpresa", data.usuario.id_empresa);
                 
                 setTimeout(() => {
-                    window.location = '/dash-alertas.html'
+                    window.location = '/dash-servidores.html'
                 }, 2000);
             }
         })

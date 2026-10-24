@@ -58,7 +58,7 @@ async function verificarEmail(id_usuario) {
 }
 
 // lista para a tela de usuários
-async function listar() {
+async function listar(idEmpresa) {
   const [resultado] = await pool.query(
     `SELECT
         u.id_usuario,
@@ -71,24 +71,28 @@ async function listar() {
      FROM usuario u
      LEFT JOIN cargo c ON c.id_cargo = u.fk_cargo
      LEFT JOIN empresa e ON e.id_empresa = u.fk_empresa
-     ORDER BY u.nome`
+     WHERE u.fk_empresa = ?
+     ORDER BY u.nome`,
+    [idEmpresa]
   );
   return resultado;
 }
 
 // lista de cargos para atribuir
-async function listarCargos() {
+async function listarCargos(idEmpresa) {
   const [resultado] = await pool.query(
-    `SELECT id_cargo, nome FROM cargo ORDER BY nome`
+    `SELECT id_cargo, nome FROM cargo WHERE fk_empresa = ? ORDER BY nome`,
+    [idEmpresa]
   );
   return resultado;
 }
 
 // atribui cargo a um usuário (tela de usuários)
-async function atualizarConta(id, fk_cargo) {
+async function atualizarConta(id, fk_cargo, idEmpresa) {
   const [resultado] = await pool.query(
-    `UPDATE usuario SET fk_cargo = ? WHERE id_usuario = ?`,
-    [fk_cargo, id]
+    `UPDATE usuario u JOIN cargo c ON c.id_cargo = ? AND c.fk_empresa = u.fk_empresa
+     SET u.fk_cargo = c.id_cargo WHERE u.id_usuario = ? AND u.fk_empresa = ?`,
+    [fk_cargo, id, idEmpresa]
   );
   return resultado;
 }
@@ -115,10 +119,10 @@ async function atualizarPerfil(id, nome, email_institucional, senhaHash) {
 }
 
 // sem SQL injection
-async function excluirConta(id) {
+async function excluirConta(id, idEmpresa) {
   const [resultado] = await pool.query(
-    `DELETE FROM usuario WHERE id_usuario = ?`,
-    [id]
+    `DELETE FROM usuario WHERE id_usuario = ? AND fk_empresa = ?`,
+    [id, idEmpresa]
   );
   return resultado;
 }

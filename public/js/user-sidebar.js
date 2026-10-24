@@ -50,3 +50,7 @@ async function preencherUsuario(){
 }
 
 preencherUsuario();
+
+document.querySelector('.sidebar-user > a:last-child')?.addEventListener('click', () => {
+    sessionStorage.clear();
+});

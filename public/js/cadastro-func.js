@@ -9,15 +9,25 @@ const listaUsuarios = document.getElementById('lista_usuarios');
 const listaCargos = document.getElementById('lista_cargos');
 
 const idUsuario = sessionStorage.getItem("idUsuario");
+const idEmpresa = sessionStorage.getItem("idEmpresa");
 
 let verificar = []
 
 async function verificarPermissao() {
-    verificar = await api.get(`/buscarUsuario/${idUsuario}`)
-
-    if (verificar.nome_cargo !== "Administrador") {
-        window.location.href = '/proibir.html'
-        return;
+    if (!idUsuario || !idEmpresa) {
+      window.location.href = '/login.html';
+      return;
+    }
+    try {
+      verificar = await api.get(`/buscarUsuario/${idUsuario}`);
+      if (verificar.nome_cargo !== "Administrador") {
+          window.location.href = '/proibir.html';
+          return;
+      }
+      await carregarDados();
+    } catch (erro) {
+      alert('Não foi possível verificar o usuário. Faça login novamente.');
+      window.location.href = '/login.html';
     }
 } 
 
@@ -93,8 +103,8 @@ function selecionarUsuario(u) {
 async function carregarDados() {
   try {
     const [resUsuarios, resCargos] = await Promise.all([
-      fetch(`${API}/listar`),
-      fetch(`${API}/cargos`),
+      fetch(`${API}/listar?idEmpresa=${idEmpresa}`),
+      fetch(`${API}/cargos?idEmpresa=${idEmpresa}`),
     ]);
 
     if (!resUsuarios.ok || !resCargos.ok) throw new Error('Falha ao carregar dados');
@@ -123,6 +133,7 @@ document.getElementById('atualizarConta').addEventListener('click', async () => 
       body: JSON.stringify({
         id: usuarioSelecionado.id_usuario,
         fk_cargo: cargoSelecionado,
+        idEmpresa: idEmpresa,
       }),
     });
 
@@ -146,7 +157,7 @@ document.getElementById('excluirConta').addEventListener('click', async () => {
   if (!confirm(`Deletar o usuário ${usuarioSelecionado.nome}?`)) return;
 
   try {
-    const res = await fetch(`${API}/excluirConta/${usuarioSelecionado.id_usuario}`, {
+    const res = await fetch(`${API}/excluirConta/${usuarioSelecionado.id_usuario}?idEmpresa=${idEmpresa}`, {
       method: 'DELETE',
     });
 
@@ -166,5 +177,3 @@ document.getElementById('excluirConta').addEventListener('click', async () => {
     alert('Erro ao excluir usuário.');
   }
 });
-
-carregarDados();

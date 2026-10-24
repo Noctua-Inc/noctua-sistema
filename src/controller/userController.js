@@ -176,8 +176,10 @@ async function login(req, res) {
 }
 
 async function listar(req, res) {
+    const idEmpresa = Number(req.query.idEmpresa);
+   
     try {
-        const usuarios = await userModel.listar();
+        const usuarios = await userModel.listar(idEmpresa);
 
         return res.status(200).json(usuarios);
     } catch (erro) {
@@ -190,8 +192,10 @@ async function listar(req, res) {
 }
 
 async function listarCargos(req, res) {
+    const idEmpresa = Number(req.query.idEmpresa);
+   
     try {
-        const cargos = await userModel.listarCargos();
+        const cargos = await userModel.listarCargos(idEmpresa);
         res.status(200).json(cargos);
     } catch (erro) {
         console.error(erro);
@@ -202,12 +206,13 @@ async function listarCargos(req, res) {
 async function atualizarConta(req, res) {
     try {
         const { id, fk_cargo } = req.body;
+        const idEmpresa = Number(req.body.idEmpresa);
 
         if (!id || !fk_cargo) {
             return res.status(400).json({ mensagem: 'Informe o usuário e o cargo!' });
         }
 
-        const resultado = await userModel.atualizarConta(id, fk_cargo);
+        const resultado = await userModel.atualizarConta(id, fk_cargo, idEmpresa);
 
         if (resultado.affectedRows === 0) {
             return res.status(404).json({ mensagem: 'Usuário não encontrado' });
@@ -276,8 +281,10 @@ async function atualizarPerfil(req, res) {
 }
 
 async function excluirConta(req, res) {
+    const idEmpresa = Number(req.query.idEmpresa);
+   
     try {
-        const resultado = await userModel.excluirConta(req.params.id);
+        const resultado = await userModel.excluirConta(req.params.id, idEmpresa);
 
         if (resultado.affectedRows === 0) {
             return res.status(404).json({ mensagem: 'Usuário não encontrado' });

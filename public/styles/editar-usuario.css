@@ -1,3 +1,9 @@
+.sidebar-user > a:first-child {
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+}
+
 .popup-editar {
     position: absolute;
     top: 30%;
