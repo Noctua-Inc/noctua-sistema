@@ -69,12 +69,16 @@ setInterval(() => {
     let minutos = String(agora.getMinutes()).padStart(2, '0');  
     let segundos = String(agora.getSeconds()).padStart(2, '0');
 
-    let formatandoData = `${horas}:${minutos}:${segundos}`;
-
+    
     let porcentagemCpu = []
     let porcentagemRam = []
     let porcentagemSwap = []
     let porcentagemDisco = []
+    let datasHoras = []
+    
+    let formatandoData = `${horas}:${minutos}:${segundos}`;
+
+    datasHoras.push(formatandoData)
 
     let dadosPorcentagem = []
     let CPUFrequencia = (Math.random() * (6 - 4) + 4).toFixed(1);
@@ -94,17 +98,13 @@ setInterval(() => {
     porcentagemSwap.push(dadosPorcentagem[2]);
     porcentagemDisco.push(dadosPorcentagem[3]);
 
-    console.log(Math.abs(inicioCaptura[4] - formatandoData[4]));
-    
-
-    if(Math.abs(inicioCaptura[7] - formatandoData[7]) >= 5) {
+    if(Math.abs(inicioCaptura.slice(6, 8) - formatandoData.slice(6, 8)) >= 10) {
         inicioCaptura = formatandoData;
 
         let somaCpu = 0;
         let somaRam = 0;
         let somaSwap = 0;
         let somaDisco = 0;
-
         for(let i = 0; i < porcentagemCpu.length; i++) {
             somaCpu += porcentagemCpu[i];
             somaRam += porcentagemRam[i];
