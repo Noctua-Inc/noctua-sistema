@@ -4,6 +4,7 @@ import mainframeController from '../controller/mainframeController.js';
 const router = express.Router();
 
 router.get('/empresa/:id', mainframeController.listar);
+router.get('/idEmpresa/:idEmpresa/idMainFrame/:idMainFrame', mainframeController.listaPorIdMainframeId);
 router.get('/:id', mainframeController.buscarPorId);
 router.post('/', mainframeController.criar);
 router.put('/:id', mainframeController.atualizar);

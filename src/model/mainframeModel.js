@@ -9,22 +9,81 @@ async function listar(idEmpresa) {
         l.estado,
         l.cidade,
         l.cep,
-        GROUP_CONCAT(
-            DISTINCT c.tipo
-            ORDER BY c.tipo
-            SEPARATOR ', '
-        ) AS componentes
+        comp.componentes,
+        param.parametros
     FROM mainframe m
     LEFT JOIN localizacao l
         ON l.id_localizacao = m.fk_localizacao
-    LEFT JOIN parametro p
-        ON p.id_mainframe = m.id_mainframe
-    LEFT JOIN componente c
-        ON c.id_componente = p.id_componente
+    LEFT JOIN (
+        SELECT 
+            p.id_mainframe,
+            GROUP_CONCAT(
+                DISTINCT c.tipo
+                ORDER BY c.tipo
+                SEPARATOR ', '
+            ) AS componentes
+        FROM parametro p
+        INNER JOIN componente c ON c.id_componente = p.id_componente
+        GROUP BY p.id_mainframe
+    ) comp ON comp.id_mainframe = m.id_mainframe
+
+    LEFT JOIN (
+        SELECT 
+            id_mainframe,
+            GROUP_CONCAT(
+                pico_max
+                SEPARATOR ', '
+            ) AS parametros
+        FROM parametro
+        GROUP BY id_mainframe
+    ) param ON param.id_mainframe = m.id_mainframe
+
     WHERE m.fk_empresa = ?
-    GROUP BY m.id_mainframe
-    ORDER BY m.hostname;
+    ORDER BY m.hostname;	
   `, [idEmpresa]);
+  return rows;
+}
+
+async function listaPorIdMainframeId(idEmpresa, idMainFrame) {
+  const [rows] = await pool.execute(
+    `
+    SELECT
+        m.hostname,
+        comp.componentes,
+        param.parametros
+    FROM mainframe m
+    LEFT JOIN localizacao l
+        ON l.id_localizacao = m.fk_localizacao
+    LEFT JOIN (
+        SELECT 
+            p.id_mainframe,
+            GROUP_CONCAT(
+                DISTINCT c.tipo
+                ORDER BY c.tipo
+                SEPARATOR ', '
+            ) AS componentes
+        FROM parametro p
+        INNER JOIN componente c ON c.id_componente = p.id_componente
+        GROUP BY p.id_mainframe
+    ) comp ON comp.id_mainframe = m.id_mainframe
+
+    LEFT JOIN (
+        SELECT 
+            id_mainframe,
+            GROUP_CONCAT(
+                pico_max
+                SEPARATOR ', '
+            ) AS parametros
+        FROM parametro
+        GROUP BY id_mainframe
+    ) param ON param.id_mainframe = m.id_mainframe
+
+    WHERE m.fk_empresa = ? AND m.id_mainframe = ?
+    ORDER BY m.hostname;	
+    `,
+    [idEmpresa, idMainFrame]
+  );
+
   return rows;
 }
 
@@ -135,4 +194,4 @@ async function remover(id) {
   }
 }
 
-export default { listar, buscarPorId, criar, atualizar, remover };
+export default { listar, listaPorIdMainframeId, buscarPorId, criar, atualizar, remover };

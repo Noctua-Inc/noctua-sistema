@@ -147,8 +147,6 @@ main .navbar .parte-direita {
 }
 
 main .navbar .parte-direita .estado-servidor {
-    background-color: #FEEDEC;
-    color: #F44336;
     width: 180px;
     height: 45px;
     font-size: 24px;

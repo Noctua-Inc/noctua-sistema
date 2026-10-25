@@ -50,14 +50,13 @@
     <main id="container_main" onclick="fecharEditarUsuario()">
         <nav class="navbar">
             <div class="parte-esquerda">
-                <h1 class="tituto-servidor">
-                    Detalhes do Servidor: srv-prod-01
+                <h1 class="tituto-servidor" id="nomeServidor">
+                    Detalhes do Servidor: 
                 </h1>
             </div>
 
             <div class="parte-direita">
-                <p class="estado-servidor">
-                    Em Alerta
+                <p class="estado-servidor" id="estadoServidor">
                 </p>
             </div>
     
@@ -71,8 +70,8 @@
                 <h2 class="componente" id="kpiRisco">
                     Risco: 
                 </h2>
-                <p class="observacao">
-                    3 Componentes Excedidos
+                <p class="observacao" id="observacaoKpi">
+                    Componentes Excedidos
                 </p>
             </div>
 
@@ -92,7 +91,7 @@
                 <h2 class="componente" id="kpiCPUPor">
                     CPU: 
                 </h2>
-                <p class="observacao">
+                <p class="observacao" id="observacaoCpu">
                     Aumentou 8.2% nos 
                 </p>
             </div>
@@ -104,7 +103,7 @@
                 <h2 class="componente" id="kpiCPUFreq">
                     Freq CPU:
                 </h2>
-                <p class="observacao">
+                <p class="observacao" id="observacaoCPUFrq">
                     Aumentou 8.2% nos 
                 </p>
             </div>
@@ -116,7 +115,7 @@
                 <h2 class="componente" id="kpiRAMPor">
                     RAM: 
                 </h2>
-                <p class="observacao">
+                <p class="observacao" id="observacaoRAM">
                     Diminuiu 1% nos 
                 </p>
             </div>
@@ -128,7 +127,7 @@
                 <h2 class="componente" id="kpiSWAPPor">
                     SWAP:
                 </h2>
-                <p class="observacao">
+                <p class="observacao" id="observacaoSWAP">
                     Diminuiu 5% nos 
                 </p>
             </div>
@@ -140,7 +139,7 @@
                 <h2 class="componente" id="kpiRAMUso">
                     RAM: 
                 </h2>
-                <p class="observacao">
+                <p class="observacao" id="observacaoRAMUso">
                     Diminuiu 1GM nos 
                 </p>
             </div>
@@ -152,7 +151,7 @@
                 <h2 class="componente" id="kpiDiscoPor">
                     Disco:
                 </h2>
-                <p class="observacao">
+                <p class="observacao" id="observacaoDisco">
                     Aumentou 4% nos 
                 </p>
             </div>
@@ -164,7 +163,7 @@
                 <h2 class="componente" id="kpiDiscoUso">
                     Disco:
                 </h2>
-                <p class="observacao">
+                <p class="observacao" id="observacaoDiscoUso">
                     Aumentou 2GM nos 
                 </p>
             </div>
