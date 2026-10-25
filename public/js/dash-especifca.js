@@ -295,7 +295,7 @@ async function buscarMainframe() {
             grafico.data.datasets[0].hidden = !componentesMainframe.includes("CPU");
             grafico.data.datasets[1].hidden = !componentesMainframe.includes("RAM");
             grafico.data.datasets[2].hidden = !componentesMainframe.includes("SWAP");
-            grafico.data.datasets[3].hidden = !componentesMainframe.includes("Disco");
+            grafico.data.datasets[3].hidden = !componentesMainframe.includes("DISCO");
             grafico.update();
         }
 
