@@ -6,6 +6,11 @@
     padding: 0;
 }
 
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 50px;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background: white;
@@ -941,7 +946,6 @@ footer li {
     color: #FFFFFFA6;
     text-decoration: none;
     list-style-type: none;
-    margin-bottom: 10px;
 }
 
 footer li {
@@ -951,13 +955,29 @@ footer li {
 
 footer .footer-alto {
     width: 100%;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 40px;
+    display: flex;
+    justify-content: space-between;
 }
 
 footer .bloco {
     min-width: 0;
+    width: 700px;
+}
+
+footer .topicos_navbar {
+    width: 200px;
+}
+
+footer .topicos_navbar .topicos ul li a{
+    color: #FFFFFFA6;
+    text-decoration: none;
+    list-style-type: none;
+    transition: 0.5s;
+}
+
+
+footer .topicos_navbar .topicos ul li a:hover {
+    color: #FFF;
 }
 
 footer .footer-alto .title {
