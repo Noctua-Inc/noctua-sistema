@@ -44,6 +44,49 @@ async function listar(idEmpresa) {
   return rows;
 }
 
+async function listaPorIdMainframeId(idEmpresa, idMainFrame) {
+  const [rows] = await pool.execute(
+    `
+    SELECT
+        m.hostname,
+        comp.componentes,
+        param.parametros
+    FROM mainframe m
+    LEFT JOIN localizacao l
+        ON l.id_localizacao = m.fk_localizacao
+    LEFT JOIN (
+        SELECT 
+            p.id_mainframe,
+            GROUP_CONCAT(
+                DISTINCT c.tipo
+                ORDER BY c.tipo
+                SEPARATOR ', '
+            ) AS componentes
+        FROM parametro p
+        INNER JOIN componente c ON c.id_componente = p.id_componente
+        GROUP BY p.id_mainframe
+    ) comp ON comp.id_mainframe = m.id_mainframe
+
+    LEFT JOIN (
+        SELECT 
+            id_mainframe,
+            GROUP_CONCAT(
+                pico_max
+                SEPARATOR ', '
+            ) AS parametros
+        FROM parametro
+        GROUP BY id_mainframe
+    ) param ON param.id_mainframe = m.id_mainframe
+
+    WHERE m.fk_empresa = ? AND m.id_mainframe = ?
+    ORDER BY m.hostname;	
+    `,
+    [idEmpresa, idMainFrame]
+  );
+
+  return rows;
+}
+
 async function buscarPorId(id) {
   const [rows] = await pool.execute(
     'SELECT * FROM mainframe WHERE id_mainframe = ?',
@@ -151,4 +194,4 @@ async function remover(id) {
   }
 }
 
-export default { listar, buscarPorId, criar, atualizar, remover };
+export default { listar, listaPorIdMainframeId, buscarPorId, criar, atualizar, remover };

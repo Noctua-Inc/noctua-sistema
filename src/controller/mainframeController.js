@@ -61,6 +61,18 @@ async function listar(req, res) {
   }
 }
 
+async function listaPorIdMainframeId(req, res) {
+  try {
+    const idEmpresa = req.params.idEmpresa;
+    const idMainFrame = req.params.idMainFrame;
+    const mainframes = await mainframeModel.listaPorIdMainframeId(idEmpresa, idMainFrame);
+    res.json(mainframes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar mainframes.' });
+  }
+}
+
 async function buscarPorId(req, res) {
   try {
     const mainframe = await mainframeModel.buscarPorId(req.params.id);
@@ -118,4 +130,4 @@ async function remover(req, res) {
   }
 }
 
-export default { listar, buscarPorId, criar, atualizar, remover };
+export default { listar, listaPorIdMainframeId, buscarPorId, criar, atualizar, remover };
