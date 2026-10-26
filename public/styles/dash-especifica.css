@@ -304,3 +304,108 @@ main .sessao-grafico .botoes-tempo .botao-escolhido:hover{
     font-weight: normal;
     color: #667085;
 }
+
+@media (max-width: 1180px) {
+    main {
+        margin-left: 240px;
+        width: calc(100% - 240px);
+    }
+    main .navbar {
+        width: 90%;
+    }
+    main .kpis {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 760px) {
+    .sidebar {
+        width: 72px;
+        padding: 24px 8px 0;
+    }
+    .sidebar-brand {
+        padding: 0;
+        justify-content: center;
+    }
+    .sidebar-brand img {
+        width: 54px;
+    }
+    .sidebar-menu a {
+        justify-content: center;
+        padding: 14px 8px;
+        font-size: 0;
+        gap: 0;
+    }
+    .sidebar-menu i {
+        font-size: 17px;
+    }
+    .sidebar-user {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .user-info {
+        display: none;
+    }
+
+    main {
+        margin-left: 72px;
+        width: calc(100% - 72px);
+        gap: 2.5rem;
+    }
+
+    main .navbar {
+        width: 92%;
+        height: 80px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    main .kpis {
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+
+    main .kpis .kpi {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+    }
+
+    main .sessao-grafico {
+        width: 94%;
+        height: auto;
+        padding: 20px;
+    }
+
+    main .sessao-grafico .sessao-acima {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    #grafico {
+        height: 300px;
+    }
+
+    .historico {
+        width: 94%;
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-especifica h1,
+    main .navbar .parte-esquerda .tituto-servidor {
+        font-size: 20px;
+    }
+
+    main .kpis .kpi .horario {
+        font-size: 24px;
+    }
+
+    .historico table {
+        font-size: 10px;
+    }
+}

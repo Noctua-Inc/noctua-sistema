@@ -259,3 +259,117 @@
     .servidores-controles { width: 100%; flex-direction: column; }
     .servidores-busca input, .servidores-controles select { width: 100%; max-width: none; }
 }
+
+@media (max-width: 1180px) {
+    .servidores-indicadores {
+        grid-template-columns: 1fr;
+    }
+    .servidores-cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .servidores-atualizacao {
+        text-align: left;
+    }
+}
+
+@media (max-width: 760px) {
+    .pagina-servidores .sidebar {
+        width: 72px;
+        padding: 24px 8px 0;
+    }
+
+    .pagina-servidores .sidebar-brand {
+        padding: 0;
+        justify-content: center;
+    }
+
+    .pagina-servidores .sidebar-brand img {
+        width: 54px;
+    }
+
+    .pagina-servidores .sidebar-menu a {
+        justify-content: center;
+        padding: 14px 8px;
+        font-size: 0;
+        gap: 0;
+    }
+
+    .pagina-servidores .sidebar-menu i {
+        font-size: 17px;
+    }
+
+    .pagina-servidores .sidebar-user {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .pagina-servidores .user-info {
+        display: none;
+    }
+
+    .pagina-servidores .main-wrapper {
+        margin-left: 72px;
+        width: calc(100% - 72px);
+    }
+
+    .dashboard-servidores {
+        padding: 20px 14px;
+        gap: 16px;
+    }
+
+    .servidores-cabecalho h1 {
+        font-size: 24px;
+    }
+
+    .servidores-indicador {
+        padding: 16px;
+    }
+
+    .servidores-status-resumo {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .servidores-status-resumo > div {
+        border-left: 0;
+        padding-left: 0;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 8px;
+    }
+
+    .servidores-status-resumo > div:first-child {
+        border-top: 0;
+        padding-top: 0;
+    }
+
+    .servidores-controles {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .servidores-busca input,
+    .servidores-controles select {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-servidores {
+        padding: 16px 10px;
+    }
+
+    .servidores-cabecalho h1 {
+        font-size: 20px;
+    }
+
+    .servidores-total {
+        font-size: 24px;
+    }
+
+    .servidores-status-resumo strong {
+        font-size: 20px;
+    }
+}

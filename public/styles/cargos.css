@@ -537,42 +537,63 @@ body {
   color: #15803D;
 }
 
-@media (max-width: 900px) {
-  .forms-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .roles-table-header,
-  .role-row {
-    grid-template-columns: 115px minmax(0, 1fr) 66px;
-  }
+@media (max-width: 1180px) {
+    .forms-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
-@media (max-width: 720px) {
-  .sidebar {
-    width: 210px;
-  }
+@media (max-width: 760px) {
+    .sidebar {
+        width: 72px;
+        padding: 24px 8px 0;
+    }
+    .sidebar-brand {
+        padding: 0;
+        justify-content: center;
+    }
+    .sidebar-brand img {
+        width: 54px;
+    }
+    .sidebar-menu a {
+        justify-content: center;
+        padding: 14px 8px;
+        font-size: 0;
+        gap: 0;
+    }
+    .sidebar-menu i {
+        font-size: 17px;
+    }
+    .sidebar-user {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .user-info {
+        display: none;
+    }
 
-  .main {
-    margin-left: 210px;
-    width: calc(100% - 210px);
-  }
+    .main {
+        margin-left: 72px;
+        width: calc(100% - 72px);
+    }
 
-  .content {
-    padding: 24px 18px 30px;
-  }
+    .content {
+        padding: 20px 16px;
+    }
 
-  .roles-header,
-  .roles-table-header,
-  .roles-list {
-    margin-left: 12px;
-    margin-right: 12px;
-    padding-left: 0;
-    padding-right: 0;
-  }
+    .roles-table-header,
+    .role-row {
+        grid-template-columns: 100px minmax(0, 1fr) 60px;
+    }
+}
 
-  .roles-header {
-    margin-left: 12px;
-    margin-right: 12px;
-  }
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 18px;
+    }
+    .roles-table-header,
+    .role-row {
+        grid-template-columns: 80px minmax(0, 1fr) 50px;
+        font-size: 9px;
+    }
 }
