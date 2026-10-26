@@ -13,7 +13,6 @@ let kpiDiscoUso = document.querySelector("#kpiDiscoUso");
 let corpoTabela = document.querySelector("#corpoTabela");
 let estadoServidor = document.querySelector("#estadoServidor");
 
-let observacaoKpi = document.querySelector("#observacaoKpi");
 let observacaoCpu = document.querySelector("#observacaoCpu");
 let observacaoCPUFrq = document.querySelector("#observacaoCPUFrq");
 let observacaoRAM = document.querySelector("#observacaoRAM");
@@ -183,10 +182,7 @@ setInterval(() => {
     if (totalExcedidos > 0) {
         quantidadeRiscos += totalExcedidos;
         kpiRisco.innerHTML = "Risco: " + quantidadeRiscos; 
-        observacaoKpi.innerHTML = `${quantidadeRiscos} Excedidos (Média atual: ${mediaMomento}%)`;
         kpiRisco.classList.remove("excedeu");
-    } else {
-        observacaoKpi.innerHTML = `Média atual: ${mediaMomento}%`;
     }
 
     let statusTabela = "Normal";

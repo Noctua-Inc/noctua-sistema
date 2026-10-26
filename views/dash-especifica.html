@@ -18,32 +18,30 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <a href="dash-servidores.html"><img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo" /></a>
+        <a href="dash-servidores.html">
+            <img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo">
+        </a>
         </div>
 
         <ul class="sidebar-menu">
-            <li><a href="dash-servidores.html" class="active"><i class="fa-solid fa-server"
-                        style="color:white;"></i>Servidores</a></li>
-            <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"
-                        style="color:white;"></i>Alertas</a></li>
-            <li><a href="./mainframes.html"><i class="fa-regular fa-pen-to-square" style="color:white;"></i>Editar
-                    Servidores</a></li>
-            <li><a href="#"><i class="fa-solid fa-gear" style="color:white;"></i>Configurações</a></li>
+        <li><a href="dash-servidores.html" class="active" aria-current="page"><i class="fa-solid fa-server"></i>Servidores</a></li>
+        <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"></i>Alertas</a></li>
+        <li><a href="mainframes.html"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
+        <li id="cargos-html" class="hidden"><a href="cargos.html"><i class="fa-solid fa-user-tag" aria-hidden="true"></i>Cargos</a></li>
+        <li id="funcionarios-html" class="hidden"><a href="cadastro-func.html"><i class="fa-solid fa-users" aria-hidden="true"></i>Usuários</a></li>
         </ul>
 
         <div class="sidebar-user">
-            <a href="#" onclick="abrirEditarUsuario(); return false;" aria-label="Editar meu perfil">
-                <div class="user-avatar">
-                    <span id="user-avatar">-</span>
-                </div>
-                <div class="user-info">
-                    <span id="user-name">-</span>
-                    <span id="user-role">-</span>
-                </div>
-            </a>
-            <a href="index.html">
-                <i class="fa-solid fa-right-from-bracket" style="color:rgb(255, 102, 102);"></i>
-            </a>
+        <a href="#" onclick="abrirEditarUsuario(); return false;" aria-label="Editar meu perfil">
+            <div class="user-avatar"><span id="user-avatar">-</span></div>
+            <div class="user-info">
+            <span id="user-name">-</span>
+            <span id="user-role">-</span>
+            </div>
+        </a>
+        <a href="index.html" aria-label="Sair">
+            <i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);"></i>
+        </a>
         </div>
     </aside>
 
@@ -70,9 +68,6 @@
                 <h2 class="componente" id="kpiRisco">
                     Risco: 
                 </h2>
-                <p class="observacao" id="observacaoKpi">
-                    Componentes Excedidos
-                </p>
             </div>
 
             <div class="kpi">
