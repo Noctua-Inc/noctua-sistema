@@ -1,0 +1,51 @@
+.pagina-previsao .main-wrapper { min-width: 0; }
+.dashboard-previsao { padding: 26px 24px 32px; display: flex; flex-direction: column; gap: 20px; font-size: 13px; }
+.previsao-cabecalho { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
+.previsao-cabecalho h1 { color: #1a1f71; font-size: 28px; letter-spacing: -.7px; }
+.previsao-atualizacao { text-align: right; color: #64748b; font-size: 11px; }
+.previsao-demo { display: inline-block; color: #64748b; font-size: 11px; margin-top: 4px; }
+.previsao-controles { display: flex; flex-wrap: wrap; gap: 24px; align-items: end; }
+.previsao-campo { display: flex; flex-direction: column; gap: 6px; }
+.previsao-campo label, .previsao-campo > span { color: #1a1f71; font-weight: 600; }
+.previsao-campo select { min-width: 260px; max-width: 100%; height: 39px; padding: 0 12px; background: #fff; border: 1px solid #dbe3ef; border-radius: 6px; color: #1a1f71; font: inherit; }
+.previsao-opcoes { display: flex; border: 1px solid #dbe3ef; border-radius: 6px; overflow: hidden; background: #fff; }
+.previsao-opcoes button { padding: 9px 20px; min-height: 38px; background: #fff; border: 0; color: #1a1f71; font: inherit; cursor: pointer; }
+.previsao-opcoes button + button { border-left: 1px solid #dbe3ef; }
+.previsao-opcoes button[aria-pressed="true"] { background: #1a1f71; color: white; }
+.previsao-opcoes button:disabled { color: #94a3b8; cursor: not-allowed; background: #f8fafc; }
+.pagina-previsao button:focus-visible, .pagina-previsao select:focus-visible, .previsao-tabela tr:focus-visible { outline: 3px solid #60a5fa; outline-offset: -3px; }
+.previsao-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.previsao-kpi, .previsao-painel { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; min-width: 0; }
+.previsao-kpi h2 { color: #1a1f71; font-size: 12px; font-weight: 600; }
+.previsao-kpi strong { display: block; color: #0f172a; font-size: clamp(23px, 2.4vw, 36px); margin: 8px 0 2px; line-height: 1.3; }
+.previsao-kpi p { color: #64748b; font-size: 11px; }
+.previsao-painel h2 { color: #1a1f71; font-size: 18px; font-weight: 600; }
+.previsao-subtitulo { color: #64748b; font-size: 12px; margin: 4px 0 14px; }
+.previsao-grafico-scroll { overflow-x: auto; }
+.previsao-legenda { display: flex; flex-wrap: wrap; gap: 12px 20px; font-size: 11px; color: #64748b; }
+.previsao-legenda span { display: inline-flex; align-items: center; gap: 7px; }
+.previsao-legenda i { width: 25px; border-top: 2px solid #2563eb; }
+.previsao-legenda .linha-prevista { border-color: #1a1f71; border-top-style: dashed; }
+.previsao-legenda .linha-minima { border-color: #0d9488; border-top-style: dashed; }
+.previsao-legenda .linha-maxima { border-color: #d97706; border-top-style: dashed; }
+.previsao-legenda .faixa { border: 0; background: #dbeafe; height: 12px; border-radius: 2px; }
+.previsao-inferior { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; }
+.previsao-mapa-scroll, .previsao-tabela-scroll { overflow-x: auto; }
+.previsao-mapa-legenda { margin-top: 14px; display: flex; align-items: center; gap: 6px; font-size: 10px; color: #64748b; flex-wrap: wrap; }
+.previsao-mapa-legenda i { width: 15px; height: 12px; display: inline-block; }
+.previsao-tabela { width: 100%; min-width: 400px; border-collapse: collapse; font-size: 11px; }
+.pagina-previsao .previsao-tabela th, .pagina-previsao .previsao-tabela td { padding: 11px 8px; text-align: left; border-bottom: 1px solid #edf2f7; height: auto; text-transform: none; color: #334155; }
+.pagina-previsao .previsao-tabela th { background: #f8fafc; color: #1a1f71; font-weight: 600; }
+.previsao-tabela td:first-child { white-space: nowrap; }
+.previsao-tabela tbody tr { cursor: pointer; }
+.previsao-tabela tbody tr:hover, .previsao-tabela .selecionada { background: #eff6ff; }
+.pagina-previsao .situacao-abaixo { color: #a16207 !important; }
+.pagina-previsao .situacao-acima { color: #a16207 !important; }
+.pagina-previsao .situacao-ambos { color: #dc2626 !important; }
+.pagina-previsao .situacao-dentro { color: #15803d !important; }
+.previsao-mensagem { border: 1px solid #e2e8f0; padding: 18px; background: white; border-radius: 8px; color: #475569; }
+.pagina-previsao [hidden] { display: none !important; }
+@media (max-width: 1150px) { .previsao-inferior { grid-template-columns: 1fr; } .previsao-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .pagina-previsao .sidebar { width: 68px; padding: 18px 6px 0; } .pagina-previsao .sidebar-brand { padding: 0; overflow: hidden; } .pagina-previsao .sidebar-brand img { width: 55px; } .pagina-previsao .sidebar-menu a { font-size: 0; justify-content: center; padding: 12px; } .pagina-previsao .sidebar-menu i { font-size: 17px; } .pagina-previsao .user-info, .pagina-previsao .sidebar-user > a:last-child { display: none; } .pagina-previsao .main-wrapper { margin-left: 68px; } .dashboard-previsao { padding: 18px 12px; gap: 14px; } .previsao-cabecalho { flex-direction: column; } .previsao-atualizacao { text-align: left; } .previsao-cabecalho h1 { font-size: 23px; } .previsao-kpis { gap: 8px; } .previsao-kpi, .previsao-painel { padding: 12px; } .previsao-opcoes button { padding: 8px 12px; } .previsao-campo { max-width: 100%; } .previsao-campo select { min-width: 200px; } }
+.previsao-chart { position: relative; height: 340px; min-width: 650px; }
+.previsao-mapa-chart { position: relative; height: 210px; min-width: 560px; }
