@@ -60,31 +60,31 @@
             <section class="sessao-fundo opcoes-monitoramento">
                 <ul>
                     <li>
-                        <button class="opcao-monitoramento opcao-monitoramento-selecionada">
+                        <button class="opcao-monitoramento opcao-monitoramento-selecionada" onclick="trocarMonitoramento(0)">
                             Geral (Visão Geral)
     
                         </button>
                     </li>
                     <li>
-                        <button class="opcao-monitoramento">
+                        <button class="opcao-monitoramento" onclick="trocarMonitoramento(1)">
                             Rede e Conectividade
     
                         </button>
                     </li>
                     <li>
-                        <button class="opcao-monitoramento">
+                        <button class="opcao-monitoramento" onclick="trocarMonitoramento(2)">
                             Processador (CPU)
     
                         </button>
                     </li>
                     <li>
-                        <button class="opcao-monitoramento">
+                        <button class="opcao-monitoramento" onclick="trocarMonitoramento(3)">
                             Memória RAM & SWAP
     
                         </button>
                     </li>
                     <li>
-                        <button class="opcao-monitoramento">
+                        <button class="opcao-monitoramento" onclick="trocarMonitoramento(4)">
                             Armazenamento (Disco)
     
                         </button>
@@ -92,7 +92,7 @@
                 </ul>
             </section>
     
-            <section class="sessao-kpis">
+            <section class="sessao-kpis" id="sessaoKpis">
             </section>
     
             <section class="sessao-fundo sessao-grafico">
@@ -100,19 +100,19 @@
                     <h2 class="titulo-grafico"></h2>
     
                     <div class="opcoes-tempo">
-                        <button class="opcao-tempo opcao-tempo-selecionada">
+                        <button class="opcao-tempo opcao-tempo-selecionada" onclick="trocarTempo(0)">
                             1h
                         </button>
     
-                        <button class="opcao-tempo">
+                        <button class="opcao-tempo" onclick="trocarTempo(1)">
                             12h
                         </button>
     
-                        <button class="opcao-tempo">
+                        <button class="opcao-tempo" onclick="trocarTempo(2)">
                             24h
                         </button>
     
-                        <button class="opcao-tempo">
+                        <button class="opcao-tempo" onclick="trocarTempo(3)">
                             7 dias
                         </button>
                     </div>
@@ -147,7 +147,7 @@
 <script src="/js/user-sidebar.js"></script>
 <script src="/js/editar-usuario.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- <script src="/js/dash-especifca.js"></script> -->
+<script src="/js/dash-especifca.js"></script>
 
 </body>
 </html>
