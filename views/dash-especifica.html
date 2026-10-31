@@ -46,178 +46,95 @@
     </aside>
 
     <main id="container_main" onclick="fecharEditarUsuario()">
-        <nav class="navbar">
-            <div class="parte-esquerda">
-                <h1 class="tituto-servidor" id="nomeServidor">
-                    Detalhes do Servidor: 
-                </h1>
-            </div>
+        <section class="navbar">
+            <h2 class="nome-mainframe" id="nomeMainframe">
+                Detalhes do Servidor: 
+            </h2>
 
-            <div class="parte-direita">
-                <p class="estado-servidor" id="estadoServidor">
-                </p>
-            </div>
-    
-        </nav>
-
-        <section class="kpis">
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Previsão de Riso
-                </p>
-                <h2 class="componente" id="kpiRisco">
-                    Risco: 
-                </h2>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Momento mais utilizado
-                </p>
-                <h2 class="componente horario" id="kpiHorario">
-
-                </h2>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Uso Médio CPU
-                </p>
-                <h2 class="componente" id="kpiCPUPor">
-                    CPU: 
-                </h2>
-                <p class="observacao" id="observacaoCpu">
-                    Aumentou 8.2% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Frequência Médio CPU
-                </p>
-                <h2 class="componente" id="kpiCPUFreq">
-                    Freq CPU:
-                </h2>
-                <p class="observacao" id="observacaoCPUFrq">
-                    Aumentou 8.2% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Uso Médio RAM
-                </p>
-                <h2 class="componente" id="kpiRAMPor">
-                    RAM: 
-                </h2>
-                <p class="observacao" id="observacaoRAM">
-                    Diminuiu 1% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Uso Médio SWAP
-                </p>
-                <h2 class="componente" id="kpiSWAPPor">
-                    SWAP:
-                </h2>
-                <p class="observacao" id="observacaoSWAP">
-                    Diminuiu 5% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Quantidade Média RAM Livre
-                </p>
-                <h2 class="componente" id="kpiRAMUso">
-                    RAM: 
-                </h2>
-                <p class="observacao" id="observacaoRAMUso">
-                    Diminuiu 1GM nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Uso Médio Disco
-                </p>
-                <h2 class="componente" id="kpiDiscoPor">
-                    Disco:
-                </h2>
-                <p class="observacao" id="observacaoDisco">
-                    Aumentou 4% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Quantidade Média Disco Livre
-                </p>
-                <h2 class="componente" id="kpiDiscoUso">
-                    Disco:
-                </h2>
-                <p class="observacao" id="observacaoDiscoUso">
-                    Aumentou 2GM nos 
-                </p>
+            <div class="status-mainframe" id="statusMainframe">
             </div>
         </section>
 
-        <section class="sessao-grafico">
-            <div class="sessao-acima">
-                <h2 class="titulo-sessao">
-                    Monitoramento de Componentes
-                </h2>
+        <section class="opcoes-monitoramento">
+            <ul>
+                <li>
+                    <button class="opcao-monitoramento opcao-monitoramento-selecionada">
+                        Geral (Visão Geral)
 
-                <div class="botoes-tempo">
-                    <button class="botao-tempo botao-escolhido" onclick="trocarTempo(0)">
+                    </button>
+                </li>
+                <li>
+                    <button class="opcao-monitoramento">
+                        Rede e Conectividade
+
+                    </button>
+                </li>
+                <li>
+                    <button class="opcao-monitoramento">
+                        Processador (CPU)
+
+                    </button>
+                </li>
+                <li>
+                    <button class="opcao-monitoramento">
+                        Memória RAM & SWAP
+
+                    </button>
+                </li>
+                <li>
+                    <button class="opcao-monitoramento">
+                        Armazenamento (Disco)
+
+                    </button>
+                </li>
+            </ul>
+        </section>
+
+        <section class="sessao-kpis">
+        </section>
+
+        <section class="sessao-grafio">
+            <div class="parte-acima">
+                <h2 class="tituloGrafico"></h2>
+
+                <div class="opcoes-tempo">
+                    <button class="opcao-tempo opcao-tempo-selecionada">
                         1h
                     </button>
 
-                    <button class="botao-tempo" onclick="trocarTempo(1)">
+                    <button class="opcao-tempo">
                         12h
                     </button>
 
-                    <button class="botao-tempo" onclick="trocarTempo(2)">
+                    <button class="opcao-tempo">
                         24h
                     </button>
-                    
-                    <button class="botao-tempo" onclick="trocarTempo(3)">
+
+                    <button class="opcao-tempo">
                         7 dias
                     </button>
                 </div>
             </div>
-            
-            <canvas id="grafico"></canvas>
 
+            <canvas id="grafico"></canvas>
         </section>
 
-        <section class="historico">
-            <h2 class="titulo-sessao">
-                Histórico Detalhado de Métricas
-            </h2>
-
-            <table>
+        <section class="sessao-historico">
+             <table>
                 <thead>
-                    <tr>
+                    <tr class="titulo-grafico">
                         <th>Data e Hora</th>
-                        <th>CPU(%)</th>
-                        <th>Freq CPU</th>
-                        <th>RAM(%)</th>
-                        <th>Quantidade RAM</th>
-                        <th>SWAP (%)</th>
-                        <th>Disco(%)</th>
-                        <th>Quantidade Disco</th>
+                        <th>Componente</th>
+                        <th>Métrica</th>
+                        <th>Valor Capturado</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="corpoTabela">
                 </tbody>
-            </table>            
         </section>
     </main>
-
+    
 <div id="editar-usuario" style="display: none;"></div>
 <script src="/js/api.js"></script>
 <script src="/js/user-sidebar.js"></script>
