@@ -46,93 +46,100 @@
     </aside>
 
     <main id="container_main" onclick="fecharEditarUsuario()">
-        <section class="navbar">
-            <h2 class="nome-mainframe" id="nomeMainframe">
-                Detalhes do Servidor: 
-            </h2>
-
-            <div class="status-mainframe" id="statusMainframe">
-            </div>
-        </section>
-
-        <section class="opcoes-monitoramento">
-            <ul>
-                <li>
-                    <button class="opcao-monitoramento opcao-monitoramento-selecionada">
-                        Geral (Visão Geral)
-
-                    </button>
-                </li>
-                <li>
-                    <button class="opcao-monitoramento">
-                        Rede e Conectividade
-
-                    </button>
-                </li>
-                <li>
-                    <button class="opcao-monitoramento">
-                        Processador (CPU)
-
-                    </button>
-                </li>
-                <li>
-                    <button class="opcao-monitoramento">
-                        Memória RAM & SWAP
-
-                    </button>
-                </li>
-                <li>
-                    <button class="opcao-monitoramento">
-                        Armazenamento (Disco)
-
-                    </button>
-                </li>
-            </ul>
-        </section>
-
-        <section class="sessao-kpis">
-        </section>
-
-        <section class="sessao-grafio">
-            <div class="parte-acima">
-                <h2 class="tituloGrafico"></h2>
-
-                <div class="opcoes-tempo">
-                    <button class="opcao-tempo opcao-tempo-selecionada">
-                        1h
-                    </button>
-
-                    <button class="opcao-tempo">
-                        12h
-                    </button>
-
-                    <button class="opcao-tempo">
-                        24h
-                    </button>
-
-                    <button class="opcao-tempo">
-                        7 dias
-                    </button>
+        <div class="container-main">
+            <section class="navbar">
+                <h2 class="titulo-mainframe">
+                    Detalhes do Servidor: 
+                    <span class="nome-mainframe" id="nomeMainframe"></span>
+                </h2>
+    
+                <div class="status-mainframe" id="statusMainframe">
                 </div>
-            </div>
+            </section>
+    
+            <section class="sessao-fundo opcoes-monitoramento">
+                <ul>
+                    <li>
+                        <button class="opcao-monitoramento opcao-monitoramento-selecionada">
+                            Geral (Visão Geral)
+    
+                        </button>
+                    </li>
+                    <li>
+                        <button class="opcao-monitoramento">
+                            Rede e Conectividade
+    
+                        </button>
+                    </li>
+                    <li>
+                        <button class="opcao-monitoramento">
+                            Processador (CPU)
+    
+                        </button>
+                    </li>
+                    <li>
+                        <button class="opcao-monitoramento">
+                            Memória RAM & SWAP
+    
+                        </button>
+                    </li>
+                    <li>
+                        <button class="opcao-monitoramento">
+                            Armazenamento (Disco)
+    
+                        </button>
+                    </li>
+                </ul>
+            </section>
+    
+            <section class="sessao-kpis">
+            </section>
+    
+            <section class="sessao-fundo sessao-grafico">
+                <div class="parte-acima">
+                    <h2 class="titulo-grafico"></h2>
+    
+                    <div class="opcoes-tempo">
+                        <button class="opcao-tempo opcao-tempo-selecionada">
+                            1h
+                        </button>
+    
+                        <button class="opcao-tempo">
+                            12h
+                        </button>
+    
+                        <button class="opcao-tempo">
+                            24h
+                        </button>
+    
+                        <button class="opcao-tempo">
+                            7 dias
+                        </button>
+                    </div>
+                </div>
+    
+                <canvas id="grafico"></canvas>
+            </section>
+    
+            <section class="sessao-fundo sessao-historico">
+                <h2 class="titulo-lista">
+                    Histórico de Eventos e Histórico Detalhado
+                </h2>
 
-            <canvas id="grafico"></canvas>
-        </section>
-
-        <section class="sessao-historico">
-             <table>
-                <thead>
-                    <tr class="titulo-grafico">
-                        <th>Data e Hora</th>
-                        <th>Componente</th>
-                        <th>Métrica</th>
-                        <th>Valor Capturado</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="corpoTabela">
-                </tbody>
-        </section>
+                 <table>
+                    <thead>
+                        <tr class="titulo-grafico">
+                            <th>Data e Hora</th>
+                            <th>Componente</th>
+                            <th>Métrica</th>
+                            <th>Valor Capturado</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabela">
+                    </tbody>
+            </section>
+        </div>
     </main>
     
 <div id="editar-usuario" style="display: none;"></div>
@@ -140,7 +147,7 @@
 <script src="/js/user-sidebar.js"></script>
 <script src="/js/editar-usuario.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/js/dash-especifca.js"></script>
+<!-- <script src="/js/dash-especifca.js"></script> -->
 
 </body>
 </html>
