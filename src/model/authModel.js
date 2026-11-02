@@ -40,6 +40,23 @@ class AuthModel {
         return resultado;
     }
 
+    static async buscarNomeEmpresa(idUsuario) {
+        
+        const [resultado] = await pool.query(
+            `
+            SELECT 
+                e.razao_social 
+            FROM empresa AS e 
+            JOIN usuario AS u 
+                ON u.fk_empresa = e.id_empresa 
+            WHERE id_usuario = ?
+            `,
+            [idUsuario]
+        );
+        return resultado[0];
+        
+    }
+
 
     static async buscarComponentes(idMainframe) {
 

@@ -34,6 +34,16 @@ class AuthController {
                 });
             }
 
+            const empresa = await authModel.buscarNomeEmpresa(
+                usuario.id_usuario
+            );
+
+            if (empresa.length === 0) {
+                return res.status(401).json({
+                    mensagem: 'Empresa não encontrada ou não vinculada à um usuário'
+                });
+            }
+
             const mainframes = await authModel.buscarMainframe(
                 usuario.id_empresa
             );
@@ -48,6 +58,7 @@ class AuthController {
             if (!hostname) {
                 return res.status(200).json({
                     autenticado: true,
+                    empresa: empresa,
                     mainframe: mainframes
                 });
             }
