@@ -1,8 +1,6 @@
 const idEmpresa = sessionStorage.getItem('idEmpresa');
-const caminhoBasePrevisoes = '';
-const prefixoGoldPrevisoes = '03-gold/previsoes';
+const caminhoBasePrevisoes = '/api/gold/empresa/' + idEmpresa + '/previsoes';
 
-let prefixoEmpresa;
 let componenteSelecionado = 'CPU';
 let metricaDiscoSelecionada = 'ocupacao';
 let dadosPrevisao;
@@ -77,8 +75,6 @@ async function carregarMainframes() {
             return;
         }
 
-        prefixoEmpresa = mainframes[0].nome_empresa.toLowerCase().replaceAll(' ', '_');
-
         await carregarResumo();
         await selecionarMainframe();
     } catch (erro) {
@@ -90,13 +86,8 @@ async function carregarMainframes() {
 
 async function carregarResumo() {
     resumoPrevisao = null;
-    if (caminhoBasePrevisoes === '') {
-        return;
-    }
-
     try {
-        // Caminho para pegar o resumo das previsões das mainframes de determinada empresa
-        const caminho = caminhoBasePrevisoes + '/' + encodeURIComponent(prefixoEmpresa) + '/' + prefixoGoldPrevisoes + '/resumo.json';
+        const caminho = caminhoBasePrevisoes + '/resumo.json';
         const resposta = await fetch(caminho);
 
         if (resposta.ok) {
@@ -122,15 +113,8 @@ async function selecionarMainframe() {
     mensagem.textContent = 'Carregando previsão...';
     mensagem.hidden = false;
 
-    if (caminhoBasePrevisoes === '') {
-        mensagem.textContent = 'Previsão ainda não disponível.';
-        seletor.disabled = false;
-        return;
-    }
-
     try {
-        // Fetch para acessar o caminho do bucket gold de determinada mainframe de uma empresa
-        const caminho = caminhoBasePrevisoes + '/' + encodeURIComponent(prefixoEmpresa) + '/' + prefixoGoldPrevisoes + '/' + encodeURIComponent(hostname) + '.json';
+        const caminho = caminhoBasePrevisoes + '/' + encodeURIComponent(hostname) + '.json';
         const resposta = await fetch(caminho);
 
         if (resposta.ok) {
@@ -138,8 +122,11 @@ async function selecionarMainframe() {
             atualizarTela();
             conteudo.hidden = false;
             mensagem.hidden = true;
-        } else {
+        } else if (resposta.status === 404) {
             mensagem.textContent = 'Previsão ainda não disponível para esta mainframe.';
+        } else {
+            const erro = await resposta.json();
+            mensagem.textContent = erro.erro;
         }
     } catch (erro) {
         mensagem.textContent = 'Não foi possível carregar a previsão.';

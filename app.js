@@ -6,6 +6,7 @@ import routesMainframe from './src/routes/mainframe.js';
 import routesParametro from './src/routes/parametro.js';
 import routesAuth from './src/routes/authRoutes.js';
 import routesCargo from './src/routes/cargo.js';
+import routesGold from './src/routes/gold.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -30,6 +31,7 @@ app.use('/api/mainframe', routesMainframe);
 app.use('/api/parametro', routesParametro);
 app.use('/api/autenticacao', routesAuth);
 app.use('/api/cargo', routesCargo);
+app.use('/api/gold', routesGold);
 
 app.listen(port, () => {
     console.log(`
