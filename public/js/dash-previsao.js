@@ -1,6 +1,8 @@
 const idEmpresa = sessionStorage.getItem('idEmpresa');
 const caminhoBasePrevisoes = '';
+const prefixoGoldPrevisoes = '03-gold/previsoes';
 
+let prefixoEmpresa;
 let componenteSelecionado = 'CPU';
 let metricaDiscoSelecionada = 'ocupacao';
 let dadosPrevisao;
@@ -75,6 +77,8 @@ async function carregarMainframes() {
             return;
         }
 
+        prefixoEmpresa = mainframes[0].nome_empresa.toLowerCase().replaceAll(' ', '_');
+
         await carregarResumo();
         await selecionarMainframe();
     } catch (erro) {
@@ -92,7 +96,7 @@ async function carregarResumo() {
 
     try {
         // Caminho para pegar o resumo das previsões das mainframes de determinada empresa
-        const caminho = caminhoBasePrevisoes + '/' + idEmpresa + '/resumo.json';
+        const caminho = caminhoBasePrevisoes + '/' + encodeURIComponent(prefixoEmpresa) + '/' + prefixoGoldPrevisoes + '/resumo.json';
         const resposta = await fetch(caminho);
 
         if (resposta.ok) {
@@ -107,7 +111,7 @@ async function carregarResumo() {
 
 async function selecionarMainframe() {
     const seletor = document.getElementById('mainframe-previsao');
-    const idMainframe = seletor.value;
+    const hostname = seletor.options[seletor.selectedIndex].textContent;
     const mensagem = document.getElementById('mensagem-mainframes');
     const conteudo = document.getElementById('conteudo-previsao');
 
@@ -126,7 +130,7 @@ async function selecionarMainframe() {
 
     try {
         // Fetch para acessar o caminho do bucket gold de determinada mainframe de uma empresa
-        const caminho = caminhoBasePrevisoes + '/' + idEmpresa + '/' + idMainframe + '.json';
+        const caminho = caminhoBasePrevisoes + '/' + encodeURIComponent(prefixoEmpresa) + '/' + prefixoGoldPrevisoes + '/' + encodeURIComponent(hostname) + '.json';
         const resposta = await fetch(caminho);
 
         if (resposta.ok) {

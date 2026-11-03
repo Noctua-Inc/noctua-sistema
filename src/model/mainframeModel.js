@@ -5,6 +5,7 @@ async function listar(idEmpresa) {
   const [rows] = await pool.query(`
     SELECT
         m.*,
+        e.razao_social AS nome_empresa,
         l.nome AS localizacao_nome,
         l.estado,
         l.cidade,
@@ -12,6 +13,7 @@ async function listar(idEmpresa) {
         comp.componentes,
         param.parametros
     FROM mainframe m
+    JOIN empresa e ON e.id_empresa = m.fk_empresa
     LEFT JOIN localizacao l
         ON l.id_localizacao = m.fk_localizacao
     LEFT JOIN (
