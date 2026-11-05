@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noctua - Análise de Processos</title>
+    <!-- Fontes Poppins/Inter e Chart.js -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/styles/dash-processos.css">
+</head>
+<body>
+
+    <!-- Sidebar Padrão Noctua (#1A1F71) -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-title">NOCTUA</span>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li><a href="#">Dashboard Geral</a></li>
+            <li><a href="#">Servidores</a></li>
+            <li><a href="#">Alertas</a></li>
+            <li><a href="#" class="active">Análise de Processos</a></li>
+            <li><a href="#">Configurações</a></li>
+        </ul>
+
+        <div class="sidebar-user">
+            <a href="#">
+                <div class="user-avatar">
+                    <span id="user-avatar-letter">B</span>
+                </div>
+                <div class="user-info">
+                    <span id="user-name">Bianca</span>
+                    <span id="user-role">Analista Infra</span>
+                </div>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-wrapper">
+        <header class="header">
+            <h1 class="header-title">Monitoramento de Processos</h1>
+        </header>
+
+        <main class="content">
+            <!-- Cabeçalho de Controle e Seleção de Servidor -->
+            <div class="content-header">
+                <div class="title-group">
+                    <h2 class="subtitulo-sessao">Visão Detalhada de Jobs e Rotinas</h2>
+                    <p class="descricao-sessao">Identificação de ofensores para Capacity Planning e Resolução de Causa Raiz</p>
+                </div>
+                <div class="controls-group">
+                    <select id="mainframeSelect" class="filter-select">
+                        <option value="">Carregando mainframes...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Seletor de Métrica em Foco -->
+            <div class="filter-container">
+                <span class="filter-label">Recurso em foco:</span>
+                <div class="metric-tabs">
+                    <button class="tab-btn active" data-metric="cpu">CPU (MIPS)</button>
+                    <button class="tab-btn" data-metric="ram">RAM (Memória)</button>
+                    <button class="tab-btn" data-metric="disco">DISCO (I/O Ops)</button>
+                </div>
+            </div>
+
+            <!-- KPIs Dinâmicos (Padrão de Cards Claros) -->
+            <section class="metrics-grid">
+                <div class="card">
+                    <span class="card-title" id="kpi1-label">--</span>
+                    <span class="card-value" id="kpi1-value">--</span>
+                    <span class="card-subtext" id="kpi1-sub">--</span>
+                </div>
+                <div class="card">
+                    <span class="card-title" id="kpi2-label">--</span>
+                    <span class="card-value" id="kpi2-value">--</span>
+                    <span class="card-subtext" id="kpi2-sub">--</span>
+                </div>
+                <div class="card">
+                    <span class="card-title" id="kpi3-label">--</span>
+                    <span class="card-value" id="kpi3-value">--</span>
+                    <span class="card-subtext" id="kpi3-sub">--</span>
+                </div>
+                <div class="card card-highlight">
+                    <span class="card-title" id="kpi4-label">Maior Ofensor</span>
+                    <span class="card-value value-job" id="kpi4-value">--</span>
+                    <span class="card-subtext" id="kpi4-sub">--</span>
+                </div>
+            </section>
+
+            <!-- Sessão do Gráfico Temporal -->
+            <section class="chart-card">
+                <div class="card-header-clean">
+                    <h3 class="card-heading" id="chartTitle">Evolução Temporal do Consumo</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="processChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Tabela de Ofensores -->
+            <section class="table-card">
+                <div class="table-card-header">
+                    <h3 class="table-header-title" id="tableTitle">Top Processos Consumidores</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>PID</th>
+                                <th>Job / Rotina</th>
+                                <th>CPU (MIPS)</th>
+                                <th>RAM (MB)</th>
+                                <th>DISCO (IOPS)</th>
+                                <th>Threads</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="processTableBody">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/dash-processos.js"></script>
+</body>
+</html>

@@ -194,4 +194,16 @@ async function remover(id) {
   }
 }
 
-export default { listar, listaPorIdMainframeId, buscarPorId, criar, atualizar, remover };
+async function buscarDetalhesMainframe(idMainframe) {
+    const instrucaoSql = `
+        SELECT m.hostname, c.tipo AS componente, p.pico_max
+        FROM mainframe m
+        JOIN parametro p ON m.id_mainframe = p.id_mainframe
+        JOIN componente c ON p.id_componente = c.id_componente
+        WHERE m.id_mainframe = ?;
+    `;
+    const [rows] = await pool.execute(instrucaoSql, [idMainframe]);
+    return rows;
+}
+
+export default { listar, listaPorIdMainframeId, buscarPorId, criar, atualizar, remover, buscarDetalhesMainframe };
