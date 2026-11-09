@@ -1,10 +1,29 @@
-const idEmpresa = sessionStorage.getItem('idEmpresa');
-const idMainframe = window.location.href.split('id_mainframe=')[1];
+const ID_EMPRESA = sessionStorage.getItem('idEmpresa');
+const ID_MAINFRAME = window.location.href.split('id_mainframe=')[1];
+const CAMINHO_BASE_MONITORAMENTO = '/api/gold/empresa/' + ID_EMPRESA + '/monitoramentoComponentes/';
 
-let nomeMainframe = document.querySelector("#nomeMainframe");
+let nomeMainframeHTML = document.querySelector("#nomeMainframe");
 let opcoesBotoesMonitoramento = document.querySelectorAll(".opcao-monitoramento");
 let sessaoKpis = document.querySelector("#sessaoKpis");
 let opcoesBotoesTempo = document.querySelectorAll(".opcao-tempo")
+
+async function buscarMainframe() {
+    try {
+        let resposta = await api.get(`/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`);
+        let mainframe = resposta[0];
+        
+        nomeMainframe.innerHTML = mainframe.hostname;
+
+        return mainframe.hostname;
+
+    } catch (erro) {
+        console.error(erro);
+    } finally {
+        carregando = false;
+    }
+}
+
+buscarMainframe();
 
 function criarKPI (titulo, dado, observacao) {
     let kpi = `
@@ -18,7 +37,42 @@ function criarKPI (titulo, dado, observacao) {
     return kpi; 
 }
 
-function trocarMonitoramento(indice) {
+async function puxarJsonS3(quaisRegistros) {
+    registros = null;
+
+    try {
+        let nomeMainframe = await buscarMainframe(); 
+
+        const horarioAtual = new Date();
+
+        let ano = horarioAtual.getFullYear();
+        let mes = String(horarioAtual.getMonth() + 1).padStart(2, '0');
+        let dia = String(horarioAtual.getDate()).padStart(2, '0');
+
+        let hora = String(horarioAtual.getHours()).padStart(2, '0');
+        let minuto = String(horarioAtual.getMinutes()).padStart(2, '0');
+
+        // let dataHoraFormatado = `${ano}-${mes}-${dia}_${hora}-${minuto}`
+        let dataHoraFormatado = `2026-11-06_19-02`
+
+        let nomeArquivo = encodeURIComponent(`${nomeMainframe}_${dataHoraFormatado}_${quaisRegistros}_registros.json`);        
+
+        let caminho = CAMINHO_BASE_MONITORAMENTO + nomeArquivo;
+        let resposta = await fetch(caminho);
+
+        if (resposta.ok) {
+            registros = await resposta.json();
+        } else {
+            registros = null;
+        }
+    } catch (erro) {
+        registros = null;
+    }
+
+    return registros;
+}
+
+async function trocarMonitoramento(indice) {
     let titulosKpi = [];
     let todasKpis = "";
 
@@ -34,12 +88,15 @@ function trocarMonitoramento(indice) {
     switch (indice) {
         case 0:
             titulosKpi = ["Status de Risco", "Momento mais utilizado", "Uso Médio CPU", "Uso Médio RAM", "Uso Médio Disco", "Tráfego de Rede (Tx/Rx)"];
+            let [dadosCapturados] = await puxarJsonS3("todos");
+            dadosKpi = ["", dadosCapturados.estatisticas.horario_pico, dadosCapturados.estatisticas.media_cpu_porcentagem + "%", dadosCapturados.estatisticas.media_ram_porcentagem + "%", dadosCapturados.estatisticas.media_disco_porcentagem + "%", dadosCapturados.estatisticas.media_dados_enviados]
 
-            for(let titulo of titulosKpi) {
-                todasKpis += criarKPI(titulo, "...", "...");
+            for (let i = 0; i < titulosKpi.length; i++) {
+                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
             }
 
-            sessaoKpis.innerHTML = todasKpis;
+            sessaoKpis.innerHTML = todasKpis;  
+
             break;
 
         case 1:
@@ -120,26 +177,6 @@ function trocarTempo(indice) {
     // grafico.data.labels = intervaloTempo;
     // grafico.update();
 }
-
-async function trocarNome(nome) {
-    nomeMainframe.innerHTML += nome;
-}
-
-async function buscarMainframe() {
-    try {
-        let resposta = await api.get(`/mainframe/idEmpresa/${idEmpresa}/idMainFrame/${idMainframe}`);
-        let mainframe = resposta[0];
-        
-        trocarNome(mainframe.hostname);
-
-    } catch (erro) {
-        console.error(erro);
-    } finally {
-        carregando = false;
-    }
-}
-
-buscarMainframe()
 
 
 const ctx = document.getElementById('grafico').getContext('2d');

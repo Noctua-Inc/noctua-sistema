@@ -10,18 +10,18 @@ async function carregar(req, res) {
 
     const diretorio = req.params.diretorio;
     const arquivo = req.params.arquivo;
-    if (!/^[a-zA-Z0-9_-]+$/.test(diretorio) || !/^[a-zA-Z0-9_.-]+\.json$/.test(arquivo)) {
-        return res.status(400).json({erro: 'Informe um diretório e um nome de arquivo JSON válidos.'});
-    }
+    // if (!/^[a-zA-Z0-9_-]+$/.test(diretorio) || !/^[a-zA-Z0-9_.-]+\.json$/.test(arquivo)) {
+    //     return res.status(400).json({erro: 'Informe um diretório e um nome de arquivo JSON válidos.'});
+    // }
 
     try {
-        const idEmpresa = req.params.idEmpresa;
+        const idEmpresa = req.params.idEmpresa;        
         const empresa = await goldModel.buscarEmpresa(idEmpresa);
         if (!empresa) {
             return res.status(404).json({erro: 'Empresa não encontrada.'});
         }
 
-        const prefixoEmpresa = empresa.razao_social.toLowerCase().replaceAll(' ', '_');
+        const prefixoEmpresa = empresa.razao_social.toLowerCase().replaceAll(' ', '_');        
         const dados = await goldService.lerJson(prefixoEmpresa, diretorio, arquivo);
         return res.json(dados);
     } catch (erro) {
