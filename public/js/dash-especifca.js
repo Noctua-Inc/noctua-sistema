@@ -2,10 +2,19 @@ const ID_EMPRESA = sessionStorage.getItem('idEmpresa');
 const ID_MAINFRAME = window.location.href.split('id_mainframe=')[1];
 const CAMINHO_BASE_MONITORAMENTO = '/api/gold/empresa/' + ID_EMPRESA + '/monitoramentoComponentes/';
 
-let nomeMainframeHTML = document.querySelector("#nomeMainframe");
+let nomeMainframe = document.querySelector("#nomeMainframe");
 let opcoesBotoesMonitoramento = document.querySelectorAll(".opcao-monitoramento");
 let sessaoKpis = document.querySelector("#sessaoKpis");
-let opcoesBotoesTempo = document.querySelectorAll(".opcao-tempo")
+let opcoesBotoesTempo = document.querySelectorAll(".opcao-tempo");
+
+let intervaloTempo = [];
+let grafico;
+
+// Dados dashboard Geral
+dadosCpu = [];
+dadosRam = [];
+dadosDisco = [];
+dadosSwap = [];
 
 async function buscarMainframe() {
     try {
@@ -14,7 +23,7 @@ async function buscarMainframe() {
         
         nomeMainframe.innerHTML = mainframe.hostname;
 
-        return mainframe.hostname;
+        return mainframe;
 
     } catch (erro) {
         console.error(erro);
@@ -22,8 +31,6 @@ async function buscarMainframe() {
         carregando = false;
     }
 }
-
-buscarMainframe();
 
 function criarKPI (titulo, dado, observacao) {
     let kpi = `
@@ -41,7 +48,8 @@ async function puxarJsonS3(quaisRegistros) {
     registros = null;
 
     try {
-        let nomeMainframe = await buscarMainframe(); 
+        let mainframe = await buscarMainframe(); 
+        let nomeMainframe = mainframe.hostname;
 
         const horarioAtual = new Date();
 
@@ -72,6 +80,43 @@ async function puxarJsonS3(quaisRegistros) {
     return registros;
 }
 
+function trocarTempo(indice) {
+    for(let i = 0; i < opcoesBotoesTempo.length; i++) {
+        if(opcoesBotoesTempo[i].className == "opcao-tempo opcao-tempo-selecionada") {
+            opcoesBotoesTempo[i].classList.remove("opcao-tempo-selecionada");
+            break;
+        }
+    }
+
+    opcoesBotoesTempo[indice].classList.add("opcao-tempo-selecionada");
+
+    switch (indice) {
+        case 0:
+            intervaloTempo = ['05min', '10min', '15min', '20min', '25min', '30min', '35min', '40min', '45min', '50min', '55min', '60min']
+            break;
+
+        case 1:
+            intervaloTempo = ['01h', '02h', '03h', '04h', '05h', '06h', '07h', '08h', '09h', '10h', '11h', '12h']
+            break;
+
+        case 2:
+            intervaloTempo = ['02h', '04h', '06h', '08h', '10h', '12h', '14h', '16h', '18h', '20h', '22h', '24h']
+            break;
+        
+        case 3:
+            intervaloTempo = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+            break;
+    
+        default:
+            break;
+    }
+
+    if (grafico) {
+        grafico.data.labels = intervaloTempo;
+        grafico.update();
+    }
+}
+
 async function trocarMonitoramento(indice) {
     let titulosKpi = [];
     let todasKpis = "";
@@ -83,6 +128,9 @@ async function trocarMonitoramento(indice) {
         }
     }
 
+    let mainframe = await buscarMainframe(); 
+    let parametrosMainframe = String(mainframe.parametros).replaceAll(" ", "").split(",");
+
     opcoesBotoesMonitoramento[indice].classList.add("opcao-monitoramento-selecionada");
 
     switch (indice) {
@@ -91,12 +139,16 @@ async function trocarMonitoramento(indice) {
             let [dadosCapturados] = await puxarJsonS3("todos");
             dadosKpi = ["", dadosCapturados.estatisticas.horario_pico, dadosCapturados.estatisticas.media_cpu_porcentagem + "%", dadosCapturados.estatisticas.media_ram_porcentagem + "%", dadosCapturados.estatisticas.media_disco_porcentagem + "%", dadosCapturados.estatisticas.media_dados_enviados]
 
+            dadosCpu.push(dadosCapturados.estatisticas.media_cpu_porcentagem);            
+            dadosRam.push(dadosCapturados.estatisticas.media_ram_porcentagem);
+            dadosDisco.push(dadosCapturados.estatisticas.media_disco_porcentagem);
+            dadosSwap.push(dadosCapturados.estatisticas.media_dados_enviados);
+
             for (let i = 0; i < titulosKpi.length; i++) {
                 todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
             }
-
-            sessaoKpis.innerHTML = todasKpis;  
-
+            
+            sessaoKpis.innerHTML = todasKpis;              
             break;
 
         case 1:
@@ -139,47 +191,15 @@ async function trocarMonitoramento(indice) {
             sessaoKpis.innerHTML = todasKpis;
             break;
     }
-}
 
-trocarMonitoramento(0);
-
-function trocarTempo(indice) {
-    for(let i = 0; i < opcoesBotoesTempo.length; i++) {
-        if(opcoesBotoesTempo[i].className == "opcao-tempo opcao-tempo-selecionada") {
-            opcoesBotoesTempo[i].classList.remove("opcao-tempo-selecionada");
-            break;
-        }
+    if (grafico) {
+        grafico.data.datasets[0].data = dadosCpu;
+        grafico.data.datasets[1].data = dadosRam;
+        grafico.data.datasets[2].data = dadosSwap;
+        grafico.data.datasets[3].data = dadosDisco;
+        grafico.update();
     }
-
-    opcoesBotoesTempo[indice].classList.add("opcao-tempo-selecionada");
-
-    // switch (indice) {
-    //     case 0:
-    //         intervaloTempo = ['05min', '10min', '15min', '20min', '25min', '30min', '35min', '40min', '45min', '50min', '55min', '60min']
-    //         break;
-
-    //     case 1:
-    //         intervaloTempo = ['01h', '02h', '03h', '04h', '05h', '06h', '07h', '08h', '09h', '10h', '11h', '12h']
-    //         break;
-
-    //     case 2:
-    //         intervaloTempo = ['02h', '04h', '06h', '08h', '10h', '12h', '14h', '16h', '18h', '20h', '22h', '24h']
-    //         break;
-        
-    //     case 3:
-    //         intervaloTempo = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
-    //         break;
-    
-    //     default:
-    //         break;
-    // }
-
-    // grafico.data.labels = intervaloTempo;
-    // grafico.update();
 }
-
-
-const ctx = document.getElementById('grafico').getContext('2d');
 
 /*
     A ideia do intervalo de Tempo será a mesma que na sprint passada (qualquer coisa pegar código no diretório 'sprint-2')
@@ -187,80 +207,89 @@ const ctx = document.getElementById('grafico').getContext('2d');
     e dependento da escolha do usuário, pode ficar modificando ele.
 */
 
-// const grafico = new Chart(ctx, {
-//     type: 'line',
-//     data: {
-//         labels: intervaloTempo,
-//         datasets: [
-//             {
-//                 label: 'CPU',
-//                 data: dadosPorcentagemCPU,
-//                 borderColor: '#2196F3',
-//                 backgroundColor: '#2196F3',
-//                 borderWidth: 2,
-//                 tension: 0.4,
-//                 fill: false
-//             },
-//             {
-//                 label: 'RAM',
-//                 data: dadosPorcentagemRAM,
-//                 borderColor: '#4CAF50',
-//                 backgroundColor: '#4CAF50',
-//                 borderWidth: 2,
-//                 tension: 0.4,
-//                 fill: false
-//             },
-//             {
-//                 label: 'SWAP',
-//                 data: dadosPorcentagemSWAP,
-//                 borderColor: '#9C27B0',
-//                 backgroundColor: '#9C27B0',
-//                 borderWidth: 2,
-//                 tension: 0.4,
-//                 fill: false
-//             },
-//             {
-//                 label: 'Disco',
-//                 data: dadosPorcentagemDisco,
-//                 borderColor: '#FF9800',
-//                 backgroundColor: '#FF9800',
-//                 borderWidth: 2,
-//                 tension: 0.4,
-//                 fill: false
-//             }
-//         ]
-//     },
-//     options: {
-//         responsive: true,
-//         plugins: {
-//             legend: {
-//                 position: 'top',
-//                 labels: {
-//                     boxWidth: 12,
-//                     usePointStyle: true,
-//                     padding: 25,
-//                     boxPadding: 8
-//                 }
-//             }
-//         },
-//         scales: {
-//             y: {
-//                 min: 0,
-//                 max: 100,
-//                 ticks: {
-//                     callback: function(value) {
-//                         return value + '%';
-//                     }
-//                 },
-//                 grid: {
-//                     color: '#eee'
-//                 }
-//             },
-//             x: {
-//                 grid: {
-//                     display: false
-//                 }
-//             }
-//         }
-//     }
-// });
+async function inicializarPagina() {
+    const ctx = document.getElementById('grafico').getContext('2d');    
+
+    grafico = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: intervaloTempo,
+            datasets: [
+                {
+                    label: 'CPU',
+                    data: await dadosCpu,
+                    borderColor: '#2196F3',
+                    backgroundColor: '#2196F3',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'RAM',
+                    data: dadosRam,
+                    borderColor: '#4CAF50',
+                    backgroundColor: '#4CAF50',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'SWAP',
+                    data: await dadosSwap,
+                    borderColor: '#9C27B0',
+                    backgroundColor: '#9C27B0',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Disco',
+                    data: await dadosDisco,
+                    borderColor: '#FF9800',
+                    backgroundColor: '#FF9800',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        usePointStyle: true,
+                        padding: 25,
+                        boxPadding: 8
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    grid: {
+                        color: '#eee'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    trocarTempo(0); 
+    await trocarMonitoramento(0);
+}
+
+inicializarPagina();

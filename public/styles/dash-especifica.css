@@ -231,7 +231,12 @@ main {
 .container-main .sessao-kpis .kpi .previsto {color: #10B981;}
 
 .container-main .sessao-grafico {
-    height: 400px;
+    height: 625px;
+}
+
+.container-main .sessao-grafico .sessao-grafico {
+    width: 80%;
+    margin: 0 auto;
 }
 
 .container-main .sessao-grafico .parte-acima .titulo-grafico {
