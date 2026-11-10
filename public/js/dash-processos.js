@@ -33,28 +33,28 @@ function limparSessao() {
 const kpiContextData = {
     cpu: {
         color: '#DC2626',
-        kpi1: { label: 'Uso Total MIPS / CPU', sub: 'Pico crítico: 90%' },
-        kpi2: { label: 'Threads em Execução', sub: 'Média aceitável: 1.200' },
-        kpi3: { label: 'Fila de Processamento', sub: 'Aguardando CPU' }
+        kpi1: { label: 'Uso de CPU', sub: 'Unidade: percentual' },
+        kpi2: { label: 'Processos capturados', sub: 'Quantidade no período' },
+        kpi3: { label: 'Última captura', sub: 'Horário informado pelo Gold' }
     },
     ram: {
         color: '#2563EB',
-        kpi1: { label: 'Uso Total de RAM', sub: 'Capacidade máxima próxima' },
-        kpi2: { label: 'Memória em Swap', sub: 'Limite de alerta: 5.0 GB' },
-        kpi3: { label: 'Taxa de Paginação', sub: 'Status de paginação' }
+        kpi1: { label: 'Memória por processo', sub: 'Unidade: MB' },
+        kpi2: { label: 'Processos capturados', sub: 'Quantidade no período' },
+        kpi3: { label: 'Última captura', sub: 'Horário informado pelo Gold' }
     },
     disco: {
         color: '#7C3AED',
-        kpi1: { label: 'Taxa I/O de Disco', sub: 'Limite físico: 15K IOPS' },
-        kpi2: { label: 'Latência Média', sub: 'Tempo de resposta (ms)' },
-        kpi3: { label: 'Fila I/O (Wait)', sub: 'Operações em buffer' }
+        kpi1: { label: 'Bytes lidos', sub: 'Valor acumulado informado' },
+        kpi2: { label: 'Bytes escritos', sub: 'Valor acumulado informado' },
+        kpi3: { label: 'Última captura', sub: 'Horário informado pelo Gold' }
     }
 };
 
 const chartTitles = {
-    cpu: { title: 'Evolução Temporal - Consumo de CPU (MIPS)', table: 'Top Processos Consumindo CPU' },
+    cpu: { title: 'Evolução Temporal - Consumo de CPU (%)', table: 'Processos por consumo de CPU' },
     ram: { title: 'Evolução Temporal - Alocação de Memória RAM', table: 'Top Processos Alocando RAM' },
-    disco: { title: 'Evolução Temporal - Taxa I/O de Disco', table: 'Top Processos com Maior I/O' }
+    disco: { title: 'Evolução Temporal - I/O acumulado', table: 'Processos por atividade de disco' }
 };
 
 let chartInstance = null;
@@ -108,8 +108,8 @@ async function switchMetric(metric) {
         return;
     }
 
-    // 3. Trata ausência de dados
-    if (!dadosReais || dadosReais.processos.length === 0) {
+    const dados = normalizarDadosGold(dadosReais);
+    if (dados.processos.length === 0) {
         renderTabelaVazia();
         return;
     }
@@ -119,13 +119,39 @@ async function switchMetric(metric) {
     document.getElementById('tableTitle').innerText = chartTitles[metric].table;
 
     // 5. Atualiza Gráfico
-    chartInstance.data.labels = dadosReais.grafico.labels; // Ex: ['11:30', '11:35', '11:40']
-    chartInstance.data.datasets = dadosReais.grafico.datasets.map(ds => ({ ...ds, fill: true }));
+    chartInstance.data.labels = dados.grafico.labels;
+    chartInstance.data.datasets = dados.grafico.datasets.map(ds => ({ ...ds, fill: true }));
     chartInstance.update();
 
     // 6. Atualiza KPIs e Tabela
-    updateKPIs(metric, dadosReais.kpis, dadosReais.processos[0]);
-    renderTable(metric, dadosReais.processos);
+    updateKPIs(metric, dados.kpis, dados.processos[0]);
+    renderTable(metric, dados.processos);
+}
+
+function normalizarDadosGold(resposta) {
+    const processos = Array.isArray(resposta)
+        ? resposta
+        : Array.isArray(resposta?.processos) ? resposta.processos : [];
+    const primeiro = processos[0] || {};
+
+    return {
+        kpis: resposta?.kpis || {
+            valor1: primeiro.CPU_percentual ?? primeiro.cpu ?? '--',
+            valor2: processos.length,
+            valor3: primeiro.Timestamp ?? primeiro.timestamp ?? '--'
+        },
+        grafico: resposta?.grafico || { labels: [], datasets: [] },
+        processos: processos.map(processo => ({
+            pid: processo.PID ?? processo.pid ?? '--',
+            job: processo.Nome_Processo ?? processo.job ?? '--',
+            cpu: processo.CPU_percentual ?? processo.cpu ?? '--',
+            ram: processo.Memoria_MB ?? processo.ram ?? '--',
+            bytesLidos: processo.Bytes_Lidos ?? processo.bytesLidos ?? '--',
+            bytesEscritos: processo.Bytes_Escritos ?? processo.bytesEscritos ?? '--',
+            status: processo.status ?? 'Sem dados',
+            timestamp: processo.Timestamp ?? processo.timestamp ?? '--'
+        }))
+    };
 }
 
 function updateKPIs(metric, kpiData, topProc) {
@@ -145,7 +171,7 @@ function updateKPIs(metric, kpiData, topProc) {
     let subtextoOfensor = '';
     if (metric === 'cpu') subtextoOfensor = `Consumindo ${topProc.cpu}% da CPU`;
     if (metric === 'ram') subtextoOfensor = `Alocando ${topProc.ram} MB de RAM`;
-    if (metric === 'disco') subtextoOfensor = `Gerando ${topProc.disco} IOPS`;
+    if (metric === 'disco') subtextoOfensor = `Lendo ${topProc.bytesLidos} bytes`;
     
     document.getElementById('kpi4-sub').innerText = subtextoOfensor;
 }
@@ -161,8 +187,8 @@ function renderTable(metric, processos) {
             <td><strong>${proc.job}</strong></td>
             <td class="${metric === 'cpu' ? 'highlight-col' : ''}" style="${metric === 'cpu' ? 'color: #DC2626;' : ''}">${proc.cpu}%</td>
             <td class="${metric === 'ram' ? 'highlight-col' : ''}" style="${metric === 'ram' ? 'color: #2563EB;' : ''}">${proc.ram} MB</td>
-            <td class="${metric === 'disco' ? 'highlight-col' : ''}" style="${metric === 'disco' ? 'color: #7C3AED;' : ''}">${proc.disco} IOPS</td>
-            <td>${proc.threads}</td>
+            <td class="${metric === 'disco' ? 'highlight-col' : ''}" style="${metric === 'disco' ? 'color: #7C3AED;' : ''}">${proc.bytesLidos}</td>
+            <td>${proc.bytesEscritos}</td>
             <td><span class="badge-status status-${proc.status.toLowerCase()}">${proc.status}</span></td>
         `;
         tbody.appendChild(tr);
