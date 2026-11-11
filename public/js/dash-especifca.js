@@ -7,6 +7,7 @@ let opcoesBotoesMonitoramento = document.querySelectorAll(".opcao-monitoramento"
 let sessaoKpis = document.querySelector("#sessaoKpis");
 let opcoesBotoesTempo = document.querySelectorAll(".opcao-tempo");
 let statusMainframe = document.querySelector("#statusMainframe");
+let corpoTabela = document.querySelector("#corpoTabela");
 
 let intervaloTempo = [];
 let grafico;
@@ -201,7 +202,24 @@ async function trocarMonitoramento(indice) {
                 todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
             }
             
-            sessaoKpis.innerHTML = todasKpis;              
+            sessaoKpis.innerHTML = todasKpis;    
+
+            console.log(dadosCapturados.registros);
+            
+            
+            for (let i = 0; i < dadosCapturados.registros.length; i++) {
+                corpoTabela.innerHTML += `
+                    <td>${dadosCapturados.registros[i].Timestamp}</td>
+                    <td>${dadosCapturados.registros[i].Porcentagem_CPU}%</td>
+                    <td>${dadosCapturados.registros[i].Porcentagem_RAM}%</td>
+                    <td>${dadosCapturados.registros[i].Porcentagem_Disco}%</td>
+                    <td>${dadosCapturados.registros[i].Swap}%</td>
+                    <td>${dadosCapturados.registros[i].Dados_Enviados}</td>
+                    <td>${dadosCapturados.registros[i].Dados_Recebidos}</td>
+                    <td>${"aa"}</td>
+                `
+            }
+
             break;
 
         case 1:

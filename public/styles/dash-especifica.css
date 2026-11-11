@@ -287,3 +287,12 @@ main {
     color: #94A3B8;
     background-color: #F8FAFC;
 }
+
+.container-main .sessao-historico table thead .titulo-grafico th {
+    width: 125px;
+    text-align: center;
+}
+
+.container-main .sessao-historico table tbody td {
+    text-align: center;
+}
