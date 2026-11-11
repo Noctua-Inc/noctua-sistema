@@ -6,9 +6,11 @@ let nomeMainframe = document.querySelector("#nomeMainframe");
 let opcoesBotoesMonitoramento = document.querySelectorAll(".opcao-monitoramento");
 let sessaoKpis = document.querySelector("#sessaoKpis");
 let opcoesBotoesTempo = document.querySelectorAll(".opcao-tempo");
+let statusMainframe = document.querySelector("#statusMainframe");
 
 let intervaloTempo = [];
 let grafico;
+let statusRisco = 0;
 
 // Dados dashboard Geral
 dadosCpu = [];
@@ -120,6 +122,12 @@ function trocarTempo(indice) {
 async function trocarMonitoramento(indice) {
     let titulosKpi = [];
     let todasKpis = "";
+    let statusRiscoCalculo = 0;
+
+    dadosCpu = [];
+    dadosRam = [];
+    dadosDisco = [];
+    dadosSwap = [];
 
     for(let i = 0; i < opcoesBotoesMonitoramento.length; i++) {
         if(opcoesBotoesMonitoramento[i].className == "opcao-monitoramento opcao-monitoramento-selecionada") {
@@ -137,7 +145,52 @@ async function trocarMonitoramento(indice) {
         case 0:
             titulosKpi = ["Status de Risco", "Momento mais utilizado", "Uso Médio CPU", "Uso Médio RAM", "Uso Médio Disco", "Tráfego de Rede (Tx/Rx)"];
             let [dadosCapturados] = await puxarJsonS3("todos");
-            dadosKpi = ["", dadosCapturados.estatisticas.horario_pico, dadosCapturados.estatisticas.media_cpu_porcentagem + "%", dadosCapturados.estatisticas.media_ram_porcentagem + "%", dadosCapturados.estatisticas.media_disco_porcentagem + "%", dadosCapturados.estatisticas.media_dados_enviados]
+
+            // Order parâmetros = CPU, DISCO, RAM, REDE, SWAP
+            let [resposta] = await api.get(`/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`);
+            let arayParametros = resposta.parametros.split(',')
+
+            if(dadosCapturados.estatisticas.media_cpu_porcentagem >= arayParametros[0]) {
+                statusRiscoCalculo ++;
+            }
+
+            if(dadosCapturados.estatisticas.media_disco_porcentagem >= arayParametros[1]) {
+                statusRiscoCalculo ++;
+            }
+
+            if(dadosCapturados.estatisticas.media_ram_porcentagem >= arayParametros[2]) {
+                statusRiscoCalculo ++;
+            }   
+            
+            if(dadosCapturados.estatisticas.media_dados_enviados >= arayParametros[3]) {
+                statusRiscoCalculo ++;
+            }   
+
+            if(statusRisco != statusRiscoCalculo) {
+                statusRisco = statusRiscoCalculo;
+            }            
+
+            if (statusRisco > 2) {
+                statusMainframe.innerHTML = "Em Alerta!";
+
+                statusMainframe.style.backgroundColor = "#FFE4E6";
+                statusMainframe.style.border = "2px solid #FECDD3";
+                statusMainframe.style.color = "#E11D48";
+            } else if (statusRisco > 0) {
+                statusMainframe.innerHTML = "Em Atenção!";
+
+                statusMainframe.style.backgroundColor = "#FEF3C7";
+                statusMainframe.style.border = "2px solid #FDE68A";
+                statusMainframe.style.color = "#D97706";
+            } else {
+                statusMainframe.innerHTML = "Ok";
+
+                statusMainframe.style.backgroundColor = "#D1FAE5";
+                statusMainframe.style.border = "2px solid #A7F3D0";
+                statusMainframe.style.color = "#059669";
+            }
+
+            dadosKpi = [statusRisco, dadosCapturados.estatisticas.horario_pico, dadosCapturados.estatisticas.media_cpu_porcentagem + "%", dadosCapturados.estatisticas.media_ram_porcentagem + "%", dadosCapturados.estatisticas.media_disco_porcentagem + "%", dadosCapturados.estatisticas.media_dados_enviados]
 
             dadosCpu.push(dadosCapturados.estatisticas.media_cpu_porcentagem);            
             dadosRam.push(dadosCapturados.estatisticas.media_ram_porcentagem);
