@@ -114,7 +114,7 @@ async function selecionarMainframe() {
     mensagem.hidden = false;
 
     try {
-        const caminho = caminhoBasePrevisoes + '/' + encodeURIComponent(hostname) + '.json';
+        const caminho = '/api/gold/empresa/' + idEmpresa + '/' + encodeURIComponent(hostname) + '/previsoes.json';
         const resposta = await fetch(caminho);
 
         if (resposta.ok) {
@@ -186,6 +186,11 @@ function preencherIndicadores(metrica, nome) {
     escrever('limite-maximo', 'Máximo configurado: ' + formatarValor(metrica.limite_maximo, metrica.unidade));
     escrever('limite-minimo', 'Mínimo configurado: ' + formatarValor(metrica.limite_minimo, metrica.unidade));
     escrever('erro-medio', formatarValor(indicadores.erro_medio, indicadores.unidade_erro));
+    let detalheErro = 'Aguardando medições para comparar com as previsões salvas.';
+    if (indicadores.erro_medio != null) {
+        detalheErro = 'De ' + formatarHorario(janela.inicio) + ' até ' + formatarHorario(metrica.graficos.atual.horario);
+    }
+    escrever('detalhe-erro', detalheErro);
 
     const minutos = indicadores.primeira_saida_em_minutos;
     escrever('primeira-saida', '—');
@@ -297,7 +302,7 @@ function preencherTabela() {
         criarCelula(linha, item.hostname);
         criarCelula(linha, menor + ' – ' + maior);
         criarCelula(linha, minimo + ' – ' + maximo);
-        const situacao = criarCelula(linha, item.situacao);
+        const situacao = criarCelula(linha, item.situacao || '—');
 
         if (item.situacao === 'Dentro da faixa') {
             situacao.className = 'situacao-dentro';
@@ -334,8 +339,6 @@ function desenharGrafico(metrica) {
     const dados = metrica.graficos;
     const observado = [];
     const previsto = [];
-    const inferior = [];
-    const superior = [];
     const tamanhoPontos = [];
 
     for (let i = 0; i < dados.historico.length; i++) {
@@ -354,21 +357,12 @@ function desenharGrafico(metrica) {
     observado.push(atual);
     tamanhoPontos.push(4);
     previsto.push(atual);
-    inferior.push(atual);
-    superior.push(atual);
-
-    let temFaixa = false;
     for (let i = 0; i < dados.previsao.length; i++) {
         const ponto = dados.previsao[i];
         const data = new Date(ponto.horario);
         const horario = data.getTime();
 
         previsto.push({x: horario, y: ponto.valor});
-        inferior.push({x: horario, y: ponto.inferior});
-        superior.push({x: horario, y: ponto.superior});
-        if (ponto.inferior != null && ponto.superior != null) {
-            temFaixa = true;
-        }
     }
 
     const janela = janelaGrafico(dados.atual.horario);
@@ -406,22 +400,6 @@ function desenharGrafico(metrica) {
             borderDash: [7, 5]
         }
     ];
-
-    if (temFaixa) {
-        series.push({
-            label: 'Faixa inferior',
-            data: inferior,
-            borderWidth: 0
-        });
-        series.push({
-            label: 'Faixa de previsão',
-            data: superior,
-            borderWidth: 0,
-            fill: '-1',
-            backgroundColor: '#dbeafe'
-        });
-    }
-    document.getElementById('legenda-faixa').hidden = !temFaixa;
 
     graficoConsumo = new Chart(document.getElementById('grafico-previsao'), {
         type: 'line',

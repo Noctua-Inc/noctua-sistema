@@ -180,13 +180,6 @@
     border-top-style: dashed;
 }
 
-.previsao-legenda .faixa {
-    border: 0;
-    background: #dbeafe;
-    height: 12px;
-    border-radius: 2px;
-}
-
 .previsao-inferior {
     display: grid;
     grid-template-columns: 1.35fr 1fr;
