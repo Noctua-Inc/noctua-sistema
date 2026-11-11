@@ -122,290 +122,159 @@ body {
     line-height: 1.2;
 }
 main {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 5rem;
-    margin-left: 240px;
-
-    background-color: #F8F9FA;
-}
-
-main .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     width: 80%;
-    height: 100px;
-    align-self: center;
+    margin-left: 240px;
+    background-color: #F8FAFC;
 }
 
-main .navbar .parte-direita {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-}
-
-main .navbar .parte-direita .estado-servidor {
-    width: 180px;
-    height: 45px;
-    font-size: 24px;
-    border-radius: 30px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    cursor: pointer;
-
-    transition: all 1s;
-}
-
-main .navbar .parte-direita .estado-servidor:hover {
-    transform: scale(1.1);
-}
-
-main .navbar .parte-direita .monitorar-servidor {
-    display: flex;
-    gap: 0.5rem;
-}
-
-main .navbar .parte-esquerda .tituto-servidor {
-    font-size: 28px;
-    font-weight: normal;
-}
-
-main .kpis {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 2rem;
-}
-
-main .kpis .kpi {
-    width: 270px;
-    height: 140px;
-    border-radius: 10px;
-    background-color: #FFF;
-
+.container-main {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
 
-    padding: 13px;
-}
-
-main .kpis .kpi .componente {
-    font-weight: normal;
-    color: #27AE60;
-}
-main .kpis .kpi .horario {font-size: 32px;}
-
-main .kpis .kpi .titulo-kpi,
-main .kpis .kpi .observacao {
-    font-size: 12px;
-}
-
-main .kpis .kpi .excedeu {color: #F44336;}
-
-main .sessao-grafico {
-    width: 90%;
-    height: 700px;
-    border: 10px;
-    border-radius: 10px;
-    background-color: #FFF;
-    padding: 30px 40px;
-
-    align-self: center;
-}
-
-main .sessao-grafico .sessao-acima {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-main .sessao-grafico .botoes-tempo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.75rem;
-
-    background-color: #E0E0E0;
-    width: 250px;
-    height: 35px;
-    border-radius: 10px;
-}
-
-main .sessao-grafico .botoes-tempo .botao-tempo {
-    width: 45px;
-    height: 30px;
-    color: #667085;
-    background-color: #E0E0E0;
-    border: none;
-    cursor: pointer;
-}
-
-main .sessao-grafico .botoes-tempo .botao-tempo:hover{
-    background-color: #D2D2D2;
-}
-
-main .sessao-grafico .botoes-tempo .botao-escolhido {
-    background-color: #FFF;
-    color: #2196F3;
-    font-weight: bold;
-    cursor: default;
-}
-
-main .sessao-grafico .botoes-tempo .botao-escolhido:hover{
-    background-color: rgb(248, 248, 248);
-}
-
-.titulo-sessao {
-    font-size: 18px;
-    font-weight: normal;
-}
-
-#grafico{
-    width: 100%;
-    height: 500px;
+    width: 95%;
+    padding-top: 20px;
     margin: 0 auto;
 }
 
-.historico {
-    width: 90%;
-    background-color: #FFF;
-    border-radius: 10px;
-    padding: 20px 40px;
+.container-main .navbar,
+.container-main .sessao-grafico .parte-acima {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
+.container-main .navbar .titulo-mainframe {
+    font-weight: 600;
+}
+
+.container-main .navbar .nome-mainframe {
+    font-weight: 900;
+}
+
+.container-main .navbar .status-mainframe {
+    width: 200px;
+    height: 45px;
+
+    margin-top: 10px;
+    background-color: #E7E7E7;
+    border: 2px solid #D1D5DB;
+    border-radius: 20px;
+}
+
+.container-main .sessao-fundo {
+    background-color: #FFF;
+    border: 1px solid #F1F5F9;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.container-main .opcoes-monitoramento {
+    height: 90px;
+    padding: 0 20px;
+}
+
+.container-main .opcoes-monitoramento ul {
+    height: 90px;
+    display: flex;
+    align-items: center;
+}
+.container-main .opcoes-monitoramento ul li {
+    list-style: none;
+}
+
+.container-main .opcoes-monitoramento ul li .opcao-monitoramento {
+    background: none;
+    border: none;
+    color: #475569;
+    font-size: 16px;
+    width: 200px;
+    height: 50px;
+    cursor: pointer;
+}
+
+.container-main .opcoes-monitoramento ul li .opcao-monitoramento-selecionada {
+    background-color: #4F46E5;
+    color: #FFF;
+    border-radius: 20px;
+} 
+
+.container-main .sessao-kpis {
+    height: 140px;
+    display: flex;
+    gap: 20px;
+}
+
+.container-main .sessao-kpis .kpi {
     display: flex;
     flex-direction: column;
-    align-self: center;
+    justify-content: space-around;
 
-    margin-bottom: 2rem;
-    max-height: 400px;
-    overflow-y: auto;
+    width: 265px;
+    height: 120px;
+    background-color: #FFF;
+    border-radius: 20px;
+    padding: 10px;
 }
 
-.historico table {
-    border: 1px solid #E7EAF0;
+.container-main .sessao-kpis .kpi .texto-kpi {
+    font-size: 15px;
+    color: #94A3B8;
+}
+
+.container-main .sessao-kpis .kpi .dado-kpi {
+    font-size: 24px;
+    margin-left: 10px;
+}
+
+.container-main .sessao-kpis .kpi .excedeu {color: #F43F5E;}
+.container-main .sessao-kpis .kpi .previsto {color: #10B981;}
+
+.container-main .sessao-grafico {
+    height: 400px;
+}
+
+.container-main .sessao-grafico .parte-acima .titulo-grafico {
+    color: #1E293B;
+}
+
+.container-main .sessao-grafico .parte-acima .opcoes-tempo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 220px;
+    height: 40px;
+    color: #475569;
+    background-color: #F1F5F9;
+    border-radius: 20px;
+}
+
+.container-main .sessao-grafico .parte-acima .opcoes-tempo .opcao-tempo {
+    width: 50px;
+    height: 30px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.container-main .sessao-grafico .parte-acima .opcoes-tempo .opcao-tempo-selecionada {
+    background-color: #FFF;
     border-radius: 10px;
 }
 
-.historico table thead {
-    background-color: #E7EAF0;
+.container-main .sessao-historico .titulo-lista {
+    font-weight: 600;
 }
 
-.historico th {
+.container-main .sessao-historico table {
+    margin: 0 auto;
+    width: 95%;
+}
+.container-main .sessao-historico table thead .titulo-grafico {
     text-align: left;
-    border-bottom: 1px solid #E7EAF0;
-    padding: 10px 20px;
-    font-weight: normal;
-    color: #667085;
-}
-
-@media (max-width: 1180px) {
-    main {
-        margin-left: 240px;
-        width: calc(100% - 240px);
-    }
-    main .navbar {
-        width: 90%;
-    }
-    main .kpis {
-        gap: 1rem;
-    }
-}
-
-@media (max-width: 760px) {
-    .sidebar {
-        width: 72px;
-        padding: 24px 8px 0;
-    }
-    .sidebar-brand {
-        padding: 0;
-        justify-content: center;
-    }
-    .sidebar-brand img {
-        width: 54px;
-    }
-    .sidebar-menu a {
-        justify-content: center;
-        padding: 14px 8px;
-        font-size: 0;
-        gap: 0;
-    }
-    .sidebar-menu i {
-        font-size: 17px;
-    }
-    .sidebar-user {
-        flex-direction: column;
-        gap: 8px;
-    }
-    .user-info {
-        display: none;
-    }
-
-    main {
-        margin-left: 72px;
-        width: calc(100% - 72px);
-        gap: 2.5rem;
-    }
-
-    main .navbar {
-        width: 92%;
-        height: 80px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        margin-top: 15px;
-    }
-
-    main .kpis {
-        gap: 1rem;
-        padding: 0 1rem;
-    }
-
-    main .kpis .kpi {
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-    }
-
-    main .sessao-grafico {
-        width: 94%;
-        height: auto;
-        padding: 20px;
-    }
-
-    main .sessao-grafico .sessao-acima {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    #grafico {
-        height: 300px;
-    }
-
-    .historico {
-        width: 94%;
-        padding: 15px 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    .dashboard-especifica h1,
-    main .navbar .parte-esquerda .tituto-servidor {
-        font-size: 20px;
-    }
-
-    main .kpis .kpi .horario {
-        font-size: 24px;
-    }
-
-    .historico table {
-        font-size: 10px;
-    }
+    width: 300px;
+    height: 40px;
+    color: #94A3B8;
+    background-color: #F8FAFC;
 }
