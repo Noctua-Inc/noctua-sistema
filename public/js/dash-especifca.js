@@ -146,27 +146,27 @@ async function trocarMonitoramento(indice) {
     switch (indice) {
         case 0:
             titulosKpi = ["Status de Risco", "Momento mais utilizado", "Uso Médio CPU", "Uso Médio RAM", "Uso Médio Disco", "Tráfego de Rede (Tx/Rx)"];
-            let dadosCapturados = await puxarJsonS3("todos");
-            console.log(dadosCapturados);
+            let dadosCapturadosGeral = await puxarJsonS3("todos");
+            console.log(dadosCapturadosGeral);
             
 
             // Order parâmetros = CPU, DISCO, RAM, REDE, SWAP
             let [resposta] = await api.get(`/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`);
             let arayParametros = resposta.parametros.split(',')
 
-            if(dadosCapturados.porcentagem_cpu >= arayParametros[0]) {
+            if(dadosCapturadosGeral.porcentagem_cpu >= arayParametros[0]) {
                 statusRiscoCalculo ++;
             }
 
-            if(dadosCapturados.porcentagem_disco >= arayParametros[1]) {
+            if(dadosCapturadosGeral.porcentagem_disco >= arayParametros[1]) {
                 statusRiscoCalculo ++;
             }
 
-            if(dadosCapturados.porcentagem_ram >= arayParametros[2]) {
+            if(dadosCapturadosGeral.porcentagem_ram >= arayParametros[2]) {
                 statusRiscoCalculo ++;
             }   
             
-            if(dadosCapturados.dados_enviados_medio >= arayParametros[3]) {
+            if(dadosCapturadosGeral.dados_enviados_medio >= arayParametros[3]) {
                 statusRiscoCalculo ++;
             }   
 
@@ -194,12 +194,12 @@ async function trocarMonitoramento(indice) {
                 statusMainframe.style.color = "#059669";
             }
 
-            dadosKpi = [statusRisco, dadosCapturados.hora_de_captura, dadosCapturados.porcentagem_cpu + "%", dadosCapturados.porcentagem_ram + "%", dadosCapturados.porcentagem_disco + "%", dadosCapturados.media_trafego_rede]
+            dadosKpi = [statusRisco, dadosCapturadosGeral.hora_de_captura, dadosCapturadosGeral.porcentagem_cpu + "%", dadosCapturadosGeral.porcentagem_ram + "%", dadosCapturadosGeral.porcentagem_disco + "%", dadosCapturadosGeral.media_trafego_rede]
 
-            dadosCpu.push(dadosCapturados.porcentagem_cpu);            
-            dadosRam.push(dadosCapturados.porcentagem_ram);
-            dadosDisco.push(dadosCapturados.porcentagem_disco);
-            dadosSwap.push(dadosCapturados.dados_enviados_medio);
+            dadosCpu.push(dadosCapturadosGeral.porcentagem_cpu);            
+            dadosRam.push(dadosCapturadosGeral.porcentagem_ram);
+            dadosDisco.push(dadosCapturadosGeral.porcentagem_disco);
+            dadosSwap.push(dadosCapturadosGeral.dados_enviados_medio);
 
             for (let i = 0; i < titulosKpi.length; i++) {
                 todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
@@ -219,14 +219,16 @@ async function trocarMonitoramento(indice) {
             `
 
             corpoTabela.innerHTML = `
-                <td>${dadosCapturados.hora_de_captura}</td>
-                <td>${dadosCapturados.porcentagem_cpu}%</td>
-                <td>${dadosCapturados.porcentagem_ram}%</td>
-                <td>${dadosCapturados.porcentagem_disco}%</td>
-                <td>${dadosCapturados.media_swap_porcentagem}%</td>
-                <td>${dadosCapturados.dados_enviados_medio}</td>
-                <td>${dadosCapturados.dados_recebidos_medio}</td>
-                <td>${"aa"}</td>
+                <tr>
+                    <td>${dadosCapturadosGeral.hora_de_captura}</td>
+                    <td>${dadosCapturadosGeral.porcentagem_cpu}%</td>
+                    <td>${dadosCapturadosGeral.porcentagem_ram}%</td>
+                    <td>${dadosCapturadosGeral.porcentagem_disco}%</td>
+                    <td>${dadosCapturadosGeral.media_swap_porcentagem}%</td>
+                    <td>${dadosCapturadosGeral.dados_enviados_medio}</td>
+                    <td>${dadosCapturadosGeral.dados_recebidos_medio}</td>
+                    <td>${"aa"}</td>
+                </tr>    
             `
 
             break;
@@ -234,11 +236,35 @@ async function trocarMonitoramento(indice) {
         case 1:
             titulosKpi = ["Momento mais utilizado", "Dados Enviados (Tx)", "Dados Recebidos (Rx)", "Erros Pacotes Entrada (errin)", "Sockets TIME_WAIT"];
 
-            for(let titulo of titulosKpi) {
-                todasKpis += criarKPI(titulo, "...", "...");
+            let dadosCapturadosRede = await puxarJsonS3("rede");
+            console.log(dadosCapturadosRede);
+
+            dadosKpi = [dadosCapturadosRede.hora_de_captura, dadosCapturadosRede.media_dados_enviados, dadosCapturadosRede.media_dados_recebidos, dadosCapturadosRede.media_dados_perdidos, dadosCapturadosRede.media_sockets_tw];
+
+            for (let i = 0; i < titulosKpi.length; i++) {
+                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
             }
 
             sessaoKpis.innerHTML = todasKpis;
+
+            tituloTabela.innerHTML = `
+                <th>Data Hora</th>
+                <th>Dados Enviados</th>
+                <th>Dados Recebidos</th>
+                <th>Pacotes Perdidos</th>
+                <th>Sockets TIME_WAIT</th>
+            `
+
+            corpoTabela.innerHTML = `
+                <tr>
+                    <td>${dadosCapturadosRede.hora_de_captura}</td>
+                    <td>${dadosCapturadosRede.media_dados_enviados}</td>
+                    <td>${dadosCapturadosRede.media_dados_recebidos}</td>
+                    <td>${dadosCapturadosRede.media_dados_perdidos}</td>
+                    <td>${dadosCapturadosRede.media_sockets_tw}</td>
+                </tr>    
+            `
+
             break;
 
         case 2:
