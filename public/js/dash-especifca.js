@@ -1,12 +1,14 @@
 const ID_EMPRESA = sessionStorage.getItem('idEmpresa');
 const ID_MAINFRAME = window.location.href.split('id_mainframe=')[1];
-const CAMINHO_BASE_MONITORAMENTO = '/api/gold/empresa/' + ID_EMPRESA + '/monitoramentoComponentes/';
+// No frontend, se o :diretorio for apenas um nível:
+const CAMINHO_BASE_MONITORAMENTO = '/api/gold/empresa/' + ID_EMPRESA + '/gustavo/monitoramentoComponentes/';
 
 let nomeMainframe = document.querySelector("#nomeMainframe");
 let opcoesBotoesMonitoramento = document.querySelectorAll(".opcao-monitoramento");
 let sessaoKpis = document.querySelector("#sessaoKpis");
 let opcoesBotoesTempo = document.querySelectorAll(".opcao-tempo");
 let statusMainframe = document.querySelector("#statusMainframe");
+let tituloTabela = document.querySelector("#tituloTabela");
 let corpoTabela = document.querySelector("#corpoTabela");
 
 let intervaloTempo = [];
@@ -64,15 +66,14 @@ async function puxarJsonS3(quaisRegistros) {
         let minuto = String(horarioAtual.getMinutes()).padStart(2, '0');
 
         // let dataHoraFormatado = `${ano}-${mes}-${dia}_${hora}-${minuto}`
-        let dataHoraFormatado = `2026-11-06_19-02`
+        let dataHoraFormatado = `2026-11-11_10-38`
 
-        let nomeArquivo = encodeURIComponent(`${nomeMainframe}_${dataHoraFormatado}_${quaisRegistros}_registros.json`);        
-
+        let nomeArquivo = encodeURIComponent(`${nomeMainframe}_${dataHoraFormatado}_${quaisRegistros}_registros.json`);           
         let caminho = CAMINHO_BASE_MONITORAMENTO + nomeArquivo;
-        let resposta = await fetch(caminho);
+        let resposta = await fetch(caminho);        
 
         if (resposta.ok) {
-            registros = await resposta.json();
+            registros = await resposta.json();     
         } else {
             registros = null;
         }
@@ -145,25 +146,27 @@ async function trocarMonitoramento(indice) {
     switch (indice) {
         case 0:
             titulosKpi = ["Status de Risco", "Momento mais utilizado", "Uso Médio CPU", "Uso Médio RAM", "Uso Médio Disco", "Tráfego de Rede (Tx/Rx)"];
-            let [dadosCapturados] = await puxarJsonS3("todos");
+            let dadosCapturados = await puxarJsonS3("todos");
+            console.log(dadosCapturados);
+            
 
             // Order parâmetros = CPU, DISCO, RAM, REDE, SWAP
             let [resposta] = await api.get(`/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`);
             let arayParametros = resposta.parametros.split(',')
 
-            if(dadosCapturados.estatisticas.media_cpu_porcentagem >= arayParametros[0]) {
+            if(dadosCapturados.porcentagem_cpu >= arayParametros[0]) {
                 statusRiscoCalculo ++;
             }
 
-            if(dadosCapturados.estatisticas.media_disco_porcentagem >= arayParametros[1]) {
+            if(dadosCapturados.porcentagem_disco >= arayParametros[1]) {
                 statusRiscoCalculo ++;
             }
 
-            if(dadosCapturados.estatisticas.media_ram_porcentagem >= arayParametros[2]) {
+            if(dadosCapturados.porcentagem_ram >= arayParametros[2]) {
                 statusRiscoCalculo ++;
             }   
             
-            if(dadosCapturados.estatisticas.media_dados_enviados >= arayParametros[3]) {
+            if(dadosCapturados.dados_enviados_medio >= arayParametros[3]) {
                 statusRiscoCalculo ++;
             }   
 
@@ -191,34 +194,40 @@ async function trocarMonitoramento(indice) {
                 statusMainframe.style.color = "#059669";
             }
 
-            dadosKpi = [statusRisco, dadosCapturados.estatisticas.horario_pico, dadosCapturados.estatisticas.media_cpu_porcentagem + "%", dadosCapturados.estatisticas.media_ram_porcentagem + "%", dadosCapturados.estatisticas.media_disco_porcentagem + "%", dadosCapturados.estatisticas.media_dados_enviados]
+            dadosKpi = [statusRisco, dadosCapturados.hora_de_captura, dadosCapturados.porcentagem_cpu + "%", dadosCapturados.porcentagem_ram + "%", dadosCapturados.porcentagem_disco + "%", dadosCapturados.media_trafego_rede]
 
-            dadosCpu.push(dadosCapturados.estatisticas.media_cpu_porcentagem);            
-            dadosRam.push(dadosCapturados.estatisticas.media_ram_porcentagem);
-            dadosDisco.push(dadosCapturados.estatisticas.media_disco_porcentagem);
-            dadosSwap.push(dadosCapturados.estatisticas.media_dados_enviados);
+            dadosCpu.push(dadosCapturados.porcentagem_cpu);            
+            dadosRam.push(dadosCapturados.porcentagem_ram);
+            dadosDisco.push(dadosCapturados.porcentagem_disco);
+            dadosSwap.push(dadosCapturados.dados_enviados_medio);
 
             for (let i = 0; i < titulosKpi.length; i++) {
                 todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
             }
             
-            sessaoKpis.innerHTML = todasKpis;    
+            sessaoKpis.innerHTML = todasKpis;
 
-            console.log(dadosCapturados.registros);
-            
-            
-            for (let i = 0; i < dadosCapturados.registros.length; i++) {
-                corpoTabela.innerHTML += `
-                    <td>${dadosCapturados.registros[i].Timestamp}</td>
-                    <td>${dadosCapturados.registros[i].Porcentagem_CPU}%</td>
-                    <td>${dadosCapturados.registros[i].Porcentagem_RAM}%</td>
-                    <td>${dadosCapturados.registros[i].Porcentagem_Disco}%</td>
-                    <td>${dadosCapturados.registros[i].Swap}%</td>
-                    <td>${dadosCapturados.registros[i].Dados_Enviados}</td>
-                    <td>${dadosCapturados.registros[i].Dados_Recebidos}</td>
-                    <td>${"aa"}</td>
-                `
-            }
+            tituloTabela.innerHTML = `
+                <th>Data Hora</th>
+                <th>CPU</th>
+                <th>RAM</th>
+                <th>Disco</th>
+                <th>SWAP</th>
+                <th>Dados Enviados</th>
+                <th>Dados Recebidos</th>
+                <th>Status</th>
+            `
+
+            corpoTabela.innerHTML = `
+                <td>${dadosCapturados.hora_de_captura}</td>
+                <td>${dadosCapturados.porcentagem_cpu}%</td>
+                <td>${dadosCapturados.porcentagem_ram}%</td>
+                <td>${dadosCapturados.porcentagem_disco}%</td>
+                <td>${dadosCapturados.media_swap_porcentagem}%</td>
+                <td>${dadosCapturados.dados_enviados_medio}</td>
+                <td>${dadosCapturados.dados_recebidos_medio}</td>
+                <td>${"aa"}</td>
+            `
 
             break;
 

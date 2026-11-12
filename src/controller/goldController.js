@@ -8,21 +8,26 @@ async function carregar(req, res) {
         return res.status(503).json({erro: 'Configure NOME_BUCKET no servidor para acessar o Gold.'});
     }
 
-    const diretorio = req.params.diretorio;
+    const prefixoMainframe = req.params.prefixoMainframe;
+    const prefixoDashboard = req.params.prefixoDashboard;
     const arquivo = req.params.arquivo;
+    
+
     // if (!/^[a-zA-Z0-9_-]+$/.test(diretorio) || !/^[a-zA-Z0-9_.-]+\.json$/.test(arquivo)) {
     //     return res.status(400).json({erro: 'Informe um diretório e um nome de arquivo JSON válidos.'});
     // }
 
     try {
-        const idEmpresa = req.params.idEmpresa;        
-        const empresa = await goldModel.buscarEmpresa(idEmpresa);
+        const ID_EMPRESA = req.params.idEmpresa;        
+        const empresa = await goldModel.buscarEmpresa(ID_EMPRESA);
+
         if (!empresa) {
             return res.status(404).json({erro: 'Empresa não encontrada.'});
         }
 
-        const prefixoEmpresa = empresa.razao_social.toLowerCase().replaceAll(' ', '_');        
-        const dados = await goldService.lerJson(prefixoEmpresa, diretorio, arquivo);
+        const prefixoEmpresa = empresa.razao_social.toLowerCase().replaceAll(' ', '_');
+        const dados = await goldService.lerJson(prefixoEmpresa, prefixoMainframe, prefixoDashboard, arquivo);        
+
         return res.json(dados);
     } catch (erro) {
         if (erro.name === 'NoSuchKey' || erro.name === 'NotFound') {
