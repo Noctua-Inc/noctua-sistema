@@ -146,9 +146,7 @@ async function trocarMonitoramento(indice) {
     switch (indice) {
         case 0:
             titulosKpi = ["Status de Risco", "Momento mais utilizado", "Uso Médio CPU", "Uso Médio RAM", "Uso Médio Disco", "Tráfego de Rede (Tx/Rx)"];
-            let dadosCapturadosGeral = await puxarJsonS3("todos");
-            console.log(dadosCapturadosGeral);
-            
+            let dadosCapturadosGeral = await puxarJsonS3("todos");            
 
             // Order parâmetros = CPU, DISCO, RAM, REDE, SWAP
             let [resposta] = await api.get(`/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`);
@@ -194,7 +192,7 @@ async function trocarMonitoramento(indice) {
                 statusMainframe.style.color = "#059669";
             }
 
-            dadosKpi = [statusRisco, dadosCapturadosGeral.hora_de_captura, dadosCapturadosGeral.porcentagem_cpu + "%", dadosCapturadosGeral.porcentagem_ram + "%", dadosCapturadosGeral.porcentagem_disco + "%", dadosCapturadosGeral.media_trafego_rede]
+            dadosKpi = [statusRisco, dadosCapturadosGeral.hora_de_captura, dadosCapturadosGeral.porcentagem_cpu + "%", dadosCapturadosGeral.porcentagem_ram + "%", dadosCapturadosGeral.porcentagem_disco + "%", dadosCapturadosGeral.media_trafego_rede + " TB"]
 
             dadosCpu.push(dadosCapturadosGeral.porcentagem_cpu);            
             dadosRam.push(dadosCapturadosGeral.porcentagem_ram);
@@ -225,8 +223,8 @@ async function trocarMonitoramento(indice) {
                     <td>${dadosCapturadosGeral.porcentagem_ram}%</td>
                     <td>${dadosCapturadosGeral.porcentagem_disco}%</td>
                     <td>${dadosCapturadosGeral.media_swap_porcentagem}%</td>
-                    <td>${dadosCapturadosGeral.dados_enviados_medio}</td>
-                    <td>${dadosCapturadosGeral.dados_recebidos_medio}</td>
+                    <td>${dadosCapturadosGeral.dados_enviados_medio} TB</td>
+                    <td>${dadosCapturadosGeral.dados_recebidos_medio} TB</td>
                     <td>${"aa"}</td>
                 </tr>    
             `
@@ -237,9 +235,8 @@ async function trocarMonitoramento(indice) {
             titulosKpi = ["Momento mais utilizado", "Dados Enviados (Tx)", "Dados Recebidos (Rx)", "Erros Pacotes Entrada (errin)", "Sockets TIME_WAIT"];
 
             let dadosCapturadosRede = await puxarJsonS3("rede");
-            console.log(dadosCapturadosRede);
 
-            dadosKpi = [dadosCapturadosRede.hora_de_captura, dadosCapturadosRede.media_dados_enviados, dadosCapturadosRede.media_dados_recebidos, dadosCapturadosRede.media_dados_perdidos, dadosCapturadosRede.media_sockets_tw];
+            dadosKpi = [dadosCapturadosRede.hora_de_captura, dadosCapturadosRede.media_dados_enviados + " TB", dadosCapturadosRede.media_dados_recebidos  + " TB", dadosCapturadosRede.media_dados_perdidos, dadosCapturadosRede.media_sockets_tw];
 
             for (let i = 0; i < titulosKpi.length; i++) {
                 todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
@@ -258,8 +255,8 @@ async function trocarMonitoramento(indice) {
             corpoTabela.innerHTML = `
                 <tr>
                     <td>${dadosCapturadosRede.hora_de_captura}</td>
-                    <td>${dadosCapturadosRede.media_dados_enviados}</td>
-                    <td>${dadosCapturadosRede.media_dados_recebidos}</td>
+                    <td>${dadosCapturadosRede.media_dados_enviados} TB</td>
+                    <td>${dadosCapturadosRede.media_dados_recebidos} TB</td>
                     <td>${dadosCapturadosRede.media_dados_perdidos}</td>
                     <td>${dadosCapturadosRede.media_sockets_tw}</td>
                 </tr>    
@@ -270,31 +267,91 @@ async function trocarMonitoramento(indice) {
         case 2:
             titulosKpi = ["Momento mais utilizado", "Uso Médio CPU", "Frequência Média CPU"];
 
-            for(let titulo of titulosKpi) {
-                todasKpis += criarKPI(titulo, "...", "...");
+            let dadosCapturadosCpu = await puxarJsonS3("cpu");
+
+            dadosKpi = [dadosCapturadosCpu.hora_de_captura, dadosCapturadosCpu.media_cpu_porcentagem + "%", dadosCapturadosCpu.media_cpu_frequencia + " GHz"];
+
+            for (let i = 0; i < titulosKpi.length; i++) {
+                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
             }
 
             sessaoKpis.innerHTML = todasKpis;
+
+            tituloTabela.innerHTML = `
+                <th>Data Hora</th>
+                <th>CPU</th>
+                <th>Frequência CPU</th>
+            `
+
+            corpoTabela.innerHTML = `
+                <tr>
+                    <td>${dadosCapturadosCpu.hora_de_captura}</td>
+                    <td>${dadosCapturadosCpu.media_cpu_porcentagem}%</td>
+                    <td>${dadosCapturadosCpu.media_cpu_frequencia} GHz</td>
+                </tr>    
+            `
             break;
 
         case 3:
             titulosKpi = ["Momento mais utilizado", "Uso Média RAM", "GB Livre RAM", "Uso Médio SWAP"];
 
-            for(let titulo of titulosKpi) {
-                todasKpis += criarKPI(titulo, "...", "...");
+            let dadosCapturadosRam = await puxarJsonS3("ram");
+
+            dadosKpi = [dadosCapturadosRam.hora_de_captura, dadosCapturadosRam.media_ram_porcentagem + "%", dadosCapturadosRam.media_swap_porcentagem + "%", dadosCapturadosRam.media_ram_disponivel + " GB"];
+
+            for (let i = 0; i < titulosKpi.length; i++) {
+                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
             }
 
             sessaoKpis.innerHTML = todasKpis;
+
+            tituloTabela.innerHTML = `
+                <th>Data Hora</th>
+                <th>RAM</th>
+                <th>SWAP</th>
+                <th>RAM Disponível</th>
+            `
+
+            corpoTabela.innerHTML = `
+                <tr>
+                    <td>${dadosCapturadosRam.hora_de_captura}</td>
+                    <td>${dadosCapturadosRam.media_ram_porcentagem}%</td>
+                    <td>${dadosCapturadosRam.media_swap_porcentagem}%</td>
+                    <td>${dadosCapturadosRam.media_ram_disponivel} GB</td>
+                </tr>    
+            `
             break;
 
         case 4:
             titulosKpi = ["Momento mais utilizado", "Uso Média Disco", "GB Livre Disco", "Quantidade requisição (Escrita)", "Quantidade requisição (Leitura)"];
 
-            for(let titulo of titulosKpi) {
-                todasKpis += criarKPI(titulo, "...", "...");
+            let dadosCapturadosDisco = await puxarJsonS3("disco");
+
+            dadosKpi = [dadosCapturadosDisco.hora_de_captura, dadosCapturadosDisco.media_disco_porcentagem + "%", dadosCapturadosDisco.media_disco_disponivel + " GB", dadosCapturadosDisco.media_qtd_requisicao_escrita, dadosCapturadosDisco.media_qtd_requisicao_leitura];
+
+            for (let i = 0; i < titulosKpi.length; i++) {
+                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
             }
 
             sessaoKpis.innerHTML = todasKpis;
+
+            tituloTabela.innerHTML = `
+                <th>Data Hora</th>
+                <th>Disco</th>
+                <th>Disco Disponível</th>
+                <th>Dados Enviados</th>
+                <th>Dados Recebidos</th>
+            `
+
+            corpoTabela.innerHTML = `
+                <tr>
+                    <td>${dadosCapturadosDisco.hora_de_captura}</td>
+                    <td>${dadosCapturadosDisco.media_disco_porcentagem}%</td>
+                    <td>${dadosCapturadosDisco.media_disco_disponivel} GB</td>
+                    <td>${dadosCapturadosDisco.media_qtd_requisicao_escrita}</td>
+                    <td>${dadosCapturadosDisco.media_qtd_requisicao_leitura}</td>
+                </tr>    
+            `
             break;
     }
 
