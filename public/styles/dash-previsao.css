@@ -99,7 +99,7 @@
 
 .previsao-kpis {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
 }
 
@@ -357,4 +357,16 @@
     position: relative;
     height: 210px;
     min-width: 560px;
+}
+
+.previsao-kpi.kpi-atencao {
+    background: #fffbe8;
+    border-color: #f3d98a;
+    border-left: 4px solid #e5bb4b;
+}
+
+.previsao-kpi.kpi-urgencia {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    border-left: 4px solid #dc2626;
 }

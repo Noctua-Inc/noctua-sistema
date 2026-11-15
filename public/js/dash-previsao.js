@@ -88,7 +88,7 @@ async function carregarResumo() {
     resumoPrevisao = null;
     try {
         const caminho = caminhoBasePrevisoes + '/resumo.json';
-        const resposta = await fetch(caminho);
+        const resposta = await fetch(caminho, {cache: 'no-store'});
 
         if (resposta.ok) {
             resumoPrevisao = await resposta.json();
@@ -100,22 +100,24 @@ async function carregarResumo() {
     }
 }
 
-async function selecionarMainframe() {
+async function selecionarMainframe(silencioso = false) {
     const seletor = document.getElementById('mainframe-previsao');
     const hostname = seletor.options[seletor.selectedIndex].textContent;
     const mensagem = document.getElementById('mensagem-mainframes');
     const conteudo = document.getElementById('conteudo-previsao');
 
     seletor.disabled = true;
-    dadosPrevisao = null;
-    conteudo.hidden = true;
-    escrever('atualizacao-previsao', '—');
-    mensagem.textContent = 'Carregando previsão...';
-    mensagem.hidden = false;
+    if (!silencioso) {
+        dadosPrevisao = null;
+        conteudo.hidden = true;
+        escrever('atualizacao-previsao', '—');
+        mensagem.textContent = 'Carregando previsão...';
+        mensagem.hidden = false;
+    }
 
     try {
         const caminho = '/api/gold/empresa/' + idEmpresa + '/' + encodeURIComponent(hostname) + '/previsoes.json';
-        const resposta = await fetch(caminho);
+        const resposta = await fetch(caminho, {cache: 'no-store'});
 
         if (resposta.ok) {
             dadosPrevisao = await resposta.json();
@@ -123,12 +125,15 @@ async function selecionarMainframe() {
             conteudo.hidden = false;
             mensagem.hidden = true;
         } else if (resposta.status === 404) {
+            mensagem.hidden = false;
             mensagem.textContent = 'Previsão ainda não disponível para esta mainframe.';
         } else {
             const erro = await resposta.json();
+            mensagem.hidden = false;
             mensagem.textContent = erro.erro;
         }
     } catch (erro) {
+        mensagem.hidden = false;
         mensagem.textContent = 'Não foi possível carregar a previsão.';
     }
 
@@ -166,7 +171,8 @@ function atualizarTela() {
         nome = metricaDiscoSelecionada + ' do disco';
     }
 
-    preencherIndicadores(metrica, nome);
+    preencherIndicadores(metrica);
+    preencherIndicadoresEmpresa();
     preencherTitulos(metrica, nome);
     atualizarBotoes();
     desenharGrafico(metrica);
@@ -174,44 +180,72 @@ function atualizarTela() {
     preencherTabela();
 }
 
-function preencherIndicadores(metrica, nome) {
+function preencherIndicadores(metrica) {
     const indicadores = metrica.indicadores;
     const janela = janelaGrafico(metrica.graficos.atual.horario);
     const ate = formatarHorario(janela.fim);
-
-    escrever('titulo-maior', 'Maior ' + nome + ' prevista');
-    escrever('titulo-menor', 'Menor ' + nome + ' prevista');
-    escrever('maior-previsto', formatarValor(indicadores.maior_previsto, metrica.unidade));
-    escrever('menor-previsto', formatarValor(indicadores.menor_previsto, metrica.unidade));
-    escrever('limite-maximo', 'Máximo configurado: ' + formatarValor(metrica.limite_maximo, metrica.unidade));
-    escrever('limite-minimo', 'Mínimo configurado: ' + formatarValor(metrica.limite_minimo, metrica.unidade));
-    escrever('erro-medio', formatarValor(indicadores.erro_medio, indicadores.unidade_erro));
-    let detalheErro = 'Aguardando medições para comparar com as previsões salvas.';
-    if (indicadores.erro_medio != null) {
-        detalheErro = 'De ' + formatarHorario(janela.inicio) + ' até ' + formatarHorario(metrica.graficos.atual.horario);
-    }
-    escrever('detalhe-erro', detalheErro);
-
-    const minutos = indicadores.primeira_saida_em_minutos;
+    const cartao = document.getElementById('kpi-proximo-desvio');
+    const seletor = document.getElementById('mainframe-previsao');
+    escrever('mainframe-kpi', seletor.options[seletor.selectedIndex].textContent);
+    cartao.className = 'previsao-kpi';
     escrever('primeira-saida', '—');
 
-    if (metrica.graficos.previsao.length === 0) {
+    const atual = metrica.graficos.atual.valor;
+    if (atual != null && metrica.limite_minimo != null && atual < metrica.limite_minimo) {
+        cartao.classList.add('kpi-urgencia');
+        escrever('primeira-saida', 'Já fora da faixa');
+        escrever('detalhe-saida', 'Consumo observado abaixo do mínimo.');
+    } else if (atual != null && metrica.limite_maximo != null && atual > metrica.limite_maximo) {
+        cartao.classList.add('kpi-urgencia');
+        escrever('primeira-saida', 'Já fora da faixa');
+        escrever('detalhe-saida', 'Consumo observado acima do máximo.');
+    } else if (metrica.limite_minimo == null || metrica.limite_maximo == null) {
+        escrever('detalhe-saida', 'Limites ainda não configurados.');
+    } else if (metrica.graficos.previsao.length === 0) {
         escrever('detalhe-saida', 'Previsão ainda não disponível.');
-    } else if (minutos == null) {
-        escrever('detalhe-saida', 'Nenhum ponto previsto fora da faixa até ' + ate);
-    } else if (minutos === 0) {
-        escrever('primeira-saida', '0 min');
-        escrever('detalhe-saida', 'Já está fora da faixa');
+    } else if (indicadores.primeira_saida_em_minutos == null) {
+        escrever('primeira-saida', 'Sem desvio previsto');
+        escrever('detalhe-saida', 'Dentro dos limites até ' + ate + '.');
     } else {
-        const atual = new Date(metrica.graficos.atual.horario);
-        const horarioSaida = atual.getTime() + minutos * 60000;
+        const minutos = indicadores.primeira_saida_em_minutos;
+        const horarioSaida = new Date(metrica.graficos.atual.horario).getTime() + minutos * 60000;
         let tipo = 'Acima do máximo';
-        if (indicadores.primeira_saida_tipo === 'abaixo') {
-            tipo = 'Abaixo do mínimo';
-        }
-
+        if (indicadores.primeira_saida_tipo === 'abaixo') tipo = 'Abaixo do mínimo';
+        cartao.classList.add('kpi-atencao');
         escrever('primeira-saida', minutos + ' min');
-        escrever('detalhe-saida', tipo + ', às ' + formatarHorario(horarioSaida));
+        escrever('detalhe-saida', tipo + ' às ' + formatarHorario(horarioSaida));
+    }
+}
+
+function preencherIndicadoresEmpresa() {
+    escrever('horario-concentracao', '—');
+    escrever('mainframes-com-desvio', '—');
+    escrever('detalhe-concentracao', 'Resumo da empresa ainda não disponível.');
+    escrever('detalhe-mainframes-desvio', 'Resumo da empresa ainda não disponível.');
+    if (!resumoPrevisao) return;
+    const metrica = selecionarMetrica(resumoPrevisao.componentes);
+    const indicadores = metrica.indicadores;
+    if (!indicadores) {
+        escrever('detalhe-concentracao', 'Aguardando os novos indicadores da ETL.');
+        escrever('detalhe-mainframes-desvio', 'Aguardando os novos indicadores da ETL.');
+        return;
+    }
+    if (indicadores.mainframes_com_previsao === 0) {
+        escrever('detalhe-concentracao', 'Nenhuma previsão disponível no período.');
+        escrever('detalhe-mainframes-desvio', 'Nenhuma previsão disponível no período.');
+        return;
+    }
+    escrever('mainframes-com-desvio', indicadores.mainframes_com_desvio + ' de ' + indicadores.mainframes_com_previsao);
+    escrever('detalhe-mainframes-desvio', 'Empresa · de ' + formatarHorario(indicadores.inicio_previsao) + ' até ' + formatarHorario(indicadores.fim_previsao));
+    const concentracao = indicadores.maior_concentracao;
+    if (concentracao == null) {
+        escrever('horario-concentracao', 'Sem desvios previstos');
+        escrever('detalhe-concentracao', 'Nenhuma mainframe fora dos limites no período.');
+    } else {
+        escrever('horario-concentracao', formatarHorario(concentracao.inicio) + '–' + formatarHorario(concentracao.fim));
+        let texto = ' mainframes com desvios simultâneos.';
+        if (concentracao.quantidade === 1) texto = ' mainframe com desvio previsto.';
+        escrever('detalhe-concentracao', concentracao.quantidade + texto);
     }
 }
 
@@ -558,3 +592,13 @@ function desenharMapa(metrica) {
 }
 
 carregarMainframes();
+
+setInterval(async function () {
+    const seletor = document.getElementById('mainframe-previsao');
+    if (seletor.disabled) return;
+    seletor.disabled = true;
+    await carregarResumo();
+    preencherIndicadoresEmpresa();
+    preencherTabela();
+    await selecionarMainframe(true);
+}, 60000);
