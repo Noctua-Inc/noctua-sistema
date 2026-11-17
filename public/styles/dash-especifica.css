@@ -160,6 +160,10 @@ main {
     background-color: #E7E7E7;
     border: 2px solid #D1D5DB;
     border-radius: 20px;
+
+    font-size: 20px;
+    text-align: center;
+    padding-top: 0.4%;
 }
 
 .container-main .sessao-fundo {
@@ -231,7 +235,12 @@ main {
 .container-main .sessao-kpis .kpi .previsto {color: #10B981;}
 
 .container-main .sessao-grafico {
-    height: 400px;
+    height: 625px;
+}
+
+.container-main .sessao-grafico .sessao-grafico {
+    width: 80%;
+    margin: 0 auto;
 }
 
 .container-main .sessao-grafico .parte-acima .titulo-grafico {
@@ -277,4 +286,13 @@ main {
     height: 40px;
     color: #94A3B8;
     background-color: #F8FAFC;
+}
+
+.container-main .sessao-historico table thead .titulo-grafico th {
+    width: 125px;
+    text-align: center;
+}
+
+.container-main .sessao-historico table tbody td {
+    text-align: center;
 }
