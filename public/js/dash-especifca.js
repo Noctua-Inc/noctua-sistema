@@ -1,7 +1,5 @@
-const ID_EMPRESA = sessionStorage.getItem('idEmpresa');
-const ID_MAINFRAME = window.location.href.split('id_mainframe=')[1];
-// No frontend, se o :diretorio for apenas um nível:
-const CAMINHO_BASE_MONITORAMENTO = '/api/gold/empresa/' + ID_EMPRESA + '/gustavo/monitoramentoComponentes/';
+const ID_EMPRESA = sessionStorage.getItem("idEmpresa");
+const ID_MAINFRAME = window.location.href.split("id_mainframe=")[1];
 
 let nomeMainframe = document.querySelector("#nomeMainframe");
 let opcoesBotoesMonitoramento = document.querySelectorAll(".opcao-monitoramento");
@@ -14,198 +12,307 @@ let corpoTabela = document.querySelector("#corpoTabela");
 let intervaloTempo = [];
 let grafico;
 let statusRisco = 0;
+let nomeMainframeGlobal = "";
+let ultimaMediaComponentes = 0;
+let momentoMaisUtilizadoCache = "--";
 
 // Dados dashboard Geral
-dadosCpu = [];
-dadosRam = [];
-dadosDisco = [];
-dadosSwap = [];
+let dadosCpu = [];
+let dadosRam = [];
+let dadosDisco = [];
+let dadosSwap = [];
 
 async function buscarMainframe() {
-    try {
-        let resposta = await api.get(`/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`);
-        let mainframe = resposta[0];
-        
-        nomeMainframe.innerHTML = mainframe.hostname;
+  try {
+    let resposta = await api.get(
+      `/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`
+    );
+    let mainframe = resposta[0];
 
-        return mainframe;
+    nomeMainframe.innerHTML = mainframe.hostname;
+    nomeMainframeGlobal = mainframe.hostname;
 
-    } catch (erro) {
-        console.error(erro);
-    } finally {
-        carregando = false;
-    }
+    return mainframe;
+  } catch (erro) {
+    console.error(erro);
+  }
 }
 
-function criarKPI (titulo, dado, observacao) {
-    let kpi = `
+function obterCaminhoBase(nomeHost) {
+  return `/api/gold/empresa/${ID_EMPRESA}/${nomeHost}/monitoramentoComponentes/`;
+}
+
+function criarKPI(titulo, dado, observacao) {
+  let kpi = `
     <div class="kpi">
         <p class="texto-kpi">${titulo}</p>
         <h3 class="dado-kpi">${dado}</h3>
         <p class="texto-kpi">${observacao}</p>
     </div>
     `;
-    
-    return kpi; 
+
+  return kpi;
 }
 
 async function puxarJsonS3(quaisRegistros) {
-    registros = null;
+  let registros = null;
 
-    try {
-        let mainframe = await buscarMainframe(); 
-        let nomeMainframe = mainframe.hostname;
+  try {
+    let mainframe = await buscarMainframe();
+    let nomeHost = mainframe.hostname;
 
-        const horarioAtual = new Date();
+    const horarioAtual = new Date();
+    let ano = horarioAtual.getFullYear();
+    let mes = String(horarioAtual.getMonth() + 1).padStart(2, "0");
+    let dia = String(horarioAtual.getDate()).padStart(2, "0");
 
-        let ano = horarioAtual.getFullYear();
-        let mes = String(horarioAtual.getMonth() + 1).padStart(2, '0');
-        let dia = String(horarioAtual.getDate()).padStart(2, '0');
+    let hora = String(horarioAtual.getHours()).padStart(2, "0");
+    let minutoAtual = horarioAtual.getMinutes();
 
-        let hora = String(horarioAtual.getHours()).padStart(2, '0');
-        let minuto = String(horarioAtual.getMinutes()).padStart(2, '0');
+    // let dataHoraFormatado = `${ano}-${mes}-${dia}_${hora}-${minuto}`
+    let dataHoraFormatado = `2026-11-11_10-38`;
 
-        // let dataHoraFormatado = `${ano}-${mes}-${dia}_${hora}-${minuto}`
-        let dataHoraFormatado = `2026-11-11_10-38`
+    let nomeArquivo = encodeURIComponent(
+      `${nomeMainframeGlobal}_${dataHoraFormatado}_${quaisRegistros}_registros.json`
+    );
+    let caminho = obterCaminhoBase(nomeHost) + nomeArquivo;
+    let resposta = await fetch(caminho);
 
-        let nomeArquivo = encodeURIComponent(`${nomeMainframe}_${dataHoraFormatado}_${quaisRegistros}_registros.json`);           
-        let caminho = CAMINHO_BASE_MONITORAMENTO + nomeArquivo;
-        let resposta = await fetch(caminho);        
-
-        if (resposta.ok) {
-            registros = await resposta.json();     
-        } else {
-            registros = null;
-        }
-    } catch (erro) {
-        registros = null;
+    if (resposta.ok) {
+      registros = await resposta.json();
+    } else {
+      registros = null;
     }
+  } catch (erro) {
+    registros = null;
+  }
 
-    return registros;
+  return registros;
+}
+
+async function carregarHistoricoHora(quaisRegistros) {
+  let listaDados = [];
+  let listaLabels = [];
+  let dadosCpuArr = [];
+  let dadosRamArr = [];
+  let dadosSwapArr = [];
+  let dadosDiscoArr = [];
+
+  try {
+    let mainframe = await buscarMainframe();
+    let nomeHost = mainframe ? mainframe.hostname : nomeMainframeGlobal;
+
+    const horarioAtual = new Date();
+    let ano = horarioAtual.getFullYear();
+    let mes = String(horarioAtual.getMonth() + 1).padStart(2, "0");
+    let dia = String(horarioAtual.getDate()).padStart(2, "0");
+    let hora = String(horarioAtual.getHours()).padStart(2, "0");
+    let minutoAtual = horarioAtual.getMinutes();
+
+    for (let m = 0; m <= minutoAtual; m++) {
+      let minutoStr = String(m).padStart(2, "0");
+      let dataHoraFormatado = `${ano}-${mes}-${dia}_${hora}-${minutoStr}`;
+      let nomeArquivo = encodeURIComponent(
+        `${nomeHost}_${dataHoraFormatado}_${quaisRegistros}_registros.json`
+      );
+      let caminho = obterCaminhoBase(nomeHost) + nomeArquivo;
+
+      try {
+        let resposta = await fetch(caminho);
+        if (resposta.ok) {
+          let dadoMinuto = await resposta.json();
+          listaLabels.push(`${hora}:${minutoStr}`);
+
+          if (quaisRegistros === "todos") {
+            dadosCpuArr.push(dadoMinuto.porcentagem_cpu || 0);
+            dadosRamArr.push(dadoMinuto.porcentagem_ram || 0);
+            dadosSwapArr.push(dadoMinuto.media_swap_porcentagem || 0);
+            dadosDiscoArr.push(dadoMinuto.porcentagem_disco || 0);
+          } else if (quaisRegistros === "cpu") {
+            dadosCpuArr.push(dadoMinuto.media_cpu_porcentagem || 0);
+          } else if (quaisRegistros === "ram") {
+            dadosRamArr.push(dadoMinuto.media_ram_porcentagem || 0);
+          } else if (quaisRegistros === "disco") {
+            dadosDiscoArr.push(dadoMinuto.media_disco_porcentagem || 0);
+          } else if (quaisRegistros === "rede") {
+            dadosCpuArr.push(dadoMinuto.media_dados_enviados || 0);
+          }
+        }
+      } catch (err) {}
+    }
+  } catch (erro) {
+    console.error("Erro ao carregar histórico:", erro);
+  }
+
+  return {
+    labels: listaLabels.length > 0 ? listaLabels : ["00min"],
+    cpu: dadosCpuArr,
+    ram: dadosRamArr,
+    swap: dadosSwapArr,
+    disco: dadosDiscoArr,
+  };
 }
 
 function trocarTempo(indice) {
-    for(let i = 0; i < opcoesBotoesTempo.length; i++) {
-        if(opcoesBotoesTempo[i].className == "opcao-tempo opcao-tempo-selecionada") {
-            opcoesBotoesTempo[i].classList.remove("opcao-tempo-selecionada");
-            break;
-        }
+  for (let i = 0; i < opcoesBotoesTempo.length; i++) {
+    if (
+      opcoesBotoesTempo[i].className == "opcao-tempo opcao-tempo-selecionada"
+    ) {
+      opcoesBotoesTempo[i].classList.remove("opcao-tempo-selecionada");
+      break;
     }
+  }
 
-    opcoesBotoesTempo[indice].classList.add("opcao-tempo-selecionada");
+  opcoesBotoesTempo[indice].classList.add("opcao-tempo-selecionada");
 
-    switch (indice) {
-        case 0:
-            intervaloTempo = ['05min', '10min', '15min', '20min', '25min', '30min', '35min', '40min', '45min', '50min', '55min', '60min']
-            break;
+  switch (indice) {
+    case 0:
+      intervaloTempo = [
+        "05min", "10min", "15min", "20min", "25min", "30min", "35min", "40min", "45min", "50min", "55min", "60min", ];
+      break;
 
-        case 1:
-            intervaloTempo = ['01h', '02h', '03h', '04h', '05h', '06h', '07h', '08h', '09h', '10h', '11h', '12h']
-            break;
+    case 1:
+      intervaloTempo = [
+        "01h", "02h", "03h", "04h", "05h", "06h", "07h", "08h", "09h", "10h", "11h", "12h", ];
+      break;
 
-        case 2:
-            intervaloTempo = ['02h', '04h', '06h', '08h', '10h', '12h', '14h', '16h', '18h', '20h', '22h', '24h']
-            break;
-        
-        case 3:
-            intervaloTempo = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
-            break;
-    
-        default:
-            break;
-    }
+    case 2:
+      intervaloTempo = [
+        "02h", "04h", "06h", "08h", "10h", "12h", "14h", "16h", "18h", "20h", "22h", "24h", ];
+      break;
 
-    if (grafico) {
-        grafico.data.labels = intervaloTempo;
-        grafico.update();
-    }
+    case 3:
+      intervaloTempo = [
+        "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", ];
+      break;
+
+    default:
+      break;
+  }
+
+  if (grafico) {
+    grafico.data.labels = intervaloTempo;
+    grafico.update();
+  }
 }
 
 async function trocarMonitoramento(indice) {
-    let titulosKpi = [];
-    let todasKpis = "";
-    let statusRiscoCalculo = 0;
+  let titulosKpi = [];
+  let todasKpis = "";
+  let statusRiscoCalculo = 0;
 
-    dadosCpu = [];
-    dadosRam = [];
-    dadosDisco = [];
-    dadosSwap = [];
-
-    for(let i = 0; i < opcoesBotoesMonitoramento.length; i++) {
-        if(opcoesBotoesMonitoramento[i].className == "opcao-monitoramento opcao-monitoramento-selecionada") {
-            opcoesBotoesMonitoramento[i].classList.remove("opcao-monitoramento-selecionada");
-            break;
-        }
+  for (let i = 0; i < opcoesBotoesMonitoramento.length; i++) {
+    if (
+      opcoesBotoesMonitoramento[i].className ==
+      "opcao-monitoramento opcao-monitoramento-selecionada"
+    ) {
+      opcoesBotoesMonitoramento[i].classList.remove(
+        "opcao-monitoramento-selecionada"
+      );
+      break;
     }
+  }
 
-    let mainframe = await buscarMainframe(); 
-    let parametrosMainframe = String(mainframe.parametros).replaceAll(" ", "").split(",");
+  let mainframe = await buscarMainframe();
+  let parametrosMainframe = String(mainframe.parametros)
+    .replaceAll(" ", "")
+    .split(",");
 
-    opcoesBotoesMonitoramento[indice].classList.add("opcao-monitoramento-selecionada");
+  opcoesBotoesMonitoramento[indice].classList.add(
+    "opcao-monitoramento-selecionada"
+  );
 
-    switch (indice) {
-        case 0:
-            titulosKpi = ["Status de Risco", "Momento mais utilizado", "Uso Médio CPU", "Uso Médio RAM", "Uso Médio Disco", "Tráfego de Rede (Tx/Rx)"];
-            let dadosCapturadosGeral = await puxarJsonS3("todos");            
+  let historico = { 
+    labels: [], 
+    cpu: [], 
+    ram: [], 
+    swap: [], 
+    disco: [] 
+};
 
-            // Order parâmetros = CPU, DISCO, RAM, REDE, SWAP
-            let [resposta] = await api.get(`/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`);
-            let arayParametros = resposta.parametros.split(',')
+  switch (indice) {
+    case 0:
+      titulosKpi = [
+        "Status de Risco",
+        "Momento mais utilizado",
+        "Uso Médio CPU",
+        "Uso Médio RAM",
+        "Uso Médio Disco",
+        "Tráfego de Rede (Tx/Rx)",
+      ];
+      let dadosCapturadosGeral = await puxarJsonS3("todos");
+      historico = await carregarHistoricoHora("todos");
 
-            if(dadosCapturadosGeral.porcentagem_cpu >= arayParametros[0]) {
-                statusRiscoCalculo ++;
-            }
+      if (!dadosCapturadosGeral) return;
 
-            if(dadosCapturadosGeral.porcentagem_disco >= arayParametros[1]) {
-                statusRiscoCalculo ++;
-            }
+      let [resposta] = await api.get(
+        `/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`
+      );
+      let arayParametros = resposta.parametros.split(",");
 
-            if(dadosCapturadosGeral.porcentagem_ram >= arayParametros[2]) {
-                statusRiscoCalculo ++;
-            }   
-            
-            if(dadosCapturadosGeral.dados_enviados_medio >= arayParametros[3]) {
-                statusRiscoCalculo ++;
-            }   
+      if (dadosCapturadosGeral.porcentagem_cpu >= arayParametros[0]) {
+        statusRiscoCalculo++;
+      }
+      if (dadosCapturadosGeral.porcentagem_disco >= arayParametros[1]) {
+        statusRiscoCalculo++;
+      }
+      if (dadosCapturadosGeral.porcentagem_ram >= arayParametros[2]) {
+        statusRiscoCalculo++;
+      }
+      if (dadosCapturadosGeral.dados_enviados_medio >= arayParametros[3]) {
+        statusRiscoCalculo++;
+      }
 
-            if(statusRisco != statusRiscoCalculo) {
-                statusRisco = statusRiscoCalculo;
-            }            
+      statusRisco = statusRiscoCalculo;
 
-            if (statusRisco > 2) {
-                statusMainframe.innerHTML = "Em Alerta!";
+      if (statusRisco > 2) {
+        statusMainframe.innerHTML = "Em Alerta!";
+        statusMainframe.style.backgroundColor = "#FFE4E6";
+        statusMainframe.style.border = "2px solid #FECDD3";
+        statusMainframe.style.color = "#E11D48";
+      } else if (statusRisco > 0) {
+        statusMainframe.innerHTML = "Em Atenção!";
+        statusMainframe.style.backgroundColor = "#FEF3C7";
+        statusMainframe.style.border = "2px solid #FDE68A";
+        statusMainframe.style.color = "#D97706";
+      } else {
+        statusMainframe.innerHTML = "Ok";
+        statusMainframe.style.backgroundColor = "#D1FAE5";
+        statusMainframe.style.border = "2px solid #A7F3D0";
+        statusMainframe.style.color = "#059669";
+      }
 
-                statusMainframe.style.backgroundColor = "#FFE4E6";
-                statusMainframe.style.border = "2px solid #FECDD3";
-                statusMainframe.style.color = "#E11D48";
-            } else if (statusRisco > 0) {
-                statusMainframe.innerHTML = "Em Atenção!";
+      let mediaAtualGeral =
+        (dadosCapturadosGeral.porcentagem_cpu +
+          dadosCapturadosGeral.porcentagem_ram +
+          dadosCapturadosGeral.porcentagem_disco) /
+        3;
+      if (mediaAtualGeral > ultimaMediaComponentes) {
+        ultimaMediaComponentes = mediaAtualGeral;
+        momentoMaisUtilizadoCache = dadosCapturadosGeral.hora_de_captura;
+      }
 
-                statusMainframe.style.backgroundColor = "#FEF3C7";
-                statusMainframe.style.border = "2px solid #FDE68A";
-                statusMainframe.style.color = "#D97706";
-            } else {
-                statusMainframe.innerHTML = "Ok";
+      dadosKpi = [
+        statusRisco,
+        momentoMaisUtilizadoCache,
+        dadosCapturadosGeral.porcentagem_cpu + "%",
+        dadosCapturadosGeral.porcentagem_ram + "%",
+        dadosCapturadosGeral.porcentagem_disco + "%",
+        dadosCapturadosGeral.media_trafego_rede + " TB",
+      ];
 
-                statusMainframe.style.backgroundColor = "#D1FAE5";
-                statusMainframe.style.border = "2px solid #A7F3D0";
-                statusMainframe.style.color = "#059669";
-            }
+      dadosCpu = historico.cpu;
+      dadosRam = historico.ram;
+      dadosDisco = historico.disco;
+      dadosSwap = historico.swap;
 
-            dadosKpi = [statusRisco, dadosCapturadosGeral.hora_de_captura, dadosCapturadosGeral.porcentagem_cpu + "%", dadosCapturadosGeral.porcentagem_ram + "%", dadosCapturadosGeral.porcentagem_disco + "%", dadosCapturadosGeral.media_trafego_rede + " TB"]
+      for (let i = 0; i < titulosKpi.length; i++) {
+        todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
+      }
 
-            dadosCpu.push(dadosCapturadosGeral.porcentagem_cpu);            
-            dadosRam.push(dadosCapturadosGeral.porcentagem_ram);
-            dadosDisco.push(dadosCapturadosGeral.porcentagem_disco);
-            dadosSwap.push(dadosCapturadosGeral.dados_enviados_medio);
+      sessaoKpis.innerHTML = todasKpis;
 
-            for (let i = 0; i < titulosKpi.length; i++) {
-                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
-            }
-            
-            sessaoKpis.innerHTML = todasKpis;
-
-            tituloTabela.innerHTML = `
+      tituloTabela.innerHTML = `
                 <th>Data Hora</th>
                 <th>CPU</th>
                 <th>RAM</th>
@@ -214,9 +321,9 @@ async function trocarMonitoramento(indice) {
                 <th>Dados Enviados</th>
                 <th>Dados Recebidos</th>
                 <th>Status</th>
-            `
+            `;
 
-            corpoTabela.innerHTML = `
+      corpoTabela.innerHTML = `
                 <tr>
                     <td>${dadosCapturadosGeral.hora_de_captura}</td>
                     <td>${dadosCapturadosGeral.porcentagem_cpu}%</td>
@@ -225,34 +332,98 @@ async function trocarMonitoramento(indice) {
                     <td>${dadosCapturadosGeral.media_swap_porcentagem}%</td>
                     <td>${dadosCapturadosGeral.dados_enviados_medio} TB</td>
                     <td>${dadosCapturadosGeral.dados_recebidos_medio} TB</td>
-                    <td>${"aa"}</td>
+                    <td>${statusMainframe.innerHTML}</td>
                 </tr>    
-            `
+            `;
 
-            break;
+      if (grafico) {
+        grafico.data.labels =
+          historico.labels.length > 0 ? historico.labels : intervaloTempo;
+        grafico.data.datasets = [
+          {
+            label: "CPU",
+            data: dadosCpu,
+            borderColor: "#2196F3",
+            backgroundColor: "#2196F3",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+          {
+            label: "RAM",
+            data: dadosRam,
+            borderColor: "#4CAF50",
+            backgroundColor: "#4CAF50",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+          {
+            label: "SWAP",
+            data: dadosSwap,
+            borderColor: "#9C27B0",
+            backgroundColor: "#9C27B0",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+          {
+            label: "Disco",
+            data: dadosDisco,
+            borderColor: "#FF9800",
+            backgroundColor: "#FF9800",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+        ];
+        grafico.update();
+      }
+      break;
 
-        case 1:
-            titulosKpi = ["Momento mais utilizado", "Dados Enviados (Tx)", "Dados Recebidos (Rx)", "Erros Pacotes Entrada (errin)", "Sockets TIME_WAIT"];
+    case 1:
+      titulosKpi = [
+        "Momento mais utilizado",
+        "Dados Enviados (Tx)",
+        "Dados Recebidos (Rx)",
+        "Erros Pacotes Entrada (errin)",
+        "Sockets TIME_WAIT",
+      ];
+      let dadosCapturadosRede = await puxarJsonS3("rede");
+      if (!dadosCapturadosRede) return;
 
-            let dadosCapturadosRede = await puxarJsonS3("rede");
+      let mediaAtualRede =
+        (dadosCapturadosRede.media_dados_enviados +
+          dadosCapturadosRede.media_dados_recebidos) /
+        2;
+      if (mediaAtualRede > ultimaMediaComponentes) {
+        ultimaMediaComponentes = mediaAtualRede;
+        momentoMaisUtilizadoCache = dadosCapturadosRede.hora_de_captura;
+      }
 
-            dadosKpi = [dadosCapturadosRede.hora_de_captura, dadosCapturadosRede.media_dados_enviados + " TB", dadosCapturadosRede.media_dados_recebidos  + " TB", dadosCapturadosRede.media_dados_perdidos, dadosCapturadosRede.media_sockets_tw];
+      dadosKpi = [
+        momentoMaisUtilizadoCache,
+        dadosCapturadosRede.media_dados_enviados + " TB",
+        dadosCapturadosRede.media_dados_recebidos + " TB",
+        dadosCapturadosRede.media_dados_perdidos,
+        dadosCapturadosRede.media_sockets_tw,
+      ];
 
-            for (let i = 0; i < titulosKpi.length; i++) {
-                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
-            }
+      for (let i = 0; i < titulosKpi.length; i++) {
+        todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
+      }
 
-            sessaoKpis.innerHTML = todasKpis;
+      sessaoKpis.innerHTML = todasKpis;
 
-            tituloTabela.innerHTML = `
+      tituloTabela.innerHTML = `
                 <th>Data Hora</th>
                 <th>Dados Enviados</th>
                 <th>Dados Recebidos</th>
                 <th>Pacotes Perdidos</th>
                 <th>Sockets TIME_WAIT</th>
-            `
+            `;
 
-            corpoTabela.innerHTML = `
+      corpoTabela.innerHTML = `
                 <tr>
                     <td>${dadosCapturadosRede.hora_de_captura}</td>
                     <td>${dadosCapturadosRede.media_dados_enviados} TB</td>
@@ -260,90 +431,197 @@ async function trocarMonitoramento(indice) {
                     <td>${dadosCapturadosRede.media_dados_perdidos}</td>
                     <td>${dadosCapturadosRede.media_sockets_tw}</td>
                 </tr>    
-            `
+            `;
 
-            break;
+      if (grafico) {
+        grafico.data.datasets = [
+          {
+            label: "Tx (Enviados)",
+            data: [dadosCapturadosRede.media_dados_enviados],
+            borderColor: "#00BCD4",
+            backgroundColor: "#00BCD4",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+          {
+            label: "Rx (Recebidos)",
+            data: [dadosCapturadosRede.media_dados_recebidos],
+            borderColor: "#E91E63",
+            backgroundColor: "#E91E63",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+        ];
+        grafico.update();
+      }
+      break;
 
-        case 2:
-            titulosKpi = ["Momento mais utilizado", "Uso Médio CPU", "Frequência Média CPU"];
+    case 2:
+      titulosKpi = [
+        "Momento mais utilizado",
+        "Uso Médio CPU",
+        "Frequência Média CPU",
+      ];
+      let dadosCapturadosCpu = await puxarJsonS3("cpu");
+      if (!dadosCapturadosCpu) return;
 
-            let dadosCapturadosCpu = await puxarJsonS3("cpu");
+      if (dadosCapturadosCpu.media_cpu_porcentagem > ultimaMediaComponentes) {
+        ultimaMediaComponentes = dadosCapturadosCpu.media_cpu_porcentagem;
+        momentoMaisUtilizadoCache = dadosCapturadosCpu.hora_de_captura;
+      }
 
-            dadosKpi = [dadosCapturadosCpu.hora_de_captura, dadosCapturadosCpu.media_cpu_porcentagem + "%", dadosCapturadosCpu.media_cpu_frequencia + " GHz"];
+      dadosKpi = [
+        momentoMaisUtilizadoCache,
+        dadosCapturadosCpu.media_cpu_porcentagem + "%",
+        dadosCapturadosCpu.media_cpu_frequencia + " GHz",
+      ];
 
-            for (let i = 0; i < titulosKpi.length; i++) {
-                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
-            }
+      for (let i = 0; i < titulosKpi.length; i++) {
+        todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
+      }
 
-            sessaoKpis.innerHTML = todasKpis;
+      sessaoKpis.innerHTML = todasKpis;
 
-            tituloTabela.innerHTML = `
+      tituloTabela.innerHTML = `
                 <th>Data Hora</th>
                 <th>CPU</th>
                 <th>Frequência CPU</th>
-            `
+            `;
 
-            corpoTabela.innerHTML = `
+      corpoTabela.innerHTML = `
                 <tr>
                     <td>${dadosCapturadosCpu.hora_de_captura}</td>
                     <td>${dadosCapturadosCpu.media_cpu_porcentagem}%</td>
                     <td>${dadosCapturadosCpu.media_cpu_frequencia} GHz</td>
                 </tr>    
-            `
-            break;
+            `;
 
-        case 3:
-            titulosKpi = ["Momento mais utilizado", "Uso Média RAM", "GB Livre RAM", "Uso Médio SWAP"];
+      if (grafico) {
+        grafico.data.datasets = [
+          {
+            label: "CPU %",
+            data: [dadosCapturadosCpu.media_cpu_porcentagem],
+            borderColor: "#2196F3",
+            backgroundColor: "#2196F3",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+        ];
+        grafico.update();
+      }
+      break;
 
-            let dadosCapturadosRam = await puxarJsonS3("ram");
+    case 3:
+      titulosKpi = [
+        "Momento mais utilizado",
+        "Uso Média RAM",
+        "GB Livre RAM",
+        "Uso Médio SWAP",
+      ];
+      let dadosCapturadosRam = await puxarJsonS3("ram");
+      if (!dadosCapturadosRam) return;
 
-            dadosKpi = [dadosCapturadosRam.hora_de_captura, dadosCapturadosRam.media_ram_porcentagem + "%", dadosCapturadosRam.media_swap_porcentagem + "%", dadosCapturadosRam.media_ram_disponivel + " GB"];
+      if (dadosCapturadosRam.media_ram_porcentagem > ultimaMediaComponentes) {
+        ultimaMediaComponentes = dadosCapturadosRam.media_ram_porcentagem;
+        momentoMaisUtilizadoCache = dadosCapturadosRam.hora_de_captura;
+      }
 
-            for (let i = 0; i < titulosKpi.length; i++) {
-                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
-            }
+      dadosKpi = [
+        momentoMaisUtilizadoCache,
+        dadosCapturadosRam.media_ram_porcentagem + "%",
+        dadosCapturadosRam.media_swap_porcentagem + "%",
+        dadosCapturadosRam.media_ram_disponivel + " GB",
+      ];
 
-            sessaoKpis.innerHTML = todasKpis;
+      for (let i = 0; i < titulosKpi.length; i++) {
+        todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
+      }
 
-            tituloTabela.innerHTML = `
+      sessaoKpis.innerHTML = todasKpis;
+
+      tituloTabela.innerHTML = `
                 <th>Data Hora</th>
                 <th>RAM</th>
                 <th>SWAP</th>
                 <th>RAM Disponível</th>
-            `
+            `;
 
-            corpoTabela.innerHTML = `
+      corpoTabela.innerHTML = `
                 <tr>
                     <td>${dadosCapturadosRam.hora_de_captura}</td>
                     <td>${dadosCapturadosRam.media_ram_porcentagem}%</td>
                     <td>${dadosCapturadosRam.media_swap_porcentagem}%</td>
                     <td>${dadosCapturadosRam.media_ram_disponivel} GB</td>
                 </tr>    
-            `
-            break;
+            `;
 
-        case 4:
-            titulosKpi = ["Momento mais utilizado", "Uso Média Disco", "GB Livre Disco", "Quantidade requisição (Escrita)", "Quantidade requisição (Leitura)"];
+      if (grafico) {
+        grafico.data.datasets = [
+          {
+            label: "RAM %",
+            data: [dadosCapturadosRam.media_ram_porcentagem],
+            borderColor: "#4CAF50",
+            backgroundColor: "#4CAF50",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+          {
+            label: "SWAP %",
+            data: [dadosCapturadosRam.media_swap_porcentagem],
+            borderColor: "#9C27B0",
+            backgroundColor: "#9C27B0",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+        ];
+        grafico.update();
+      }
+      break;
 
-            let dadosCapturadosDisco = await puxarJsonS3("disco");
+    case 4:
+      titulosKpi = [
+        "Momento mais utilizado",
+        "Uso Média Disco",
+        "GB Livre Disco",
+        "Quantidade requisição (Escrita)",
+        "Quantidade requisição (Leitura)",
+      ];
+      let dadosCapturadosDisco = await puxarJsonS3("disco");
+      if (!dadosCapturadosDisco) return;
 
-            dadosKpi = [dadosCapturadosDisco.hora_de_captura, dadosCapturadosDisco.media_disco_porcentagem + "%", dadosCapturadosDisco.media_disco_disponivel + " GB", dadosCapturadosDisco.media_qtd_requisicao_escrita, dadosCapturadosDisco.media_qtd_requisicao_leitura];
+      if (dadosCapturadosDisco.media_disco_porcentagem > ultimaMediaComponentes) {
+        ultimaMediaComponentes = dadosCapturadosDisco.media_disco_porcentagem;
+        momentoMaisUtilizadoCache = dadosCapturadosDisco.hora_de_captura;
+      }
 
-            for (let i = 0; i < titulosKpi.length; i++) {
-                todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
-            }
+      dadosKpi = [
+        momentoMaisUtilizadoCache,
+        dadosCapturadosDisco.media_disco_porcentagem + "%",
+        dadosCapturadosDisco.media_disco_disponivel + " GB",
+        dadosCapturadosDisco.media_qtd_requisicao_escrita,
+        dadosCapturadosDisco.media_qtd_requisicao_leitura,
+      ];
 
-            sessaoKpis.innerHTML = todasKpis;
+      for (let i = 0; i < titulosKpi.length; i++) {
+        todasKpis += criarKPI(titulosKpi[i], dadosKpi[i], "...");
+      }
 
-            tituloTabela.innerHTML = `
+      sessaoKpis.innerHTML = todasKpis;
+
+      tituloTabela.innerHTML = `
                 <th>Data Hora</th>
                 <th>Disco</th>
                 <th>Disco Disponível</th>
                 <th>Dados Enviados</th>
                 <th>Dados Recebidos</th>
-            `
+            `;
 
-            corpoTabela.innerHTML = `
+      corpoTabela.innerHTML = `
                 <tr>
                     <td>${dadosCapturadosDisco.hora_de_captura}</td>
                     <td>${dadosCapturadosDisco.media_disco_porcentagem}%</td>
@@ -351,108 +629,109 @@ async function trocarMonitoramento(indice) {
                     <td>${dadosCapturadosDisco.media_qtd_requisicao_escrita}</td>
                     <td>${dadosCapturadosDisco.media_qtd_requisicao_leitura}</td>
                 </tr>    
-            `
-            break;
-    }
+            `;
 
-    if (grafico) {
-        grafico.data.datasets[0].data = dadosCpu;
-        grafico.data.datasets[1].data = dadosRam;
-        grafico.data.datasets[2].data = dadosSwap;
-        grafico.data.datasets[3].data = dadosDisco;
+      if (grafico) {
+        grafico.data.datasets = [
+          {
+            label: "Disco %",
+            data: [dadosCapturadosDisco.media_disco_porcentagem],
+            borderColor: "#FF9800",
+            backgroundColor: "#FF9800",
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false,
+          },
+        ];
         grafico.update();
-    }
+      }
+      break;
+  }
 }
 
-/*
-    A ideia do intervalo de Tempo será a mesma que na sprint passada (qualquer coisa pegar código no diretório 'sprint-2')
-    agora, a ideia de como será a criação de cada "ponto" no gráfico, seria utilizando o 'datasets', já que ele aceita vetor, posso criar um vetor
-    e dependento da escolha do usuário, pode ficar modificando ele.
-*/
-
 async function inicializarPagina() {
-    const ctx = document.getElementById('grafico').getContext('2d');    
+  const ctx = document.getElementById("grafico").getContext("2d");
 
-    grafico = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: intervaloTempo,
-            datasets: [
-                {
-                    label: 'CPU',
-                    data: await dadosCpu,
-                    borderColor: '#2196F3',
-                    backgroundColor: '#2196F3',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: false
-                },
-                {
-                    label: 'RAM',
-                    data: dadosRam,
-                    borderColor: '#4CAF50',
-                    backgroundColor: '#4CAF50',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: false
-                },
-                {
-                    label: 'SWAP',
-                    data: await dadosSwap,
-                    borderColor: '#9C27B0',
-                    backgroundColor: '#9C27B0',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: false
-                },
-                {
-                    label: 'Disco',
-                    data: await dadosDisco,
-                    borderColor: '#FF9800',
-                    backgroundColor: '#FF9800',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: false
-                }
-            ]
+  grafico = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: intervaloTempo,
+      datasets: [
+        {
+          label: "CPU",
+          data: dadosCpu,
+          borderColor: "#2196F3",
+          backgroundColor: "#2196F3",
+          borderWidth: 2,
+          tension: 0.4,
+          fill: false,
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        boxWidth: 12,
-                        usePointStyle: true,
-                        padding: 25,
-                        boxPadding: 8
-                    }
-                }
+        {
+          label: "RAM",
+          data: dadosRam,
+          borderColor: "#4CAF50",
+          backgroundColor: "#4CAF50",
+          borderWidth: 2,
+          tension: 0.4,
+          fill: false,
+        },
+        {
+          label: "SWAP",
+          data: dadosSwap,
+          borderColor: "#9C27B0",
+          backgroundColor: "#9C27B0",
+          borderWidth: 2,
+          tension: 0.4,
+          fill: false,
+        },
+        {
+          label: "Disco",
+          data: dadosDisco,
+          borderColor: "#FF9800",
+          backgroundColor: "#FF9800",
+          borderWidth: 2,
+          tension: 0.4,
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top",
+          labels: {
+            boxWidth: 12,
+            usePointStyle: true,
+            padding: 25,
+            boxPadding: 8,
+          },
+        },
+      },
+      scales: {
+        y: {
+          min: 0,
+          max: 100,
+          ticks: {
+            callback: function (value) {
+              return value + "%";
             },
-            scales: {
-                y: {
-                    min: 0,
-                    max: 100,
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    },
-                    grid: {
-                        color: '#eee'
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
-            }
-        }
-    });
+          },
+          grid: {
+            color: "#eee",
+          },
+        },
+        x: {
+          grid: {
+            display: false,
+          },
+        },
+      },
+    },
+  });
 
-    trocarTempo(0); 
-    await trocarMonitoramento(0);
+  trocarTempo(0);
+  await trocarMonitoramento(0);
 }
 
 inicializarPagina();
