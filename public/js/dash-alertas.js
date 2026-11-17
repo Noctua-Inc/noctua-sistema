@@ -129,7 +129,9 @@ const DADOS_DASHBOARD = {
 
 let paginaAtual = 1;
 let statusSelecionado = 'todos';
+
 let alertasDoPeriodo = [];
+
 let graficoFluxo;
 let graficoComponentes;
 let graficoTempo;
@@ -137,398 +139,898 @@ let graficoTempo;
 const agora = new Date(DADOS_DASHBOARD.atualizadoEm).getTime();
 const umaHora = 60 * 60 * 1000;
 const itensPorPagina = 5;
-const nomesSeveridade = { critica: 'Crítica', alta: 'Alta', moderada: 'Moderada' };
-const nomesStatus = { aberto: 'Aberto', investigacao: 'Em investigação', resolvido: 'Resolvido' };
-const nomesComponentes = { RAM: 'RAM', CPU: 'CPU', DISCO: 'Disco', SWAP: 'Swap' };
 
+const nomesSeveridade = {
+    critica: 'Crítica',
+    alta: 'Alta',
+    moderada: 'Moderada'
+};
+
+const nomesStatus = {
+    aberto: 'Aberto',
+    investigacao: 'Em investigação',
+    resolvido: 'Resolvido'
+};
+
+const nomesComponentes = {
+    RAM: 'RAM',
+    CPU: 'CPU',
+    DISCO: 'Disco',
+    SWAP: 'Swap'
+};
+
+// Campos da dashboard
 const campoPeriodo = document.getElementById('filtro-periodo');
 const campoLocalizacao = document.getElementById('filtro-localizacao');
 const campoMainframe = document.getElementById('filtro-mainframe');
 const campoBusca = document.getElementById('busca-mainframe');
 const campoSeveridade = document.getElementById('filtro-severidade');
 const campoComponente = document.getElementById('filtro-componente');
+
 const botoesStatus = document.querySelectorAll('.alertas-abas button');
 
-function escreverNaTela(idElemento, texto) {
-    document.getElementById(idElemento).innerText = texto;
+// Escreve um texto em um elemento da página
+function escreverNaTela(id, texto) {
+    document.getElementById(id).innerText = texto;
 }
 
+// Formata a data para o padrão brasileiro
 function formatarData(data) {
-    return data.substring(8, 10) + '/' + data.substring(5, 7) + ' · ' + data.substring(11, 16);
+    let dia = data.substring(8, 10);
+    let mes = data.substring(5, 7);
+    let horario = data.substring(11, 16);
+
+    return dia + '/' + mes + ' · ' + horario;
 }
 
+// Formata o tempo em minutos ou horas
 function formatarTempo(minutos) {
-    if (minutos < 60) return minutos + ' min';
+    if (minutos < 60) {
+        return minutos + ' min';
+    }
+
     let horas = Math.floor(minutos / 60);
     let resto = minutos % 60;
-    if (resto == 0) return horas + ' h';
+
+    if (resto == 0) {
+        return horas + ' h';
+    }
+
     return horas + ' h ' + resto + ' min';
 }
 
+// Calcula quanto tempo um alerta ficou ativo
 function calcularMinutos(alerta) {
     let fim = agora;
-    if (alerta.status == 'resolvido') fim = new Date(alerta.resolvidoEm).getTime();
+
+    if (alerta.status == 'resolvido') {
+        fim = new Date(alerta.resolvidoEm).getTime();
+    }
+
     let inicio = new Date(alerta.inicio).getTime();
-    return Math.ceil((fim - inicio) / 60000);
+    let diferenca = fim - inicio;
+
+    return Math.ceil(diferenca / 60000);
 }
 
+// Procura a localização de um mainframe
 function buscarLocalizacao(hostname) {
     for (let i = 0; i < DADOS_DASHBOARD.mainframes.length; i++) {
-        if (DADOS_DASHBOARD.mainframes[i].hostname == hostname) {
-            return DADOS_DASHBOARD.mainframes[i].localizacao;
+        let mainframe = DADOS_DASHBOARD.mainframes[i];
+
+        if (mainframe.hostname == hostname) {
+            return mainframe.localizacao;
         }
     }
+
     return '';
 }
 
+// Preenche o filtro de localidades
 function preencherLocalizacoes() {
     let opcoes = '<option value="">Todas as localidades</option>';
+
     for (let i = 0; i < DADOS_DASHBOARD.localizacoes.length; i++) {
         let local = DADOS_DASHBOARD.localizacoes[i];
+
         opcoes += '<option value="' + local + '">' + local + '</option>';
     }
+
     campoLocalizacao.innerHTML = opcoes;
 }
 
+// Preenche o filtro de mainframes
 function preencherMainframes() {
     let escolhidoAntes = campoMainframe.value;
     let aindaExiste = false;
+
     let opcoes = '<option value="">Todos os mainframes</option>';
 
     for (let i = 0; i < DADOS_DASHBOARD.mainframes.length; i++) {
         let mainframe = DADOS_DASHBOARD.mainframes[i];
-        if (campoLocalizacao.value == '' || mainframe.localizacao == campoLocalizacao.value) {
-            opcoes += '<option value="' + mainframe.hostname + '">' + mainframe.hostname + '</option>';
-            if (mainframe.hostname == escolhidoAntes) aindaExiste = true;
+
+        if (campoLocalizacao.value == '' ||
+            mainframe.localizacao == campoLocalizacao.value) {
+
+            opcoes += '<option value="' + mainframe.hostname + '">' +
+                mainframe.hostname + '</option>';
+
+            if (mainframe.hostname == escolhidoAntes) {
+                aindaExiste = true;
+            }
         }
     }
 
     campoMainframe.innerHTML = opcoes;
-    if (aindaExiste) campoMainframe.value = escolhidoAntes;
+
+    if (aindaExiste) {
+        campoMainframe.value = escolhidoAntes;
+    }
 }
 
+// Cria os gráficos da dashboard
 function criarGraficos() {
+
     if (typeof Chart == 'undefined') {
         document.getElementById('erro-graficos').hidden = false;
         return;
     }
 
+    // Gráfico de alertas por período
     graficoFluxo = new Chart(document.getElementById('grafico-fluxo'), {
         type: 'bar',
+
         data: {
             labels: [],
             datasets: [
-                { label: 'Abertos', data: [], backgroundColor: '#1a1f71' },
-                { label: 'Resolvidos', data: [], backgroundColor: '#16afb5' }
+                {
+                    label: 'Abertos',
+                    data: [],
+                    backgroundColor: '#1a1f71'
+                },
+                {
+                    label: 'Resolvidos',
+                    data: [],
+                    backgroundColor: '#16afb5'
+                }
             ]
         },
+
         options: {
             responsive: true,
             maintainAspectRatio: false,
             animation: false,
-            plugins: { legend: { display: false } },
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
             scales: {
-                x: { grid: { display: false }, ticks: { maxRotation: 0 } },
-                y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'Alertas' } }
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 0
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    },
+                    title: {
+                        display: true,
+                        text: 'Alertas'
+                    }
+                }
             }
         }
     });
 
+    // Gráfico de alertas por componente
     graficoComponentes = new Chart(document.getElementById('grafico-componentes'), {
         type: 'bar',
+
         data: {
             labels: ['RAM', 'CPU', 'Disco', 'Swap'],
-            datasets: [{ label: 'Alertas', data: [0, 0, 0, 0], backgroundColor: ['#3b479e', '#677acc', '#98a8e5', '#ced6f4'] }]
+
+            datasets: [
+                {
+                    label: 'Alertas',
+                    data: [0, 0, 0, 0],
+                    backgroundColor: [
+                        '#3b479e',
+                        '#677acc',
+                        '#98a8e5',
+                        '#ced6f4'
+                    ]
+                }
+            ]
         },
+
         options: {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             animation: false,
-            plugins: { legend: { display: false } },
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
             scales: {
-                x: { beginAtZero: true, ticks: { precision: 0 } },
-                y: { grid: { display: false } }
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                },
+
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
             }
         }
     });
 
+    // Gráfico de tempo dos alertas ativos
     graficoTempo = new Chart(document.getElementById('grafico-tempo'), {
         type: 'bar',
+
         data: {
-            labels: ['Até 15 min', '16–30 min', '31–60 min', '> 60 min'],
+            labels: [
+                'Até 15 min',
+                '16–30 min',
+                '31–60 min',
+                '> 60 min'
+            ],
+
             datasets: [
-                { label: 'Crítica', data: [0, 0, 0, 0], backgroundColor: '#e62f51' },
-                { label: 'Alta', data: [0, 0, 0, 0], backgroundColor: '#ff8b38' },
-                { label: 'Moderada', data: [0, 0, 0, 0], backgroundColor: '#ffd364' }
+                {
+                    label: 'Crítica',
+                    data: [0, 0, 0, 0],
+                    backgroundColor: '#e62f51'
+                },
+                {
+                    label: 'Alta',
+                    data: [0, 0, 0, 0],
+                    backgroundColor: '#ff8b38'
+                },
+                {
+                    label: 'Moderada',
+                    data: [0, 0, 0, 0],
+                    backgroundColor: '#ffd364'
+                }
             ]
         },
+
         options: {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             animation: false,
-            plugins: { legend: { display: false } },
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
             scales: {
-                x: { stacked: true, beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'Alertas' } },
-                y: { stacked: true, grid: { display: false } }
+                x: {
+                    stacked: true,
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    },
+                    title: {
+                        display: true,
+                        text: 'Alertas'
+                    }
+                },
+
+                y: {
+                    stacked: true,
+                    grid: {
+                        display: false
+                    }
+                }
             }
         }
     });
 }
 
+// Atualiza todos os dados da dashboard
 function atualizarDashboard() {
+
     let horas = Number(campoPeriodo.value);
     let inicioPeriodo = agora - horas * umaHora;
-    let quantidadeIntervalos = 6;
-    if (horas == 168) quantidadeIntervalos = 7;
-    let tamanhoIntervalo = horas * umaHora / quantidadeIntervalos;
 
+    let quantidadeIntervalos = 6;
+
+    if (horas == 168) {
+        quantidadeIntervalos = 7;
+    }
+
+    let tamanhoIntervalo = (horas * umaHora) / quantidadeIntervalos;
+
+    // Dados dos gráficos
     let legendas = [];
     let abertos = [];
     let resolvidos = [];
-    let porComponente = [0, 0, 0, 0]; // RAM, CPU, Disco e Swap
-    let criticos = [0, 0, 0, 0]; // Até 15, até 30, até 60 e mais de 60 minutos
+
+    let porComponente = [0, 0, 0, 0];
+
+    let criticos = [0, 0, 0, 0];
     let altos = [0, 0, 0, 0];
     let moderados = [0, 0, 0, 0];
 
+    // Cria as legendas dos intervalos
     for (let i = 0; i < quantidadeIntervalos; i++) {
-        let fimIntervalo = new Date(inicioPeriodo + (i + 1) * tamanhoIntervalo);
-        let legenda = fimIntervalo.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hourCycle: 'h23' }) + 'h';
+
+        let fimIntervalo = new Date(
+            inicioPeriodo + (i + 1) * tamanhoIntervalo
+        );
+
+        let legenda = fimIntervalo.toLocaleTimeString('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            hour: '2-digit',
+            hourCycle: 'h23'
+        }) + 'h';
+
         if (horas == 168) {
-            legenda = fimIntervalo.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' });
+            legenda = fimIntervalo.toLocaleDateString('pt-BR', {
+                timeZone: 'America/Sao_Paulo',
+                day: '2-digit',
+                month: '2-digit'
+            });
         }
+
         legendas.push(legenda);
         abertos.push(0);
         resolvidos.push(0);
     }
 
+    // Conta os mainframes monitorados
     let totalMonitorados = 0;
+
     for (let i = 0; i < DADOS_DASHBOARD.mainframes.length; i++) {
+
         let mainframe = DADOS_DASHBOARD.mainframes[i];
-        if (campoLocalizacao.value != '' && mainframe.localizacao != campoLocalizacao.value) continue;
-        if (campoMainframe.value != '' && mainframe.hostname != campoMainframe.value) continue;
+
+        if (campoLocalizacao.value != '' &&
+            mainframe.localizacao != campoLocalizacao.value) {
+            continue;
+        }
+
+        if (campoMainframe.value != '' &&
+            mainframe.hostname != campoMainframe.value) {
+            continue;
+        }
+
         totalMonitorados++;
     }
 
+    // Indicadores
     let totalAtivos = 0;
     let totalResolvidos = 0;
     let totalReincidentes = 0;
+
     let somaMinutos = 0;
+
     let mainframesComAlertas = [];
+
     alertasDoPeriodo = [];
 
+    // Percorre todos os alertas
     for (let i = 0; i < DADOS_DASHBOARD.alertas.length; i++) {
+
         let alerta = DADOS_DASHBOARD.alertas[i];
-        if (campoLocalizacao.value != '' && buscarLocalizacao(alerta.mainframe) != campoLocalizacao.value) continue;
-        if (campoMainframe.value != '' && alerta.mainframe != campoMainframe.value) continue;
 
-        let inicio = new Date(alerta.inicio).getTime();
-        if (inicio > agora) continue;
-
-        // Os indicadores "Agora" contam todas as pendências, independentemente do período.
-        if (alerta.status != 'resolvido') {
-            totalAtivos++;
-            if (mainframesComAlertas.indexOf(alerta.mainframe) == -1) mainframesComAlertas.push(alerta.mainframe);
-
-            let minutos = calcularMinutos(alerta);
-            let faixa = 0;
-            if (minutos > 15) faixa = 1;
-            if (minutos > 30) faixa = 2;
-            if (minutos > 60) faixa = 3;
-            if (alerta.severidade == 'critica') criticos[faixa]++;
-            if (alerta.severidade == 'alta') altos[faixa]++;
-            if (alerta.severidade == 'moderada') moderados[faixa]++;
+        // Verifica a localização
+        if (campoLocalizacao.value != '' &&
+            buscarLocalizacao(alerta.mainframe) != campoLocalizacao.value) {
+            continue;
         }
 
-        if (inicio >= inicioPeriodo) {
-            alertasDoPeriodo.push(alerta);
-            if (alerta.reincidente) totalReincidentes++;
-            if (alerta.componente == 'RAM') porComponente[0]++;
-            if (alerta.componente == 'CPU') porComponente[1]++;
-            if (alerta.componente == 'DISCO') porComponente[2]++;
-            if (alerta.componente == 'SWAP') porComponente[3]++;
+        // Verifica o mainframe
+        if (campoMainframe.value != '' &&
+            alerta.mainframe != campoMainframe.value) {
+            continue;
+        }
 
-            let posicao = Math.floor((inicio - inicioPeriodo) / tamanhoIntervalo);
-            if (posicao >= quantidadeIntervalos) posicao = quantidadeIntervalos - 1;
+        let inicio = new Date(alerta.inicio).getTime();
+
+        if (inicio > agora) {
+            continue;
+        }
+
+        // Conta todos os alertas que ainda estão ativos
+        if (alerta.status != 'resolvido') {
+
+            totalAtivos++;
+
+            if (mainframesComAlertas.indexOf(alerta.mainframe) == -1) {
+                mainframesComAlertas.push(alerta.mainframe);
+            }
+
+            // Classifica o tempo do alerta
+            let minutos = calcularMinutos(alerta);
+            let faixa = 0;
+
+            if (minutos > 15) {
+                faixa = 1;
+            }
+
+            if (minutos > 30) {
+                faixa = 2;
+            }
+
+            if (minutos > 60) {
+                faixa = 3;
+            }
+
+            if (alerta.severidade == 'critica') {
+                criticos[faixa]++;
+            }
+
+            if (alerta.severidade == 'alta') {
+                altos[faixa]++;
+            }
+
+            if (alerta.severidade == 'moderada') {
+                moderados[faixa]++;
+            }
+        }
+
+        // Verifica se o alerta pertence ao período selecionado
+        if (inicio >= inicioPeriodo) {
+
+            alertasDoPeriodo.push(alerta);
+
+            if (alerta.reincidente) {
+                totalReincidentes++;
+            }
+
+            // Conta os alertas por componente
+            if (alerta.componente == 'RAM') {
+                porComponente[0]++;
+            }
+
+            if (alerta.componente == 'CPU') {
+                porComponente[1]++;
+            }
+
+            if (alerta.componente == 'DISCO') {
+                porComponente[2]++;
+            }
+
+            if (alerta.componente == 'SWAP') {
+                porComponente[3]++;
+            }
+
+            // Conta os alertas pelo momento de geração
+            let posicao = Math.floor(
+                (inicio - inicioPeriodo) / tamanhoIntervalo
+            );
+
+            if (posicao >= quantidadeIntervalos) {
+                posicao = quantidadeIntervalos - 1;
+            }
+
             abertos[posicao]++;
         }
 
+        // Conta os alertas resolvidos dentro do período
         if (alerta.status == 'resolvido') {
+
             let fim = new Date(alerta.resolvidoEm).getTime();
+
             if (fim >= inicioPeriodo && fim <= agora) {
+
                 totalResolvidos++;
+
                 somaMinutos += (fim - inicio) / 60000;
-                let posicao = Math.floor((fim - inicioPeriodo) / tamanhoIntervalo);
-                if (posicao >= quantidadeIntervalos) posicao = quantidadeIntervalos - 1;
+
+                let posicao = Math.floor(
+                    (fim - inicioPeriodo) / tamanhoIntervalo
+                );
+
+                if (posicao >= quantidadeIntervalos) {
+                    posicao = quantidadeIntervalos - 1;
+                }
+
                 resolvidos[posicao]++;
             }
         }
     }
 
+    // Atualiza os indicadores principais
     escreverNaTela('kpi-ativos', totalAtivos);
-    escreverNaTela('kpi-mainframes', mainframesComAlertas.length + ' / ' + totalMonitorados);
+
+    escreverNaTela(
+        'kpi-mainframes',
+        mainframesComAlertas.length + ' / ' + totalMonitorados
+    );
+
     escreverNaTela('kpi-resolucao', '—');
     escreverNaTela('kpi-reincidencia', '—');
-    if (totalResolvidos > 0) escreverNaTela('kpi-resolucao', formatarTempo(Math.round(somaMinutos / totalResolvidos)));
-    if (alertasDoPeriodo.length > 0) {
-        let percentual = totalReincidentes / alertasDoPeriodo.length * 100;
-        escreverNaTela('kpi-reincidencia', percentual.toFixed(1).replace('.', ',') + '%');
+
+    if (totalResolvidos > 0) {
+
+        let media = Math.round(somaMinutos / totalResolvidos);
+
+        escreverNaTela('kpi-resolucao', formatarTempo(media));
     }
+
+    if (alertasDoPeriodo.length > 0) {
+
+        let percentual = (
+            totalReincidentes / alertasDoPeriodo.length
+        ) * 100;
+
+        escreverNaTela(
+            'kpi-reincidencia',
+            percentual.toFixed(1).replace('.', ',') + '%'
+        );
+    }
+
+    // Atualiza os totais dos gráficos
     escreverNaTela('total-abertos', alertasDoPeriodo.length);
     escreverNaTela('total-resolvidos', totalResolvidos);
-    document.getElementById('vazio-fluxo').hidden = alertasDoPeriodo.length + totalResolvidos > 0;
-    document.getElementById('vazio-componentes').hidden = alertasDoPeriodo.length > 0;
-    document.getElementById('vazio-tempo').hidden = totalAtivos > 0;
 
+    document.getElementById('vazio-fluxo').hidden =
+        alertasDoPeriodo.length + totalResolvidos > 0;
+
+    document.getElementById('vazio-componentes').hidden =
+        alertasDoPeriodo.length > 0;
+
+    document.getElementById('vazio-tempo').hidden =
+        totalAtivos > 0;
+
+    // Atualiza os gráficos
     if (graficoFluxo) {
+
         graficoFluxo.data.labels = legendas;
+
         graficoFluxo.data.datasets[0].data = abertos;
         graficoFluxo.data.datasets[1].data = resolvidos;
+
         graficoFluxo.update();
+
         graficoComponentes.data.datasets[0].data = porComponente;
         graficoComponentes.update();
+
         graficoTempo.data.datasets[0].data = criticos;
         graficoTempo.data.datasets[1].data = altos;
         graficoTempo.data.datasets[2].data = moderados;
+
         graficoTempo.update();
     }
+
     atualizarTabela();
 }
 
+// Atualiza a tabela de alertas
 function atualizarTabela() {
+
     let lista = [];
-    let contadores = { todos: 0, aberto: 0, investigacao: 0, resolvido: 0 };
+
+    let contadores = {
+        todos: 0,
+        aberto: 0,
+        investigacao: 0,
+        resolvido: 0
+    };
+
     let busca = campoBusca.value.trim().toLowerCase();
 
+    // Filtra os alertas
     for (let i = 0; i < alertasDoPeriodo.length; i++) {
+
         let alerta = alertasDoPeriodo[i];
-        if (alerta.mainframe.toLowerCase().indexOf(busca) == -1) continue;
-        if (campoSeveridade.value != '' && alerta.severidade != campoSeveridade.value) continue;
-        if (campoComponente.value != '' && alerta.componente != campoComponente.value) continue;
+
+        // Busca pelo nome do mainframe
+        if (alerta.mainframe.toLowerCase().indexOf(busca) == -1) {
+            continue;
+        }
+
+        // Filtro de severidade
+        if (campoSeveridade.value != '' &&
+            alerta.severidade != campoSeveridade.value) {
+            continue;
+        }
+
+        // Filtro de componente
+        if (campoComponente.value != '' &&
+            alerta.componente != campoComponente.value) {
+            continue;
+        }
+
         contadores.todos++;
         contadores[alerta.status]++;
-        if (statusSelecionado == 'todos' || alerta.status == statusSelecionado) lista.push(alerta);
+
+        if (statusSelecionado == 'todos' ||
+            alerta.status == statusSelecionado) {
+            lista.push(alerta);
+        }
     }
 
+    // Atualiza os contadores das abas
     escreverNaTela('contador-todos', contadores.todos);
     escreverNaTela('contador-aberto', contadores.aberto);
     escreverNaTela('contador-investigacao', contadores.investigacao);
     escreverNaTela('contador-resolvido', contadores.resolvido);
 
+    // Calcula a quantidade de páginas
     let totalPaginas = Math.ceil(lista.length / itensPorPagina);
-    if (totalPaginas == 0) totalPaginas = 1;
-    if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+
+    if (totalPaginas == 0) {
+        totalPaginas = 1;
+    }
+
+    if (paginaAtual > totalPaginas) {
+        paginaAtual = totalPaginas;
+    }
+
     let primeiro = (paginaAtual - 1) * itensPorPagina;
     let ultimo = primeiro + itensPorPagina;
-    if (ultimo > lista.length) ultimo = lista.length;
 
+    if (ultimo > lista.length) {
+        ultimo = lista.length;
+    }
+
+    // Monta as linhas da tabela
     let linhas = '';
+
     for (let i = primeiro; i < ultimo; i++) {
+
         let alerta = lista[i];
-        let classe = '';
 
-        // Todos os valores inseridos aqui vêm da constante de dados simulados.
-        linhas += `<tr class="${classe}">
-            <td><strong>${alerta.mainframe}</strong></td>
-            <td><span class="alertas-badge severidade-${alerta.severidade}">${nomesSeveridade[alerta.severidade]}</span></td>
-            <td>${nomesComponentes[alerta.componente]}</td>
-            <td><time datetime="${alerta.inicio}">${formatarData(alerta.inicio)}</time></td>
-            <td>${formatarTempo(calcularMinutos(alerta))}</td>
-            <td><span class="alertas-badge status-${alerta.status}">${nomesStatus[alerta.status]}</span></td>
-        </tr>`;
+        linhas += `
+            <tr>
+                <td><strong>${alerta.mainframe}</strong></td>
+
+                <td>
+                    <span class="alertas-badge severidade-${alerta.severidade}">
+                        ${nomesSeveridade[alerta.severidade]}
+                    </span>
+                </td>
+
+                <td>${nomesComponentes[alerta.componente]}</td>
+
+                <td>
+                    <time datetime="${alerta.inicio}">
+                        ${formatarData(alerta.inicio)}
+                    </time>
+                </td>
+
+                <td>${formatarTempo(calcularMinutos(alerta))}</td>
+
+                <td>
+                    <span class="alertas-badge status-${alerta.status}">
+                        ${nomesStatus[alerta.status]}
+                    </span>
+                </td>
+            </tr>
+        `;
     }
 
+    // Verifica se existem resultados
     if (lista.length == 0) {
-        linhas = '<tr><td colspan="6" class="alertas-sem-resultados">Nenhum alerta encontrado para os filtros selecionados.</td></tr>';
+
+        linhas = `
+            <tr>
+                <td colspan="6" class="alertas-sem-resultados">
+                    Nenhum alerta encontrado para os filtros selecionados.
+                </td>
+            </tr>
+        `;
+
         escreverNaTela('resumo-paginacao', 'Nenhum alerta encontrado');
+
     } else {
-        escreverNaTela('resumo-paginacao', 'Mostrando ' + (primeiro + 1) + '–' + ultimo + ' de ' + lista.length + ' alertas');
+
+        escreverNaTela(
+            'resumo-paginacao',
+            'Mostrando ' + (primeiro + 1) + '–' + ultimo +
+            ' de ' + lista.length + ' alertas'
+        );
     }
+
     document.getElementById('corpo-alertas').innerHTML = linhas;
+
     montarPaginacao(totalPaginas, lista.length);
 }
 
-// 7. PAGINAÇÃO E BOTÕES DE STATUS
+// Cria os botões de paginação
 function montarPaginacao(totalPaginas, totalAlertas) {
+
+    let botoes = '';
     let desabilitado = '';
-    if (paginaAtual == 1) desabilitado = 'disabled';
-    let botoes = `<button type="button" aria-label="Página anterior" onclick="mudarPagina(${paginaAtual - 1})" ${desabilitado}>‹</button>`;
+
+    // Botão de página anterior
+    if (paginaAtual == 1) {
+        desabilitado = 'disabled';
+    }
+
+    botoes += `
+        <button type="button"
+            aria-label="Página anterior"
+            onclick="mudarPagina(${paginaAtual - 1})"
+            ${desabilitado}>
+            ‹
+        </button>
+    `;
+
     let ultimaMostrada = 0;
 
+    // Botões das páginas
     for (let i = 1; i <= totalPaginas; i++) {
-        if (totalPaginas <= 5 || i == 1 || i == totalPaginas || Math.abs(i - paginaAtual) <= 1 || (paginaAtual < 3 && i <= 3) || (paginaAtual > totalPaginas - 2 && i >= totalPaginas - 2)) {
-            if (i - ultimaMostrada > 1) botoes += '<span class="alertas-reticencias">…</span>';
+
+        let mostrar = false;
+
+        if (totalPaginas <= 5 ||
+            i == 1 ||
+            i == totalPaginas ||
+            Math.abs(i - paginaAtual) <= 1 ||
+            (paginaAtual < 3 && i <= 3) ||
+            (paginaAtual > totalPaginas - 2 && i >= totalPaginas - 2)) {
+
+            mostrar = true;
+        }
+
+        if (mostrar) {
+
+            if (i - ultimaMostrada > 1) {
+                botoes += '<span class="alertas-reticencias">…</span>';
+            }
+
             let selecionada = '';
-            if (i == paginaAtual) selecionada = 'aria-current="page"';
             desabilitado = '';
-            if (totalAlertas == 0) desabilitado = 'disabled';
-            botoes += `<button type="button" aria-label="Página ${i}" onclick="mudarPagina(${i})" ${selecionada} ${desabilitado}>${i}</button>`;
+
+            if (i == paginaAtual) {
+                selecionada = 'aria-current="page"';
+            }
+
+            if (totalAlertas == 0) {
+                desabilitado = 'disabled';
+            }
+
+            botoes += `
+                <button type="button"
+                    aria-label="Página ${i}"
+                    onclick="mudarPagina(${i})"
+                    ${selecionada}
+                    ${desabilitado}>
+                    ${i}
+                </button>
+            `;
+
             ultimaMostrada = i;
         }
     }
 
+    // Botão de próxima página
     desabilitado = '';
-    if (paginaAtual == totalPaginas) desabilitado = 'disabled';
-    botoes += `<button type="button" aria-label="Próxima página" onclick="mudarPagina(${paginaAtual + 1})" ${desabilitado}>›</button>`;
+
+    if (paginaAtual == totalPaginas) {
+        desabilitado = 'disabled';
+    }
+
+    botoes += `
+        <button type="button"
+            aria-label="Próxima página"
+            onclick="mudarPagina(${paginaAtual + 1})"
+            ${desabilitado}>
+            ›
+        </button>
+    `;
+
     document.getElementById('paginacao-alertas').innerHTML = botoes;
 }
 
+// Muda a página da tabela
 function mudarPagina(numero) {
     paginaAtual = numero;
     atualizarTabela();
 }
 
+// Muda o filtro de status
 function mudarStatus(status) {
+
     statusSelecionado = status;
     paginaAtual = 1;
+
     for (let i = 0; i < botoesStatus.length; i++) {
+
         botoesStatus[i].className = '';
+
         botoesStatus[i].setAttribute('aria-pressed', 'false');
+
         if (botoesStatus[i].getAttribute('data-status') == status) {
+
             botoesStatus[i].className = 'ativa';
+
             botoesStatus[i].setAttribute('aria-pressed', 'true');
         }
     }
+
     atualizarTabela();
 }
 
-// 8. LIGAR OS CAMPOS ÀS FUNÇÕES
+// Eventos dos filtros
+
 campoPeriodo.onchange = function () {
     paginaAtual = 1;
     atualizarDashboard();
 };
+
 campoLocalizacao.onchange = function () {
     paginaAtual = 1;
+
     preencherMainframes();
     atualizarDashboard();
 };
+
 campoMainframe.onchange = function () {
     paginaAtual = 1;
     atualizarDashboard();
 };
+
 campoBusca.oninput = function () {
     paginaAtual = 1;
     atualizarTabela();
 };
+
 campoSeveridade.onchange = function () {
     paginaAtual = 1;
     atualizarTabela();
 };
+
 campoComponente.onchange = function () {
     paginaAtual = 1;
     atualizarTabela();
 };
+
+// Eventos das abas de status
 for (let i = 0; i < botoesStatus.length; i++) {
+
     botoesStatus[i].onclick = function () {
-        mudarStatus(this.getAttribute('data-status'));
+
+        let status = this.getAttribute('data-status');
+
+        mudarStatus(status);
     };
 }
 
+// Atualiza a data apresentada na dashboard
 let dataAtualizacao = DADOS_DASHBOARD.atualizadoEm;
-escreverNaTela('data-atualizacao', dataAtualizacao.substring(8, 10) + '/' + dataAtualizacao.substring(5, 7) + '/' + dataAtualizacao.substring(0, 4) + ' às ' + dataAtualizacao.substring(11, 16));
-document.getElementById('data-atualizacao').setAttribute('datetime', dataAtualizacao);
+
+escreverNaTela(
+    'data-atualizacao',
+    dataAtualizacao.substring(8, 10) + '/' +
+    dataAtualizacao.substring(5, 7) + '/' +
+    dataAtualizacao.substring(0, 4) + ' às ' +
+    dataAtualizacao.substring(11, 16)
+);
+
+document.getElementById('data-atualizacao').setAttribute(
+    'datetime',
+    dataAtualizacao
+);
+
+// Inicialização da dashboard
 preencherLocalizacoes();
 preencherMainframes();
+
 criarGraficos();
 atualizarDashboard();
