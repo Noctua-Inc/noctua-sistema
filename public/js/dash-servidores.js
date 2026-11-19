@@ -26,6 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return estruturaUsoComponente;
     }
 
+    function obterLimitePorcentagem(mainframe, componente) {
+        const parametros = mainframe.parametrosDetalhados || [];
+        const parametro = parametros.find((p) => p.tipo === componente);
+        if (!parametro) return null;
+
+        if (componente === 'CPU') return parametro.cpu_pct_max;
+        if (componente === 'DISCO') return parametro.disco_pct_max;
+        if (componente === 'RAM') return parametro.ram_pct_max;
+        if (componente === 'SWAP') return parametro.swap_pct_max;
+        return null;
+    }
+
     function atualizarIndicadores() {
         let ativas = 0;
         let inativas = 0;
@@ -88,8 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             linha.className = 'servidores-linha';
             criarCelula(linha, mainframe.hostname);
            
-            let componentesMainframe = String(mainframe.componentes).replaceAll(" ", "").split(",");
-            let parametrosMainframe = String(mainframe.parametros).replaceAll(" ", "").split(",");            
+            let componentesMainframe = String(mainframe.componentes || '').replaceAll(" ", "").split(",");
 
             for (let i = 0; i < todosComponentes.length; i++) {
                 let usoComponente = Number((Math.random() * (100 - 60) + 60).toFixed(0));
@@ -99,13 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     let celulaCriada = criarCelula(linha, gerarEstrutura(usoComponente));
 
                     let barraProcresso = celulaCriada.querySelector(".progress-bar-fill");
+                    let parametroAtual = Number(obterLimitePorcentagem(mainframe, componenteAtual));
 
-                    let indexMainframe = componentesMainframe.indexOf(componenteAtual);
-                    let parametroAtual = Number(parametrosMainframe[indexMainframe]);
-
-                    if (parametroAtual <= usoComponente) {
+                    if (!Number.isNaN(parametroAtual) && parametroAtual <= usoComponente) {
                         barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-alert");
-                    } else if(Math.abs(parametroAtual - usoComponente) <= 15) {
+                    } else if (!Number.isNaN(parametroAtual) && Math.abs(parametroAtual - usoComponente) <= 15) {
                         barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-attention");
                     }
                 } else {
@@ -152,6 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
         carregando = true;
         try {
             mainframes = await api.get(`/mainframe/empresa/${idEmpresa}`);
+
+            await Promise.all(mainframes.map(async (mainframe) => {
+                try {
+                    mainframe.parametrosDetalhados = await api.get(`/parametro?id_mainframe=${mainframe.id_mainframe}`);
+                } catch (erro) {
+                    mainframe.parametrosDetalhados = [];
+                }
+            }));
+
             preencherLocalizacoes();
             atualizarIndicadores();
             atualizarTabela();
@@ -188,8 +206,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let linhaAtual = linhas[l];
             let mainframeObj = mainframes[l];
 
-            let componentesMainframe = String(mainframeObj.componentes).replaceAll(" ", "").split(",");
-            let parametrosMainframe = String(mainframeObj.parametros).replaceAll(" ", "").split(",");
+            if (!mainframeObj) continue;
+
+            let componentesMainframe = String(mainframeObj.componentes || '').replaceAll(" ", "").split(",");
             let celulas = linhaAtual.getElementsByTagName('td');
 
             for (let i = 0; i < todosComponentes.length; i++) {
@@ -218,12 +237,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         barraProcresso.className = "progress-bar-fill";
 
-                        let indexMainframe = componentesMainframe.indexOf(componenteAtual);
-                        let parametroAtual = Number(parametrosMainframe[indexMainframe]);
+                        let parametroAtual = Number(obterLimitePorcentagem(mainframeObj, componenteAtual));
 
-                        if (parametroAtual <= usoComponente) {
+                        if (!Number.isNaN(parametroAtual) && parametroAtual <= usoComponente) {
                             barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-alert");
-                        } else if (Math.abs(parametroAtual - usoComponente) <= 15) {
+                        } else if (!Number.isNaN(parametroAtual) && Math.abs(parametroAtual - usoComponente) <= 15) {
                             barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-attention");
                         }
                     }

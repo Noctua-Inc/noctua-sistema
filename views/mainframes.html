@@ -184,10 +184,6 @@
             <div class="form-grid">
               <div class="field"><label for="edit-hostname">Hostname</label><input type="text" id="edit-hostname"
                   maxlength="100" required></div>
-              <div class="field"><label for="edit-fabricante">Fabricante</label><input type="text" id="edit-fabricante"
-                  maxlength="100" placeholder="Ex: IBM" required></div>
-              <div class="field"><label for="edit-modelo">Modelo</label><input type="text" id="edit-modelo"
-                  maxlength="100" required></div>
               <div class="field"><label for="edit-numero-serie">Número de série (6 caracteres)</label><input type="text"
                   id="edit-numero-serie" maxlength="6" required></div>
               <div class="field"><label for="edit-so">Sistema operacional</label><input type="text" id="edit-so"
@@ -221,46 +217,212 @@
               <i class="fa-solid fa-microchip"></i>
               <div>
                 <h3>Componentes</h3>
-                <span>Componentes e parâmetros</span>
+                <span>Parâmetros de monitoramento do mainframe</span>
               </div>
             </div>
-            <div class="component-add">
-              <div class="field">
-                <label for="edit-componente">Componente</label>
-                <div class="select-wrap">
-                  <select id="edit-componente">
-                    <option value="">Selecione um componente</option>
-                  </select>
+
+            <div id="componentes-selecionados" class="componentes-selecionados">
+
+              <div class="component-card">
+                <div class="component-card-header">
+                  <i class="fa-solid fa-microchip"></i>
+                  <h4>CPU</h4>
+                </div>
+                <div class="params-grid">
+                  <div class="field">
+                    <label for="cpu-pct-min">Porcentagem mínima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="cpu-pct-min" min="0" max="100">
+                      <span class="input-unit">%</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="cpu-pct-max">Porcentagem máxima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="cpu-pct-max" min="0" max="100">
+                      <span class="input-unit">%</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="cpu-freq-min">Frequência mínima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="cpu-freq-min" min="0">
+                      <span class="input-unit">MHz</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="cpu-freq-max">Frequência máxima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="cpu-freq-max" min="0">
+                      <span class="input-unit">MHz</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <button type="button" class="btn-add-component" id="btn-add-componente"><i class="fa-solid fa-plus"></i>
-                Adicionar</button>
-            </div>
 
-            <button type="button" class="btn-link-add" id="btn-toggle-novo-componente"><i class="fa-solid fa-plus"></i>
-              Cadastrar novo componente</button>
-
-            <div class="inline-new-form hidden" id="form-novo-componente">
-              <div class="form-section-title">
-                <i class="fa-solid fa-microchip"></i>
-                <div>
-                  <h3>Novo componente</h3>
-                  <span>Cadastre um componente que ainda não existe</span>
+              <div class="component-card">
+                <div class="component-card-header">
+                  <i class="fa-solid fa-memory"></i>
+                  <h4>RAM</h4>
+                </div>
+                <div class="params-grid">
+                  <div class="field">
+                    <label for="ram-pct-min">Porcentagem mínima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="ram-pct-min" min="0" max="100">
+                      <span class="input-unit">%</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="ram-pct-max">Porcentagem máxima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="ram-pct-max" min="0" max="100">
+                      <span class="input-unit">%</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="ram-gb-min">Quantidade livre mínima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="ram-gb-min" min="0">
+                      <span class="input-unit">GB</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="ram-gb-max">Quantidade livre máxima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="ram-gb-max" min="0">
+                      <span class="input-unit">GB</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="form-grid">
-                <div class="field"><label for="novo-comp-tipo">Tipo</label><input type="text" id="novo-comp-tipo"
-                    maxlength="100" placeholder="Ex: CPU"></div>
-                <div class="field"><label for="novo-comp-fabricante">Fabricante</label><input type="text"
-                    id="novo-comp-fabricante" maxlength="100" placeholder="Ex: Intel"></div>
-              </div>
-              <div class="inline-form-actions">
-                <button type="button" class="btn-cancel" id="btn-cancelar-novo-componente">Cancelar</button>
-                <button type="button" class="btn-submit" id="btn-salvar-novo-componente">Salvar e adicionar</button>
-              </div>
-            </div>
 
-            <div id="edit-componentes-selecionados" class="componentes-selecionados"></div>
+              <div class="component-card">
+                <div class="component-card-header">
+                  <i class="fa-solid fa-right-left"></i>
+                  <h4>SWAP</h4>
+                </div>
+                <div class="params-grid">
+                  <div class="field">
+                    <label for="swap-pct-min">Porcentagem mínima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="swap-pct-min" min="0" max="100">
+                      <span class="input-unit">%</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="swap-pct-max">Porcentagem máxima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="swap-pct-max" min="0" max="100">
+                      <span class="input-unit">%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="component-card">
+                <div class="component-card-header">
+                  <i class="fa-solid fa-hard-drive"></i>
+                  <h4>Disco</h4>
+                </div>
+                <div class="params-grid">
+                  <div class="field">
+                    <label for="disco-pct-min">Porcentagem mínima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="disco-pct-min" min="0" max="100">
+                      <span class="input-unit">%</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="disco-pct-max">Porcentagem máxima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="disco-pct-max" min="0" max="100">
+                      <span class="input-unit">%</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="disco-pb-min">Quantidade livre mínima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="disco-pb-min" step="0.01" min="0">
+                      <span class="input-unit">PB</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="disco-pb-max">Quantidade livre máxima</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="disco-pb-max" step="0.01" min="0">
+                      <span class="input-unit">PB</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="disco-req-min">Requisições Leitura/Escrita mín.</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="disco-req-min" min="0">
+                      <span class="input-unit">req/s</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="disco-req-max">Requisições Leitura/Escrita máx.</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="disco-req-max" min="0">
+                      <span class="input-unit">req/s</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="component-card">
+                <div class="component-card-header">
+                  <i class="fa-solid fa-network-wired"></i>
+                  <h4>Rede</h4>
+                </div>
+                <div class="params-grid">
+                  <div class="field">
+                    <label for="rede-tb-min">Dados Enviados/Recebidos mín.</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="rede-tb-min" step="0.01" min="0">
+                      <span class="input-unit">TB</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="rede-tb-max">Dados Enviados/Recebidos máx.</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="rede-tb-max" step="0.01" min="0">
+                      <span class="input-unit">TB</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="rede-pkt-min">Pacotes perdidos mín.</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="rede-pkt-min" min="0">
+                      <span class="input-unit">pct</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="rede-pkt-max">Pacotes perdidos máx.</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="rede-pkt-max" min="0">
+                      <span class="input-unit">pct</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="rede-tw-min">Sockets TIME_WAIT mín.</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="rede-tw-min" min="0">
+                      <span class="input-unit">un</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="rede-tw-max">Sockets TIME_WAIT máx.</label>
+                    <div class="input-unit-wrap">
+                      <input type="number" id="rede-tw-max" min="0">
+                      <span class="input-unit">un</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
           <div class="modal-actions">
             <button type="button" class="btn-cancel btn-prev" data-prev="2"><i class="fa-solid fa-arrow-left"></i>
