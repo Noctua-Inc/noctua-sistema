@@ -38,7 +38,7 @@ class AuthController {
                 usuario.id_usuario
             );
 
-            if (empresa.length === 0) {
+            if (!empresa) {
                 return res.status(401).json({
                     mensagem: 'Empresa não encontrada ou não vinculada à um usuário'
                 });
@@ -63,9 +63,21 @@ class AuthController {
                 });
             }
 
-            const mainframe = await mainframes.find(mf => {
+            const mainframe = mainframes.find(mf => {
                 return mf.hostname === hostname
             });
+
+            if (!mainframe) {
+                return res.status(404).json({
+                    mensagem: `Não foi encontrada nenhuma mainframe com o hostname "${hostname}" na empresa do usuário. Cadastre essa mainframe no sistema antes.`
+                });
+            }
+
+            if (mainframe.status !== 'ativo') {
+                return res.status(403).json({
+                    mensagem: 'A mainframe não está ativa. A captura não foi autorizada.'
+                });
+            }
 
             const componentes = await authModel.buscarComponentes(
                 mainframe.id_mainframe
@@ -80,6 +92,7 @@ class AuthController {
 
             return res.status(200).json({
                 autenticado: true,
+                empresa: empresa,
                 mainframe: {
                     hostname: mainframe.hostname
                 },

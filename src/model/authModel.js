@@ -29,6 +29,7 @@ class AuthModel {
             SELECT 
                 id_mainframe,
                 hostname,
+                status,
                 sis_operacional,
                 fk_empresa AS id_empresa
             FROM mainframe
