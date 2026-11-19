@@ -716,6 +716,156 @@ td:last-child {
 
 .modal-step-content {
   display: none;
+  color: #1e293b;
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  max-width: 760px;
+  margin: 0 auto;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.componentes-selecionados {
+  display: flex;
+  height: 350px;
+  overflow-y: auto; 
+  gap: 3rem;
+  padding-right: 4px;
+}
+
+/* Card individual de cada componente */
+.component-card {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  width: 520px;
+}
+
+.component-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.component-card-header i {
+  color: #4f46e5;
+  font-size: 14px;
+}
+
+.component-card-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* Grid de parâmetros (2 colunas para Min e Max) */
+.params-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.input-unit-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-unit-wrap input {
+  width: 100%;
+  padding: 8px 36px 8px 12px;
+  font-size: 13px;
+  color: #0f172a;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.input-unit-wrap input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.input-unit {
+  position: absolute;
+  right: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+/* Rodapé de botões */
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #3730a3;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(55, 48, 163, 0.25);
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-submit:hover {
+  background-color: #312e81;
+}
+
+.btn-submit:active {
+  transform: scale(0.98);
 }
 
 .modal-step-content.active {
