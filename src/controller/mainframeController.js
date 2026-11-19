@@ -2,31 +2,83 @@ import mainframeModel from '../model/mainframeModel.js';
 import parametroModel from '../model/parametroModel.js';
 
 const STATUS_VALIDOS = ['ativo', 'inativo', 'manutenção'];
+const COMPONENTES_OBRIGATORIOS = ['CPU', 'RAM', 'SWAP', 'DISCO', 'REDE'];
+
+function valorVazio(valor) {
+  return valor === undefined || valor === null || String(valor).trim() === '';
+}
+
+function validarParametros(parametros) {
+  if (!parametros || typeof parametros !== 'object' || Array.isArray(parametros)) {
+    return 'Os parâmetros dos componentes são obrigatórios.';
+  }
+
+  for (const componente of COMPONENTES_OBRIGATORIOS) {
+    if (!parametros[componente] || typeof parametros[componente] !== 'object') {
+      return `Os parâmetros do componente ${componente} são obrigatórios.`;
+    }
+  }
+
+  for (const componente of COMPONENTES_OBRIGATORIOS) {
+    const dados = parametros[componente];
+
+    for (const campo in dados) {
+      const valor = dados[campo];
+      if (valor === null || valor === undefined || valor === '') continue;
+
+      const numero = Number(valor);
+      if (Number.isNaN(numero)) {
+        return `O campo ${campo} do componente ${componente} deve ser numérico.`;
+      }
+      if (numero < 0) {
+        return `O campo ${campo} do componente ${componente} deve ser positivo.`;
+      }
+      if (campo.includes('pct') && numero > 100) {
+        return `O campo ${campo} do componente ${componente} deve estar entre 0 e 100.`;
+      }
+    }
+
+    for (const campo in dados) {
+      if (!campo.endsWith('_min')) continue;
+
+      const campoMax = campo.replace('_min', '_max');
+      const minimo = dados[campo];
+      const maximo = dados[campoMax];
+
+      if (minimo === null || minimo === undefined || minimo === '') continue;
+      if (maximo === null || maximo === undefined || maximo === '') continue;
+
+      if (Number(minimo) > Number(maximo)) {
+        return `No componente ${componente}, o valor mínimo de ${campo.replace('_min', '')} não pode ser maior que o máximo.`;
+      }
+    }
+  }
+
+  return null;
+}
 
 function validar(body) {
   const {
-    hostname, fabricante, modelo, numero_serie, status,
-    sis_operacional, versao_so, fk_empresa, fk_localizacao,
+    hostname, numero_serie, status,
+    sis_operacional, versao_so, fk_empresa, fk_localizacao, parametros,
   } = body;
 
   const camposObrigatorios = {
     'hostname': hostname,
-    'fabricante': fabricante,
-    'modelo': modelo,
     'número de série': numero_serie,
     'status': status,
     'sistema operacional': sis_operacional,
+    'versão do SO': versao_so,
     'empresa': fk_empresa,
     'localização': fk_localizacao,
   };
+
   for (const campo in camposObrigatorios) {
-    if (!camposObrigatorios[campo]) {
+    if (valorVazio(camposObrigatorios[campo])) {
       return `O campo ${campo} é obrigatório.`;
     }
   }
-  if (versao_so === undefined || versao_so === null || String(versao_so).trim() === '') {
-    return 'O campo versão do SO é obrigatório.';
-  }
+
   if (String(numero_serie).length !== 6) {
     return 'O número de série deve ter exatamente 6 caracteres.';
   }
@@ -36,7 +88,8 @@ function validar(body) {
   if (String(versao_so).length > 20) {
     return 'A versão do SO deve ter até 20 caracteres.';
   }
-  return null;
+
+  return validarParametros(parametros);
 }
 
 function tratarErroBanco(err, res) {
@@ -101,14 +154,6 @@ async function criar(req, res) {
 async function atualizar(req, res) {
   const erro = validar(req.body);
   if (erro) return res.status(400).json({ erro });
-
-  for (const parametro of req.body.parametros || []) {
-    const minimo = parametro.pico_min;
-    const maximo = parametro.pico_max;
-    if (minimo != null && maximo != null && minimo > maximo) {
-      return res.status(400).json({ erro: 'O pico mínimo não pode ser maior que o pico máximo.' });
-    }
-  }
 
   try {
     const afetados = await mainframeModel.atualizar(req.params.id, req.body);

@@ -38,6 +38,20 @@ async function buscarMainframe() {
   }
 }
 
+async function buscarParametrosMainframe() {
+  try {
+    return await api.get(`/mainframe/${ID_MAINFRAME}`);
+  } catch (erro) {
+    console.error(erro);
+    return null;
+  }
+}
+
+function obterParametroPorTipo(parametros, tipo) {
+  if (!parametros || !Array.isArray(parametros)) return null;
+  return parametros.find((p) => p.tipo === tipo) || null;
+}
+
 function obterCaminhoBase(nomeHost) {
   return `/api/gold/empresa/${ID_EMPRESA}/${nomeHost}/monitoramentoComponentes/`;
 }
@@ -213,10 +227,8 @@ async function trocarMonitoramento(indice) {
     }
   }
 
-  let mainframe = await buscarMainframe();
-  let parametrosMainframe = String(mainframe.parametros)
-    .replaceAll(" ", "")
-    .split(",");
+  await buscarMainframe();
+  let mainframeDetalhado = await buscarParametrosMainframe();
 
   opcoesBotoesMonitoramento[indice].classList.add(
     "opcao-monitoramento-selecionada"
@@ -245,21 +257,22 @@ async function trocarMonitoramento(indice) {
 
       if (!dadosCapturadosGeral) return;
 
-      let [resposta] = await api.get(
-        `/mainframe/idEmpresa/${ID_EMPRESA}/idMainFrame/${ID_MAINFRAME}`
-      );
-      let arayParametros = resposta.parametros.split(",");
+      let parametros = mainframeDetalhado ? mainframeDetalhado.parametros : [];
+      let parametroCpu = obterParametroPorTipo(parametros, "CPU");
+      let parametroDisco = obterParametroPorTipo(parametros, "DISCO");
+      let parametroRam = obterParametroPorTipo(parametros, "RAM");
+      let parametroRede = obterParametroPorTipo(parametros, "REDE");
 
-      if (dadosCapturadosGeral.porcentagem_cpu >= arayParametros[0]) {
+      if (parametroCpu && parametroCpu.cpu_pct_max != null && dadosCapturadosGeral.porcentagem_cpu >= Number(parametroCpu.cpu_pct_max)) {
         statusRiscoCalculo++;
       }
-      if (dadosCapturadosGeral.porcentagem_disco >= arayParametros[1]) {
+      if (parametroDisco && parametroDisco.disco_pct_max != null && dadosCapturadosGeral.porcentagem_disco >= Number(parametroDisco.disco_pct_max)) {
         statusRiscoCalculo++;
       }
-      if (dadosCapturadosGeral.porcentagem_ram >= arayParametros[2]) {
+      if (parametroRam && parametroRam.ram_pct_max != null && dadosCapturadosGeral.porcentagem_ram >= Number(parametroRam.ram_pct_max)) {
         statusRiscoCalculo++;
       }
-      if (dadosCapturadosGeral.dados_enviados_medio >= arayParametros[3]) {
+      if (parametroRede && parametroRede.tb_max != null && dadosCapturadosGeral.dados_enviados_medio >= Number(parametroRede.tb_max)) {
         statusRiscoCalculo++;
       }
 
