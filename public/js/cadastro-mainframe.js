@@ -1,25 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
-
-  function escapeHtml(str) {
-    if (str === null || str === undefined) return "";
-    return String(str).replace(/[&<>"']/g, (m) => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;",
-    }[m]));
-  }
-
   const idEmpresa = sessionStorage.getItem("idEmpresa");
 
   let localizacoes = [];
-  let componentes = [];
-  let componentesAdicionados = [];
   let currentStep = 1;
 
   const form = document.getElementById("form-mainframe");
   if (!form) return;
 
   const hostnameInput = document.getElementById("hostname");
-  const fabricanteInput = document.getElementById("fabricante");
-  const modeloInput = document.getElementById("modelo");
   const numeroSerieInput = document.getElementById("numero-serie");
   const soSelect = document.getElementById("sistema-operacional");
   const versaoSoInput = document.getElementById("versao-so");
@@ -30,9 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const cidadeInput = document.getElementById("cidade");
   const regiaoInput = document.getElementById("regiao");
 
-  const compSelect = document.getElementById("componente");
-  const compContainer = document.getElementById("componentes-selecionados");
-  const btnAddComponente = document.getElementById("btn-add-componente");
   const btnSubmit = document.getElementById("btn-submit");
 
   // Nova localização
@@ -45,15 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const novaLocCidade = document.getElementById("nova-loc-cidade");
   const novaLocRegiao = document.getElementById("nova-loc-regiao");
 
-  // Novo componente
-  const btnToggleNovoComponente = document.getElementById("btn-toggle-novo-componente");
-  const btnCancelarNovoComponente = document.getElementById("btn-cancelar-novo-componente");
-  const btnSalvarNovoComponente = document.getElementById("btn-salvar-novo-componente");
-  const formNovoComponente = document.getElementById("form-novo-componente");
-  const novoCompTipo = document.getElementById("novo-comp-tipo");
-  const novoCompFabricante = document.getElementById("novo-comp-fabricante");
-
-  //  Localizações 
+  // Localizações
   function preencherSelectLocalizacoes() {
     localizacaoSelect.innerHTML = `<option value="">Selecione uma localização</option>`;
     localizacoes.forEach((loc) => {
@@ -64,93 +41,77 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-async function carregarEstado() {
-  novaLocEstado.innerHTML = '<option value="">Selecione o estado</option>';
+  async function carregarEstado() {
+    novaLocEstado.innerHTML = '<option value="">Selecione o estado</option>';
 
-  const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados");
+    const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados");
+    const estados = await res.json();
 
-  const estados = await res.json();
+    estados.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 
-  estados.sort((a, b) =>
-        a.nome.localeCompare(b.nome, "pt-BR")
-  );
-
-  estados.forEach(estado => {
-    const option = document.createElement("option");
-
-    option.value = estado.sigla;
-    option.textContent = estado.nome;
-
-    novaLocEstado.appendChild(option);
-  });
-}
-
-async function carregarCidade(uf, cidadeSelecionada = "") {
-  novaLocCidade.innerHTML = '<option value="">Selecione a cidade</option>';
-
-  novaLocCidade.disabled = true;
-
-  if (!uf) {
-    return;
+    estados.forEach((estado) => {
+      const option = document.createElement("option");
+      option.value = estado.sigla;
+      option.textContent = estado.nome;
+      novaLocEstado.appendChild(option);
+    });
   }
 
-  const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
+  async function carregarCidade(uf, cidadeSelecionada = "") {
+    novaLocCidade.innerHTML = '<option value="">Selecione a cidade</option>';
+    novaLocCidade.disabled = true;
 
-  const cidades = await res.json();
-
-  cidades.sort((a, b) =>
-        a.nome.localeCompare(b.nome, "pt-BR")
-  );
-
-  cidades.forEach(cidade => {
-    const option = document.createElement("option");
-
-    option.value = cidade.nome;
-    option.textContent = cidade.nome;
-
-    novaLocCidade.appendChild(option);
-
-    if (cidade.nome === cidadeSelecionada) {
-      option.selected = true;
+    if (!uf) {
+      return;
     }
 
+    const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
+    const cidades = await res.json();
+
+    cidades.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+
+    cidades.forEach((cidade) => {
+      const option = document.createElement("option");
+      option.value = cidade.nome;
+      option.textContent = cidade.nome;
+
+      novaLocCidade.appendChild(option);
+
+      if (cidade.nome === cidadeSelecionada) {
+        option.selected = true;
+      }
+    });
+
+    novaLocCidade.disabled = false;
+  }
+
+  novaLocEstado.addEventListener("change", async () => {
+    await carregarCidade(novaLocEstado.value);
   });
 
-  novaLocCidade.disabled = false;
-}
+  novaLocRegiao.addEventListener("blur", async () => {
+    const cep = novaLocRegiao.value.replace(/\D/g, "");
 
-novaLocEstado.addEventListener("change", async () => {
-  await carregarCidade(novaLocEstado.value);
-})
-
-novaLocRegiao.addEventListener("blur", async () => {
-  const cep = novaLocRegiao.value.replace(/\D/g, "");
-
-  if (cep.length !== 8){
-    alert("O cep deve conter 8 dígitos!")
-    return;
-  }
-
-  try {
-    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-
-    const endereco = await res.json();
-
-    if (endereco.erro){
-      alert("Endereço não encontrado");
-      return; 
+    if (cep.length !== 8) {
+      alert("O cep deve conter 8 dígitos!");
+      return;
     }
 
-    novaLocEstado.value = endereco.uf;
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const endereco = await res.json();
 
-    await carregarCidade(novaLocEstado.value, endereco.localidade);
+      if (endereco.erro) {
+        alert("Endereço não encontrado");
+        return;
+      }
 
-  }
-  catch (erro){
-    console.error("Erro ao consultar o CEP:", erro);
-  }
-
-})
+      novaLocEstado.value = endereco.uf;
+      await carregarCidade(novaLocEstado.value, endereco.localidade);
+    } catch (erro) {
+      console.error("Erro ao consultar o CEP:", erro);
+    }
+  });
 
   async function carregarLocalizacoes() {
     localizacoes = await api.get("/localizacao");
@@ -208,120 +169,50 @@ novaLocRegiao.addEventListener("blur", async () => {
     }
   });
 
-  //  Componentes 
-  function preencherSelectComponentes() {
-    compSelect.innerHTML = `<option value="">Selecione para adicionar...</option>`;
-    componentes.forEach((c) => {
-      const option = document.createElement("option");
-      option.value = c.id_componente;
-      option.textContent = `${c.tipo} — ${c.nome_fabricante}`;
-      compSelect.appendChild(option);
-    });
+  function lerValorNumerico(id) {
+    const componenteEscolhido = document.getElementById(id);
+    if (!componenteEscolhido || componenteEscolhido.value === "") return null;
+    return Number(componenteEscolhido.value);
   }
 
-  async function carregarComponentes() {
-    componentes = await api.get("/componente");
-    preencherSelectComponentes();
+  function coletarParametrosComponentes() {
+    return {
+      CPU: {
+        pct_min: lerValorNumerico("cpu-pct-min"),
+        pct_max: lerValorNumerico("cpu-pct-max"),
+        freq_min: lerValorNumerico("cpu-freq-min"),
+        freq_max: lerValorNumerico("cpu-freq-max"),
+      },
+      RAM: {
+        pct_min: lerValorNumerico("ram-pct-min"),
+        pct_max: lerValorNumerico("ram-pct-max"),
+        gb_min: lerValorNumerico("ram-gb-min"),
+        gb_max: lerValorNumerico("ram-gb-max"),
+      },
+      SWAP: {
+        pct_min: lerValorNumerico("swap-pct-min"),
+        pct_max: lerValorNumerico("swap-pct-max"),
+      },
+      DISCO: {
+        pct_min: lerValorNumerico("disco-pct-min"),
+        pct_max: lerValorNumerico("disco-pct-max"),
+        pb_min: lerValorNumerico("disco-pb-min"),
+        pb_max: lerValorNumerico("disco-pb-max"),
+        req_min: lerValorNumerico("disco-req-min"),
+        req_max: lerValorNumerico("disco-req-max"),
+      },
+      REDE: {
+        tb_min: lerValorNumerico("rede-tb-min"),
+        tb_max: lerValorNumerico("rede-tb-max"),
+        pkt_min: lerValorNumerico("rede-pkt-min"),
+        pkt_max: lerValorNumerico("rede-pkt-max"),
+        tw_min: lerValorNumerico("rede-tw-min"),
+        tw_max: lerValorNumerico("rede-tw-max"),
+      },
+    };
   }
 
-  function renderComponentesAdicionados() {
-    if (componentesAdicionados.length === 0) {
-      compContainer.innerHTML = `<div class="empty-components">Nenhum componente associado.</div>`;
-      return;
-    }
-
-    compContainer.innerHTML = componentesAdicionados.map((parametro, index) => {
-      const componente = componentes.find((c) => c.id_componente === parametro.id_componente);
-      if (!componente) return "";
-
-      return `
-        <div class="edit-component-card">
-          <div class="edit-component-header">
-            <div>
-              <strong>${escapeHtml(componente.tipo)}</strong>
-              <span>${escapeHtml(componente.nome_fabricante)}</span>
-            </div>
-            <button type="button" class="remover-componente" data-index="${index}">×</button>
-          </div>
-          <div class="component-parametros">
-            <div class="field">
-              <label>Pico mínimo</label>
-              <input type="number" class="parametro-input" data-index="${index}" data-field="pico_min" value="${parametro.pico_min ?? ""}" min="0">
-            </div>
-            <div class="field">
-              <label>Pico máximo</label>
-              <input type="number" class="parametro-input" data-index="${index}" data-field="pico_max" value="${parametro.pico_max ?? ""}" min="0">
-            </div>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  function adicionarComponente(id) {
-    if (!id) return;
-    const jaExiste = componentesAdicionados.some((p) => p.id_componente === id);
-    if (jaExiste) return;
-
-    componentesAdicionados.push({ id_componente: id, pico_max: 100, pico_min: 0 });
-    renderComponentesAdicionados();
-  }
-
-  btnAddComponente.addEventListener("click", () => {
-    const id = Number(compSelect.value);
-    adicionarComponente(id);
-    compSelect.value = "";
-  });
-
-  compContainer.addEventListener("click", (e) => {
-    const button = e.target.closest(".remover-componente");
-    if (!button) return;
-    componentesAdicionados.splice(Number(button.dataset.index), 1);
-    renderComponentesAdicionados();
-  });
-
-  compContainer.addEventListener("input", (e) => {
-    const input = e.target.closest(".parametro-input");
-    if (!input) return;
-    componentesAdicionados[Number(input.dataset.index)][input.dataset.field] = input.value === "" ? null : Number(input.value);
-  });
-
-  function limparFormNovoComponente() {
-    novoCompTipo.value = "";
-    novoCompFabricante.value = "";
-  }
-
-  function toggleFormNovoComponente(mostrar) {
-    formNovoComponente.classList.toggle("hidden", !mostrar);
-    if (mostrar) limparFormNovoComponente();
-  }
-
-  btnToggleNovoComponente.addEventListener("click", () => {
-    toggleFormNovoComponente(formNovoComponente.classList.contains("hidden"));
-  });
-
-  btnCancelarNovoComponente.addEventListener("click", () => toggleFormNovoComponente(false));
-
-  btnSalvarNovoComponente.addEventListener("click", async () => {
-    const tipo = novoCompTipo.value.trim();
-    const fabricante = novoCompFabricante.value.trim();
-
-    if (!tipo || !fabricante) {
-      alert("Preencha todos os campos do novo componente.");
-      return;
-    }
-
-    try {
-      const novo = await api.post("/componente", { tipo, fabricante });
-      await carregarComponentes();
-      adicionarComponente(novo.id_componente);
-      toggleFormNovoComponente(false);
-    } catch (err) {
-      alert(err.message);
-    }
-  });
-
-  //  Etapas 
+  // Etapas
   function showStep(step) {
     currentStep = step;
 
@@ -348,13 +239,11 @@ novaLocRegiao.addEventListener("blur", async () => {
     button.addEventListener("click", () => showStep(Number(button.dataset.prev)));
   });
 
-  //  Envio do formulário 
+  // Envio do formulário
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const hostname = hostnameInput.value.trim();
-    const fabricante = fabricanteInput.value.trim();
-    const modelo = modeloInput.value.trim();
     const numero_serie = numeroSerieInput.value.trim();
     const sis_operacional = soSelect.value;
     const versao_so = versaoSoInput.value.trim();
@@ -374,11 +263,17 @@ novaLocRegiao.addEventListener("blur", async () => {
       return;
     }
 
+    const parametros = coletarParametrosComponentes();
+
     const corpo = {
-      hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so,
+      hostname,
+      numero_serie,
+      status,
+      sis_operacional,
+      versao_so,
       fk_empresa: Number(idEmpresa),
       fk_localizacao,
-      parametros: componentesAdicionados,
+      parametros
     };
 
     btnSubmit.disabled = true;
@@ -391,11 +286,10 @@ novaLocRegiao.addEventListener("blur", async () => {
     }
   });
 
-  //  Inicialização 
+  // Inicialização
   (async function iniciar() {
     try {
-      await Promise.all([carregarLocalizacoes(), carregarComponentes(), carregarEstado()]);
-      renderComponentesAdicionados();
+      await Promise.all([carregarLocalizacoes(), carregarEstado()]);
     } catch (err) {
       console.error(err);
       alert("Não foi possível carregar os dados do servidor. Verifique se a API está no ar.");
