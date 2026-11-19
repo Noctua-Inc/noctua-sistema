@@ -1,21 +1,12 @@
 import goldModel from '../model/goldModel.js';
 import goldService from '../service/goldService.js';
 
-async function carregar(req, res) {
+async function carregar(req, res, caminho) {
     res.set('Cache-Control', 'no-store');
 
     if (!process.env.NOME_BUCKET) {
         return res.status(503).json({erro: 'Configure NOME_BUCKET no servidor para acessar o Gold.'});
     }
-
-    const prefixoMainframe = req.params.prefixoMainframe;
-    const prefixoDashboard = req.params.prefixoDashboard;
-    const arquivo = req.params.arquivo;
-    
-
-    // if (!/^[a-zA-Z0-9_-]+$/.test(diretorio) || !/^[a-zA-Z0-9_.-]+\.json$/.test(arquivo)) {
-    //     return res.status(400).json({erro: 'Informe um diretório e um nome de arquivo JSON válidos.'});
-    // }
 
     try {
         const ID_EMPRESA = req.params.idEmpresa;        
@@ -26,7 +17,7 @@ async function carregar(req, res) {
         }
 
         const prefixoEmpresa = empresa.razao_social.toLowerCase().replaceAll(' ', '_');
-        const dados = await goldService.lerJson(prefixoEmpresa, prefixoMainframe, prefixoDashboard, arquivo);        
+        const dados = await goldService.lerJson(prefixoEmpresa, caminho);
 
         return res.json(dados);
     } catch (erro) {

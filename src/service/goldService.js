@@ -3,10 +3,10 @@ import {S3Client, GetObjectCommand} from '@aws-sdk/client-s3';
 
 const s3 = new S3Client({region: process.env.AWS_REGION || 'us-east-1'});
 
-async function lerJson(prefixoEmpresa, prefixoMainframe, prefixoDashboard, arquivo) {
+async function lerJson(prefixoEmpresa, caminho) {
     const comando = new GetObjectCommand({
         Bucket: process.env.NOME_BUCKET,
-        Key: prefixoEmpresa + '/03-gold/' + prefixoMainframe + '/' + prefixoDashboard + '/' + arquivo
+        Key: prefixoEmpresa + '/03-gold/' + caminho
     });
     
     const resposta = await s3.send(comando);

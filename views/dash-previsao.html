@@ -93,30 +93,24 @@
                         <h1>
                             Previsão de consumo
                         </h1>
+                        <p class="previsao-atualizacao">
+                            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                            Última atualização:
+                            <time id="atualizacao-previsao">—</time>
+                        </p>
                     </div>
-                    <p class="previsao-atualizacao">
-                        Última atualização:
-                        <time id="atualizacao-previsao">
-                            —
-                        </time>
-                    </p>
+                    <button type="button" class="previsao-relatorio" disabled
+                        aria-label="Gerar relatório (indisponível)" title="Aguardando integração com o gerador Java">
+                        <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                        Gerar relatório
+                    </button>
                 </header>
                 <p id="mensagem-mainframes" role="status" hidden>
                 </p>
                 <div class="previsao-controles" id="controles-previsao">
                     <div class="previsao-campo">
-                        <label for="mainframe-previsao">
-                            Mainframe
-                        </label>
-                        <select id="mainframe-previsao" onchange="selecionarMainframe()" disabled>
-                            <option>
-                                Carregando mainframes...
-                            </option>
-                        </select>
-                    </div>
-                    <div class="previsao-campo">
                         <span id="label-componente">
-                            Componente
+                            Componente · toda a dashboard
                         </span>
                         <div class="previsao-opcoes" id="componentes-previsao" role="group" aria-labelledby="label-componente">
                             <button type="button" id="botao-CPU" data-componente="CPU" onclick="escolherComponente('CPU')" aria-pressed="true">
@@ -147,26 +141,42 @@
                         </div>
                     </div>
                 </div>
-                <div id="conteudo-previsao" hidden>
+                <div id="conteudo-previsao">
+                    <section class="previsao-mainframe" aria-labelledby="titulo-secao-mainframe">
+                        <header class="previsao-secao-cabecalho">
+                            <div>
+                                <h2 id="titulo-secao-mainframe">Previsão por mainframe</h2>
+                                <p>A mainframe selecionada filtra os três indicadores e o gráfico desta seção.</p>
+                            </div>
+                            <div class="previsao-campo previsao-filtro-mainframe">
+                                <label for="mainframe-previsao">Mainframe</label>
+                                <select id="mainframe-previsao" onchange="selecionarMainframe()" disabled>
+                                    <option>Carregando mainframes...</option>
+                                </select>
+                            </div>
+                        </header>
+                        <div id="conteudo-mainframe" hidden>
                     <section class="previsao-kpis" aria-label="Resumo do período previsto" aria-live="polite">
                         <article class="previsao-kpi" id="kpi-proximo-desvio">
-                            <p id="mainframe-kpi">Mainframe selecionada</p>
                             <h2>Tempo até o próximo desvio</h2>
                             <strong id="primeira-saida">—</strong>
                             <p id="detalhe-saida">—</p>
+                            <span class="previsao-tendencia">Sem comparação</span>
                         </article>
                         <article class="previsao-kpi">
-                            <h2>Horário de maior concentração</h2>
-                            <strong id="horario-concentracao">—</strong>
-                            <p id="detalhe-concentracao">Resumo da empresa ainda não disponível.</p>
+                            <h2>Duração do próximo desvio</h2>
+                            <strong>—</strong>
+                            <p>Duração ainda indisponível.</p>
+                            <span class="previsao-tendencia">Sem comparação</span>
                         </article>
                         <article class="previsao-kpi">
-                            <h2>Mainframes com desvio previsto</h2>
-                            <strong id="mainframes-com-desvio">—</strong>
-                            <p id="detalhe-mainframes-desvio">Resumo da empresa ainda não disponível.</p>
+                            <h2>Intensidade do desvio</h2>
+                            <strong>—</strong>
+                            <p>Intensidade ainda indisponível.</p>
+                            <span class="previsao-tendencia">Sem comparação</span>
                         </article>
                     </section>
-                    <section class="previsao-painel" style="margin-top:20px" aria-labelledby="titulo-grafico-previsao">
+                    <section class="previsao-painel" aria-labelledby="titulo-grafico-previsao">
                         <h2 id="titulo-grafico-previsao">
                             Histórico e previsão de consumo
                         </h2>
@@ -202,46 +212,33 @@
                             </span>
                         </div>
                     </section>
-                    <div class="previsao-inferior" style="margin-top:16px">
-                        <section class="previsao-painel" aria-labelledby="titulo-mapa">
-                            <h2 id="titulo-mapa">
-                                Padrão de consumo por dia e horário
-                            </h2>
-                            <p class="previsao-subtitulo">
-                                Média horária nos últimos 7 dias
-                            </p>
-                            <div class="previsao-mapa-scroll">
-                                <div class="previsao-mapa-chart">
-                                    <canvas id="mapa-previsao" role="img" aria-label="Exemplo de consumo médio por dia e horário">
-                                        Mapa de consumo por hora.
-                                    </canvas>
-                                </div>
+                        </div>
+                    </section>
+                    <section class="previsao-empresa" aria-labelledby="titulo-secao-empresa">
+                        <header class="previsao-secao-cabecalho">
+                            <div>
+                                <h2 id="titulo-secao-empresa">Visão da empresa · CPU</h2>
+                                <p>Todas as mainframes · acompanha o componente escolhido no topo.</p>
                             </div>
-                            <div class="previsao-mapa-legenda">
-                                <span>
-                                    Menor uso
-                                </span>
-                                <i style="background:rgba(26,31,113,0.08)">
-                                </i>
-                                <i style="background:rgba(26,31,113,0.3867)">
-                                </i>
-                                <i style="background:rgba(26,31,113,0.6933)">
-                                </i>
-                                <i style="background:#1a1f71">
-                                </i>
-                                <span>
-                                    Maior uso
-                                </span>
-                                <i style="background:#e5e7eb;margin-left:12px">
-                                </i>
-                                <span>
-                                    Sem dados
-                                </span>
-                            </div>
+                        </header>
+                        <div class="previsao-inferior">
+                        <section class="previsao-kpis-empresa" aria-label="Previsões da empresa" aria-live="polite">
+                            <article class="previsao-kpi">
+                                <h2>Horário com tendência de maior concentração de desvios</h2>
+                                <strong id="horario-concentracao">—</strong>
+                                <p id="detalhe-concentracao">Resumo da empresa ainda não disponível.</p>
+                                <span class="previsao-tendencia">Sem comparação</span>
+                            </article>
+                            <article class="previsao-kpi">
+                                <h2>Mainframes com desvios previstos</h2>
+                                <strong id="mainframes-com-desvio">—</strong>
+                                <p id="detalhe-mainframes-desvio">Resumo da empresa ainda não disponível.</p>
+                                <span class="previsao-tendencia">Sem comparação</span>
+                            </article>
                         </section>
                         <section class="previsao-painel" aria-labelledby="titulo-comparacao">
                             <h2 id="titulo-comparacao">
-                                Previsão e limites por mainframe
+                                Mainframes por tendência de criticidade
                             </h2>
                             <p class="previsao-subtitulo" id="unidade-tabela">
                                 Período previsto
@@ -270,6 +267,7 @@
                             </div>
                         </section>
                     </div>
+                    </section>
                 </div>
             </main>
         </div>

@@ -6,7 +6,6 @@ let metricaDiscoSelecionada = 'ocupacao';
 let dadosPrevisao;
 let resumoPrevisao;
 let graficoConsumo;
-let graficoMapa;
 
 function escrever(id, texto) {
     const elemento = document.getElementById(id);
@@ -104,7 +103,7 @@ async function selecionarMainframe(silencioso = false) {
     const seletor = document.getElementById('mainframe-previsao');
     const hostname = seletor.options[seletor.selectedIndex].textContent;
     const mensagem = document.getElementById('mensagem-mainframes');
-    const conteudo = document.getElementById('conteudo-previsao');
+    const conteudo = document.getElementById('conteudo-mainframe');
 
     seletor.disabled = true;
     if (!silencioso) {
@@ -161,23 +160,24 @@ function selecionarMetrica(componentes) {
 }
 
 function atualizarTela() {
+    let nome = componenteSelecionado;
+    if (componenteSelecionado === 'DISCO') {
+        nome = metricaDiscoSelecionada + ' do disco';
+    }
+    escrever('titulo-secao-empresa', 'Visão da empresa · ' + nome);
+    preencherIndicadoresEmpresa();
+    preencherTabela();
+    atualizarBotoes();
+
     if (!dadosPrevisao) {
         return;
     }
 
     const metrica = selecionarMetrica(dadosPrevisao.componentes);
-    let nome = componenteSelecionado;
-    if (componenteSelecionado === 'DISCO') {
-        nome = metricaDiscoSelecionada + ' do disco';
-    }
 
     preencherIndicadores(metrica);
-    preencherIndicadoresEmpresa();
     preencherTitulos(metrica, nome);
-    atualizarBotoes();
     desenharGrafico(metrica);
-    desenharMapa(metrica);
-    preencherTabela();
 }
 
 function preencherIndicadores(metrica) {
@@ -185,9 +185,7 @@ function preencherIndicadores(metrica) {
     const janela = janelaGrafico(metrica.graficos.atual.horario);
     const ate = formatarHorario(janela.fim);
     const cartao = document.getElementById('kpi-proximo-desvio');
-    const seletor = document.getElementById('mainframe-previsao');
-    escrever('mainframe-kpi', seletor.options[seletor.selectedIndex].textContent);
-    cartao.className = 'previsao-kpi';
+    cartao.classList.remove('kpi-urgencia');
     escrever('primeira-saida', '—');
 
     const atual = metrica.graficos.atual.valor;
@@ -209,11 +207,10 @@ function preencherIndicadores(metrica) {
     } else {
         const minutos = indicadores.primeira_saida_em_minutos;
         const horarioSaida = new Date(metrica.graficos.atual.horario).getTime() + minutos * 60000;
-        let tipo = 'Acima do máximo';
-        if (indicadores.primeira_saida_tipo === 'abaixo') tipo = 'Abaixo do mínimo';
-        cartao.classList.add('kpi-atencao');
+        const tipo = indicadores.primeira_saida_tipo === 'abaixo' ? 'Abaixo do mínimo' : 'Acima do máximo';
         escrever('primeira-saida', minutos + ' min');
-        escrever('detalhe-saida', tipo + ' às ' + formatarHorario(horarioSaida));
+        escrever('detalhe-saida', tipo + ' às ' + formatarHorario(horarioSaida)
+            + ' · coleta das ' + formatarHorario(metrica.graficos.atual.horario));
     }
 }
 
@@ -261,7 +258,6 @@ function preencherTitulos(metrica, nome) {
 
     escrever('titulo-grafico-previsao', 'Histórico e previsão de ' + nome);
     escrever('subtitulo-grafico', 'Previsão até ' + ate + ' · faixa configurada: ' + minimo + ' a ' + maximo);
-    escrever('titulo-mapa', 'Padrão de ' + nome + ' por dia e horário');
     escrever('atualizacao-previsao', atualizacao);
 }
 
@@ -328,6 +324,7 @@ function preencherTabela() {
     for (let i = 0; i < metrica.mainframes.length; i++) {
         const item = metrica.mainframes[i];
         const linha = document.createElement('tr');
+        linha.classList.toggle('previsao-mainframe-selecionada', String(item.id_mainframe) === seletor.value);
         const menor = formatarValor(item.menor_previsto, '');
         const maior = formatarValor(item.maior_previsto, metrica.unidade);
         const minimo = formatarValor(item.limite_minimo, '');
@@ -336,16 +333,19 @@ function preencherTabela() {
         criarCelula(linha, item.hostname);
         criarCelula(linha, menor + ' – ' + maior);
         criarCelula(linha, minimo + ' – ' + maximo);
-        const situacao = criarCelula(linha, item.situacao || '—');
+        const situacao = document.createElement('span');
+        situacao.className = 'previsao-situacao';
+        situacao.textContent = item.situacao || '—';
+        criarCelula(linha, '').appendChild(situacao);
 
         if (item.situacao === 'Dentro da faixa') {
-            situacao.className = 'situacao-dentro';
+            situacao.classList.add('situacao-dentro');
         } else if (item.situacao === 'Abaixo e acima') {
-            situacao.className = 'situacao-ambos';
+            situacao.classList.add('situacao-ambos');
         } else if (item.situacao === 'Abaixo do mínimo') {
-            situacao.className = 'situacao-abaixo';
+            situacao.classList.add('situacao-abaixo');
         } else if (item.situacao === 'Acima do máximo') {
-            situacao.className = 'situacao-acima';
+            situacao.classList.add('situacao-acima');
         }
 
         linha.onclick = function () {
@@ -490,101 +490,6 @@ function desenharGrafico(metrica) {
                     beginAtZero: true,
                     title: {display: true, text: metrica.unidade},
                     grid: {color: '#e2e8f0'}
-                }
-            }
-        }
-    });
-}
-
-function desenharMapa(metrica) {
-    if (graficoMapa) {
-        graficoMapa.destroy();
-    }
-
-    const mapa = metrica.graficos.mapa;
-    const pontos = [];
-    const cores = [];
-    const dias = [];
-    const horas = [];
-    const diaAtual = metrica.graficos.atual.horario.substring(0, 10);
-    const horaAtual = Number(metrica.graficos.atual.horario.substring(11, 13));
-    let diaAnterior = '';
-    let numeroDia = -1;
-
-    for (let hora = 0; hora < 24; hora++) {
-        horas.push(hora + 'h');
-    }
-
-    for (let i = 0; i < mapa.length; i++) {
-        const ponto = mapa[i];
-        if (ponto.dia !== diaAnterior) {
-            const dia = ponto.dia.substring(8, 10);
-            const mes = ponto.dia.substring(5, 7);
-            dias.push(dia + '/' + mes);
-            diaAnterior = ponto.dia;
-            numeroDia++;
-        }
-
-        let consumo = 'Sem dados';
-        if (ponto.media != null) {
-            consumo = formatarValor(ponto.media, metrica.unidade);
-        }
-        let texto = ponto.dia + ' às ' + ponto.hora + 'h: ' + consumo;
-        if (ponto.media != null && ponto.dia === diaAtual && ponto.hora === horaAtual) {
-            texto = texto + ' · média parcial';
-        }
-        pontos.push({x: horas[ponto.hora], y: dias[numeroDia], texto: texto});
-
-        if (ponto.intensidade == null || ponto.media == null) {
-            cores.push('#e5e7eb');
-        } else {
-            const opacidade = 0.08 + ponto.intensidade * 0.92;
-            const cor = 'rgba(26, 31, 113, ' + opacidade + ')';
-            cores.push(cor);
-        }
-    }
-
-    graficoMapa = new Chart(document.getElementById('mapa-previsao'), {
-        type: 'scatter',
-        data: {
-            datasets: [{
-                data: pontos,
-                pointStyle: 'rect',
-                pointRadius: 11,
-                pointHoverRadius: 12,
-                backgroundColor: cores,
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            plugins: {
-                legend: {display: false},
-                tooltip: {
-                    callbacks: {
-                        label: function (item) {
-                            return item.raw.texto;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    type: 'category',
-                    labels: horas,
-                    offset: true,
-                    grid: {display: false},
-                    ticks: {maxTicksLimit: 7}
-                },
-                y: {
-                    type: 'category',
-                    labels: dias,
-                    offset: true,
-                    reverse: false,
-                    grid: {display: false},
-                    ticks: {autoSkip: false}
                 }
             }
         }
