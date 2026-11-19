@@ -236,6 +236,16 @@
     font-weight: 600;
 }
 
+.previsao-tendencia.melhora {
+    background: #e8f5ee;
+    color: #21604a;
+}
+
+.previsao-tendencia.piora {
+    background: #fbeaec;
+    color: #9a2c40;
+}
+
 .previsao-painel h2 {
     color: #1a1f71;
     font-size: 18px;
@@ -366,17 +376,17 @@
     border-radius: 5px;
 }
 
-.previsao-situacao.situacao-abaixo, .previsao-situacao.situacao-acima {
+.previsao-situacao.situacao-abaixo, .previsao-situacao.situacao-acima, .previsao-situacao.atencao {
     color: #83410f;
     background: #fff3e3;
 }
 
-.previsao-situacao.situacao-ambos {
+.previsao-situacao.situacao-ambos, .previsao-situacao.alerta {
     color: #9d2639;
     background: #fdecee;
 }
 
-.previsao-situacao.situacao-dentro {
+.previsao-situacao.situacao-dentro, .previsao-situacao.normal {
     color: #21604a;
     background: #eef7f2;
 }

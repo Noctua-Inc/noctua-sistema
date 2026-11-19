@@ -36,7 +36,10 @@ function formatarValor(valor, unidade) {
     return texto + ' ' + unidade;
 }
 
-function janelaGrafico(horarioAtual) {
+function janelaGrafico(horarioAtual, janelaPublicada) {
+    if (janelaPublicada) {
+        return {inicio: Date.parse(janelaPublicada.inicio), fim: Date.parse(janelaPublicada.fim)};
+    }
     const umaHora = 60 * 60 * 1000;
     const data = new Date(horarioAtual);
     const horario = data.getTime();
@@ -180,11 +183,35 @@ function atualizarTela() {
     desenharGrafico(metrica);
 }
 
+function exibirComparacao(id, comparacao) {
+    const etiqueta = document.getElementById(id);
+    const setas = {cima: '↑ ', baixo: '↓ ', igual: '→ '};
+    etiqueta.textContent = (setas[comparacao?.direcao] ?? '') + (comparacao?.texto ?? 'Sem comparação');
+    etiqueta.classList.toggle('melhora', comparacao?.avaliacao === 'melhora');
+    etiqueta.classList.toggle('piora', comparacao?.avaliacao === 'piora');
+}
+
+function exibirKpi(indicador, idValor, idDetalhe, idComparacao) {
+    escrever(idValor, indicador?.exibicao?.valor ?? '—');
+    escrever(idDetalhe, indicador?.exibicao?.detalhe ?? 'Indicador ainda indisponível.');
+    exibirComparacao(idComparacao, indicador?.comparacao);
+}
+
 function preencherIndicadores(metrica) {
     const indicadores = metrica.indicadores;
+    const cartao = document.getElementById('kpi-proximo-desvio');
+    exibirKpi(indicadores?.duracao_desvio, 'duracao-desvio', 'detalhe-duracao', 'comparacao-duracao');
+    exibirKpi(indicadores?.intensidade_desvio, 'intensidade-desvio', 'detalhe-intensidade', 'comparacao-intensidade');
+
+    if (dadosPrevisao.versao_schema === 2) {
+        cartao.classList.toggle('kpi-urgencia', metrica.proximo_desvio?.status === 'em_desvio');
+        exibirKpi(indicadores?.tempo_ate_desvio, 'primeira-saida', 'detalhe-saida', 'comparacao-tempo');
+        return;
+    }
+
+    exibirComparacao('comparacao-tempo');
     const janela = janelaGrafico(metrica.graficos.atual.horario);
     const ate = formatarHorario(janela.fim);
-    const cartao = document.getElementById('kpi-proximo-desvio');
     cartao.classList.remove('kpi-urgencia');
     escrever('primeira-saida', '—');
 
@@ -215,6 +242,14 @@ function preencherIndicadores(metrica) {
 }
 
 function preencherIndicadoresEmpresa() {
+    if (resumoPrevisao?.versao_schema === 2) {
+        const indicadores = selecionarMetrica(resumoPrevisao.componentes).indicadores;
+        exibirKpi(indicadores?.maior_concentracao, 'horario-concentracao', 'detalhe-concentracao', 'comparacao-concentracao');
+        exibirKpi(indicadores?.mainframes_com_desvio, 'mainframes-com-desvio', 'detalhe-mainframes-desvio', 'comparacao-mainframes');
+        return;
+    }
+    exibirComparacao('comparacao-concentracao');
+    exibirComparacao('comparacao-mainframes');
     escrever('horario-concentracao', '—');
     escrever('mainframes-com-desvio', '—');
     escrever('detalhe-concentracao', 'Resumo da empresa ainda não disponível.');
@@ -247,7 +282,7 @@ function preencherIndicadoresEmpresa() {
 }
 
 function preencherTitulos(metrica, nome) {
-    const janela = janelaGrafico(metrica.graficos.atual.horario);
+    const janela = janelaGrafico(metrica.graficos.atual.horario, metrica.janela_grafico);
     const ate = formatarHorario(janela.fim);
     const minimo = formatarValor(metrica.limite_minimo, metrica.unidade);
     const maximo = formatarValor(metrica.limite_maximo, metrica.unidade);
@@ -313,7 +348,7 @@ function preencherTabela() {
     }
 
     const metrica = selecionarMetrica(resumoPrevisao.componentes);
-    const janela = janelaGrafico(resumoPrevisao.atualizado_em);
+    const janela = janelaGrafico(resumoPrevisao.atualizado_em, metrica.periodo_avaliado);
     const ate = formatarHorario(janela.fim);
     escrever('unidade-tabela', 'Previsão até ' + ate + ' · valores em ' + metrica.unidade);
 
@@ -331,14 +366,17 @@ function preencherTabela() {
         const maximo = formatarValor(item.limite_maximo, metrica.unidade);
 
         criarCelula(linha, item.hostname);
-        criarCelula(linha, menor + ' – ' + maior);
-        criarCelula(linha, minimo + ' – ' + maximo);
+        criarCelula(linha, item.exibicao?.faixa_prevista ?? menor + ' – ' + maior);
+        criarCelula(linha, item.exibicao?.limites ?? minimo + ' – ' + maximo);
         const situacao = document.createElement('span');
         situacao.className = 'previsao-situacao';
-        situacao.textContent = item.situacao || '—';
+        situacao.textContent = item.exibicao?.situacao ?? item.situacao ?? '—';
         criarCelula(linha, '').appendChild(situacao);
 
-        if (item.situacao === 'Dentro da faixa') {
+        if (item.exibicao) {
+            const destaque = item.exibicao.destaque;
+            if (['normal', 'atencao', 'alerta'].includes(destaque)) situacao.classList.add(destaque);
+        } else if (item.situacao === 'Dentro da faixa') {
             situacao.classList.add('situacao-dentro');
         } else if (item.situacao === 'Abaixo e acima') {
             situacao.classList.add('situacao-ambos');
@@ -399,7 +437,7 @@ function desenharGrafico(metrica) {
         previsto.push({x: horario, y: ponto.valor});
     }
 
-    const janela = janelaGrafico(dados.atual.horario);
+    const janela = janelaGrafico(dados.atual.horario, metrica.janela_grafico);
     const limitesMinimos = [
         {x: janela.inicio, y: metrica.limite_minimo},
         {x: janela.fim, y: metrica.limite_minimo}
