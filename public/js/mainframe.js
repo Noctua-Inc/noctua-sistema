@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   let localizacoes = [];
-  let componentes = [];
   let mainframes = [];
   let usuario = [];
   let per = [];
@@ -23,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!tableBody) return;
 
   let deleteConfirmId = null;
-  let editParametros = [];
   let editFkEmpresa = null;
   let currentStep = 1;
 
@@ -37,8 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const formEdit = document.getElementById("form-edit-mainframe");
   const editIdInput = document.getElementById("edit-id");
   const editHostnameInput = document.getElementById("edit-hostname");
-  const editFabricanteInput = document.getElementById("edit-fabricante");
-  const editModeloInput = document.getElementById("edit-modelo");
   const editNumeroSerieInput = document.getElementById("edit-numero-serie");
   const editSoInput = document.getElementById("edit-so");
   const editVersaoSoInput = document.getElementById("edit-versao-so");
@@ -47,9 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const editEstadoInput = document.getElementById("edit-estado");
   const editCidadeInput = document.getElementById("edit-cidade");
   const editRegiaoInput = document.getElementById("edit-regiao");
-  const editCompSelect = document.getElementById("edit-componente");
-  const editCompContainer = document.getElementById("edit-componentes-selecionados");
-  const btnAddComponente = document.getElementById("btn-add-componente");
   const btnCloseModal = document.getElementById("btn-close-modal");
   const btnCancelModal = document.getElementById("btn-cancel-modal");
   const formLocalizacaoRead = document.getElementById("form-grid-read");
@@ -68,13 +61,91 @@ document.addEventListener("DOMContentLoaded", () => {
   const novaLocCidade = document.getElementById("nova-loc-cidade");
   const novaLocRegiao = document.getElementById("nova-loc-regiao");
 
-  // Novo componente
-  const btnToggleNovoComponente = document.getElementById("btn-toggle-novo-componente");
-  const btnCancelarNovoComponente = document.getElementById("btn-cancelar-novo-componente");
-  const btnSalvarNovoComponente = document.getElementById("btn-salvar-novo-componente");
-  const formNovoComponente = document.getElementById("form-novo-componente");
-  const novoCompTipo = document.getElementById("novo-comp-tipo");
-  const novoCompFabricante = document.getElementById("novo-comp-fabricante");
+  function lerValorNumerico(id) {
+    const componenteEscolhido = document.getElementById(id);
+    if (!componenteEscolhido || componenteEscolhido.value === "") return null;
+    return Number(componenteEscolhido.value);
+  }
+
+  function definirValorNumerico(id, valor) {
+    const componenteEscolhido = document.getElementById(id);
+    if (!componenteEscolhido) return;
+    componenteEscolhido.value = valor ?? "";
+  }
+
+  function coletarParametrosComponentes() {
+    return {
+      CPU: {
+        pct_min: lerValorNumerico("cpu-pct-min"),
+        pct_max: lerValorNumerico("cpu-pct-max"),
+        freq_min: lerValorNumerico("cpu-freq-min"),
+        freq_max: lerValorNumerico("cpu-freq-max"),
+      },
+      RAM: {
+        pct_min: lerValorNumerico("ram-pct-min"),
+        pct_max: lerValorNumerico("ram-pct-max"),
+        gb_min: lerValorNumerico("ram-gb-min"),
+        gb_max: lerValorNumerico("ram-gb-max"),
+      },
+      SWAP: {
+        pct_min: lerValorNumerico("swap-pct-min"),
+        pct_max: lerValorNumerico("swap-pct-max"),
+      },
+      DISCO: {
+        pct_min: lerValorNumerico("disco-pct-min"),
+        pct_max: lerValorNumerico("disco-pct-max"),
+        pb_min: lerValorNumerico("disco-pb-min"),
+        pb_max: lerValorNumerico("disco-pb-max"),
+        req_min: lerValorNumerico("disco-req-min"),
+        req_max: lerValorNumerico("disco-req-max"),
+      },
+      REDE: {
+        tb_min: lerValorNumerico("rede-tb-min"),
+        tb_max: lerValorNumerico("rede-tb-max"),
+        pkt_min: lerValorNumerico("rede-pkt-min"),
+        pkt_max: lerValorNumerico("rede-pkt-max"),
+        tw_min: lerValorNumerico("rede-tw-min"),
+        tw_max: lerValorNumerico("rede-tw-max"),
+      },
+    };
+  }
+
+  function preencherParametrosComponentes(parametros = []) {
+    const porTipo = {};
+    parametros.forEach((p) => { porTipo[p.tipo] = p; });
+
+    const cpu = porTipo.CPU || {};
+    definirValorNumerico("cpu-pct-min", cpu.cpu_pct_min);
+    definirValorNumerico("cpu-pct-max", cpu.cpu_pct_max);
+    definirValorNumerico("cpu-freq-min", cpu.freq_min);
+    definirValorNumerico("cpu-freq-max", cpu.freq_max);
+
+    const ram = porTipo.RAM || {};
+    definirValorNumerico("ram-pct-min", ram.ram_pct_min);
+    definirValorNumerico("ram-pct-max", ram.ram_pct_max);
+    definirValorNumerico("ram-gb-min", ram.gb_min);
+    definirValorNumerico("ram-gb-max", ram.gb_max);
+
+    const swap = porTipo.SWAP || {};
+    definirValorNumerico("swap-pct-min", swap.swap_pct_min);
+    definirValorNumerico("swap-pct-max", swap.swap_pct_max);
+
+    const disco = porTipo.DISCO || {};
+    definirValorNumerico("disco-pct-min", disco.disco_pct_min);
+    definirValorNumerico("disco-pct-max", disco.disco_pct_max);
+    definirValorNumerico("disco-pb-min", disco.pb_min);
+    definirValorNumerico("disco-pb-max", disco.pb_max);
+    definirValorNumerico("disco-req-min", disco.req_min);
+    definirValorNumerico("disco-req-max", disco.req_max);
+
+    const rede = porTipo.REDE || {};
+    definirValorNumerico("rede-tb-min", rede.tb_min);
+    definirValorNumerico("rede-tb-max", rede.tb_max);
+    definirValorNumerico("rede-pkt-min", rede.pkt_min);
+    definirValorNumerico("rede-pkt-max", rede.pkt_max);
+    definirValorNumerico("rede-tw-min", rede.tw_min);
+    definirValorNumerico("rede-tw-max", rede.tw_max);
+  }
 
   //  Localizações 
   function preencherSelectLocalizacoes() {
@@ -392,133 +463,8 @@ if (btnToggleEditarLocalizacao) {
 
   }
 
-  //  Componentes 
-  function preencherSelectComponentes() {
-    if (!editCompSelect) return;
-    editCompSelect.innerHTML = `<option value="">Selecione um componente</option>`;
-    componentes.forEach((c) => {
-      const option = document.createElement("option");
-      option.value = c.id_componente;
-      option.textContent = `${c.tipo} — ${c.nome_fabricante}`;
-      editCompSelect.appendChild(option);
-    });
-  }
-
-  async function carregarComponentes() {
-    componentes = await api.get("/componente");
-    preencherSelectComponentes();
-  }
-
-  function renderEditComponentes() {
-    if (!editCompContainer) return;
-
-    if (editParametros.length === 0) {
-      editCompContainer.innerHTML = `<div class="empty-components">Nenhum componente associado.</div>`;
-      return;
-    }
-
-    editCompContainer.innerHTML = editParametros.map((parametro, index) => {
-      const componente = componentes.find((c) => c.id_componente === parametro.id_componente);
-      if (!componente) return "";
-
-      return `
-        <div class="edit-component-card">
-          <div class="edit-component-header">
-            <div>
-              <strong>${escapeHtml(componente.tipo)}</strong>
-              <span>${escapeHtml(componente.nome_fabricante)}</span>
-            </div>
-            <button type="button" class="remover-componente" data-index="${index}">×</button>
-          </div>
-          <div class="component-parametros">
-            <div class="field">
-              <label>Pico mínimo</label>
-              <input type="number" class="parametro-input" data-index="${index}" data-field="pico_min" value="${parametro.pico_min ?? ""}" min="0">
-            </div>
-            <div class="field">
-              <label>Pico máximo</label>
-              <input type="number" class="parametro-input" data-index="${index}" data-field="pico_max" value="${parametro.pico_max ?? ""}" min="0">
-            </div>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  if (btnAddComponente) {
-    btnAddComponente.addEventListener("click", () => {
-      const id = Number(editCompSelect.value);
-      if (!id) return;
-
-      const jaExiste = editParametros.some((p) => p.id_componente === id);
-      editCompSelect.value = "";
-      if (jaExiste) return;
-
-      editParametros.push({ id_componente: id, pico_max: 100, pico_min: 0 });
-      renderEditComponentes();
-    });
-  }
-
-  function limparFormNovoComponente() {
-    novoCompTipo.value = "";
-    novoCompFabricante.value = "";
-  }
-
-  function toggleFormNovoComponente(mostrar) {
-    if (!formNovoComponente) return;
-    formNovoComponente.classList.toggle("hidden", !mostrar);
-    if (mostrar) limparFormNovoComponente();
-  }
-
-  if (btnToggleNovoComponente) {
-    btnToggleNovoComponente.addEventListener("click", () => {
-      const estaVisivel = !formNovoComponente.classList.contains("hidden");
-      toggleFormNovoComponente(!estaVisivel);
-    });
-  }
-
-  if (btnCancelarNovoComponente) {
-    btnCancelarNovoComponente.addEventListener("click", () => toggleFormNovoComponente(false));
-  }
-
-  if (btnSalvarNovoComponente) {
-    btnSalvarNovoComponente.addEventListener("click", async () => {
-      const tipo = novoCompTipo.value.trim();
-      const fabricante = novoCompFabricante.value.trim();
-
-      if (!tipo || !fabricante) {
-        alert("Preencha todos os campos do novo componente.");
-        return;
-      }
-
-      try {
-        const novo = await api.post("/componente", { tipo, fabricante });
-        await carregarComponentes();
-
-        editParametros.push({ id_componente: novo.id_componente, pico_max: 100, pico_min: 0 });
-        renderEditComponentes();
-
-        toggleFormNovoComponente(false);
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-  }
-
-  if (editCompContainer) {
-    editCompContainer.addEventListener("click", (e) => {
-      const button = e.target.closest(".remover-componente");
-      if (!button) return;
-      editParametros.splice(Number(button.dataset.index), 1);
-      renderEditComponentes();
-    });
-
-    editCompContainer.addEventListener("input", (e) => {
-      const input = e.target.closest(".parametro-input");
-      if (!input) return;
-      editParametros[Number(input.dataset.index)][input.dataset.field] = input.value === "" ? null : Number(input.value);
-    });
-  }
+  //  Componentes
+  // Os componentes e parâmetros do mainframe são fixos (CPU, RAM, SWAP, DISCO e REDE).
   //  Tabela 
   async function carregarMainframes() {
     mainframes = await api.get(`/mainframe/empresa/${idEmpresa}`);
@@ -623,26 +569,20 @@ if (btnToggleEditarLocalizacao) {
 
       editIdInput.value = target.id_mainframe;
       editFkEmpresa = target.fk_empresa;
-      editHostnameInput.value = target.hostname;
-      editFabricanteInput.value = target.fabricante || "";
-      editModeloInput.value = target.modelo;
-      editNumeroSerieInput.value = target.numero_serie;
-      editSoInput.value = target.sis_operacional;
-      editVersaoSoInput.value = target.versao_so;
-      editStatusSelect.value = target.status;
+      editHostnameInput.value = target.hostname || "";
+      editNumeroSerieInput.value = target.numero_serie || "";
+      editSoInput.value = target.sis_operacional || "";
+      editVersaoSoInput.value = target.versao_so || "";
+      editStatusSelect.value = target.status || "ativo";
       editLocalizacaoSelect.value = target.fk_localizacao;
       atualizarDadosLocalizacao();
       atualizarBotaoLocalizacao();
       esconderFormGrid();
       carregarEstado().catch(() => alert("Não foi possível carregar os estados para editar a localização."));
 
-      editParametros = target.parametros.map((p) => ({
-        id_componente: p.id_componente, pico_max: p.pico_max, pico_min: p.pico_min,
-      }));
-      renderEditComponentes();
+      preencherParametrosComponentes(target.parametros || []);
 
       toggleFormNovaLocalizacao(false);
-      toggleFormNovoComponente(false);
 
       showStep(1);
       modalEdit.classList.remove("hidden");
@@ -654,7 +594,6 @@ if (btnToggleEditarLocalizacao) {
   function closeModal() {
     if (modalEdit) modalEdit.classList.add("hidden");
     toggleFormNovaLocalizacao(false);
-    toggleFormNovoComponente(false);
   }
 
   // Eventos da tabela
@@ -692,8 +631,6 @@ if (btnToggleEditarLocalizacao) {
 
       const id = Number(editIdInput.value);
       const hostname = editHostnameInput.value.trim();
-      const fabricante = editFabricanteInput.value.trim();
-      const modelo = editModeloInput.value.trim();
       const numero_serie = editNumeroSerieInput.value.trim();
       const sis_operacional = editSoInput.value.trim();
       const versao_so = editVersaoSoInput.value.trim();
@@ -710,9 +647,14 @@ if (btnToggleEditarLocalizacao) {
       }
 
       const corpo = {
-        hostname, fabricante, modelo, numero_serie, sis_operacional, versao_so, status, fk_localizacao,
+        hostname,
+        numero_serie,
+        sis_operacional,
+        versao_so,
+        status,
+        fk_localizacao,
         fk_empresa: editFkEmpresa,
-        parametros: editParametros,
+        parametros: coletarParametrosComponentes(),
       };
 
       const btnSalvar = formEdit.querySelector('button[type="submit"]');
@@ -734,11 +676,10 @@ if (btnToggleEditarLocalizacao) {
   if (modalEdit) modalEdit.addEventListener("click", (e) => { if (e.target === modalEdit) closeModal(); });
   if (searchInput) searchInput.addEventListener("input", renderTable);
 
-  const btnEditar = document.getElementById("btn-edit");
   // Inicialização
   (async function iniciar() {
     try {
-      await Promise.all([carregarLocalizacoes(), carregarComponentes(), carregarCargo()]);
+      await Promise.all([carregarLocalizacoes(), carregarCargo()]);
       await carregarMainframes();
     } catch (err) {
       console.error(err);

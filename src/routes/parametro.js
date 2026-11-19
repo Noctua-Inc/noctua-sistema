@@ -4,9 +4,10 @@ import parametroController from '../controller/parametroController.js';
 const router = express.Router();
 
 router.get('/', parametroController.listar);
-router.get('/:id', parametroController.buscarPorId);
+router.get('/:id_mainframe/:id_componente', parametroController.buscarPorId);
 router.post('/', parametroController.criar);
-router.put('/:id', parametroController.atualizar);
-router.delete('/:id', parametroController.remover);
+router.put('/:id_mainframe/:id_componente', parametroController.atualizar);
+router.delete('/mainframe/:id_mainframe', parametroController.removerPorMainframe);
+router.delete('/:id_mainframe/:id_componente', parametroController.remover);
 
 export default router;
