@@ -1,0 +1,439 @@
+
+/* DASHBOARD DE CORRELAÇÃO */
+
+.pagina-correlacao .main-wrapper {
+    min-width: 0;
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    display: block;
+    background-color: #F8F9FA;
+}
+
+
+/* CONTEÚDO PRINCIPAL */
+
+.dashboard-correlacao {
+    padding: 26px 24px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-size: 13px;
+}
+
+
+/* CABEÇALHO */
+
+.correlacao-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.correlacao-cabecalho h1 {
+    color: #1A1F71;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.correlacao-cabecalho p {
+    color: #64748B;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+
+/* FILTROS */
+
+.correlacao-filtros {
+    display: flex;
+    gap: 10px;
+}
+
+.correlacao-filtros select {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #D7DFED;
+    border-radius: 6px;
+    background-color: #FFFFFF;
+    color: #475569;
+    font: inherit;
+    cursor: pointer;
+}
+
+
+/* KPIs */
+
+.correlacao-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.correlacao-kpi {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 20px 24px;
+}
+
+.correlacao-kpi p {
+    color: #64748B;
+    font-size: 13px;
+}
+
+.correlacao-kpi h2 {
+    color: #1A1F71;
+    font-size: 30px;
+    font-weight: 600;
+    margin: 12px 0 5px;
+}
+
+.kpi-icone {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: #EFF6FF;
+    color: #2563EB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.kpi-icone i {
+    font-size: 17px;
+}
+
+
+/* CLASSIFICAÇÃO */
+
+.correlacao-kpi span {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.correlacao-alta {
+    color: #059669;
+}
+
+.correlacao-media {
+    color: #D97706;
+}
+
+.correlacao-fraca {
+    color: #64748B;
+}
+
+
+/* GRÁFICOS */
+
+.correlacao-graficos {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 18px;
+}
+
+.correlacao-card {
+    min-width: 0;
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 22px;
+}
+
+.correlacao-card h2 {
+    color: #1A1F71;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.correlacao-card h2 i {
+    margin-right: 7px;
+    color: #2563EB;
+}
+
+.grafico-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+}
+
+
+/* MATRIZ E INSIGHTS */
+
+.correlacao-inferior {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+
+/* MATRIZ */
+
+.matriz {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.matriz th,
+.matriz td {
+    padding: 18px 10px;
+    border: 1px solid #E2E8F0;
+    font-size: 13px;
+}
+
+.matriz th {
+    background-color: #F1F5F9;
+    color: #1A1F71;
+    font-weight: 600;
+}
+
+.matriz .forte {
+    background-color: #1A1F71;
+    color: #FFFFFF;
+}
+
+.matriz .moderada {
+    background-color: #93C5FD;
+    color: #1E3A8A;
+}
+
+.matriz .fraca {
+    background-color: #DBEAFE;
+    color: #1E3A8A;
+}
+
+
+/* LEGENDA */
+
+.legenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 18px;
+}
+
+.legenda span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748B;
+    font-size: 12px;
+}
+
+.cor-legenda {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+}
+
+.forte-cor {
+    background-color: #1A1F71;
+}
+
+.moderada-cor {
+    background-color: #93C5FD;
+}
+
+.fraca-cor {
+    background-color: #DBEAFE;
+}
+
+
+/* TABELA DE INSIGHTS */
+
+.tabela-responsiva {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabela-correlacao {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabela-correlacao th {
+    background-color: #F1F5F9;
+    color: #1A1F71;
+    text-align: left;
+    padding: 13px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.tabela-correlacao td {
+    padding: 15px 13px;
+    border-bottom: 1px solid #E2E8F0;
+    color: #475569;
+    font-size: 12px;
+}
+
+.tabela-correlacao td strong {
+    color: #1E293B;
+}
+
+
+/* OBSERVAÇÃO */
+
+.correlacao-observacao {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 18px;
+    background-color: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    border-radius: 8px;
+    color: #1E40AF;
+}
+
+.correlacao-observacao i {
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.correlacao-observacao p {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 1100px) {
+
+    .correlacao-graficos,
+    .correlacao-inferior {
+        grid-template-columns: 1fr;
+    }
+
+    .correlacao-kpis {
+        gap: 12px;
+    }
+
+}
+
+
+/* TABLETS E CELULARES */
+
+@media (max-width: 760px) {
+
+    .pagina-correlacao .sidebar {
+        width: 72px;
+        padding: 24px 8px 0;
+    }
+
+    .pagina-correlacao .sidebar-brand {
+        padding: 0;
+        justify-content: center;
+    }
+
+    .pagina-correlacao .sidebar-brand img {
+        width: 54px;
+    }
+
+    .pagina-correlacao .sidebar-menu a {
+        justify-content: center;
+        padding: 14px 8px;
+        font-size: 0;
+        gap: 0;
+    }
+
+    .pagina-correlacao .sidebar-menu i {
+        font-size: 17px;
+    }
+
+    .pagina-correlacao .sidebar-user {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .pagina-correlacao .user-info {
+        display: none;
+    }
+
+    .pagina-correlacao .main-wrapper {
+        margin-left: 72px;
+        width: calc(100% - 72px);
+    }
+
+    .dashboard-correlacao {
+        padding: 20px 14px;
+        gap: 16px;
+    }
+
+    .correlacao-cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .correlacao-cabecalho h1 {
+        font-size: 24px;
+    }
+
+    .correlacao-filtros {
+        width: 100%;
+    }
+
+    .correlacao-filtros select {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .correlacao-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .correlacao-kpi {
+        padding: 18px;
+    }
+
+    .correlacao-card {
+        padding: 16px;
+    }
+
+    .grafico-container {
+        height: 260px;
+    }
+
+    .matriz th,
+    .matriz td {
+        padding: 12px 5px;
+        font-size: 11px;
+    }
+
+}
+
+
+/* CELULARES PEQUENOS */
+
+@media (max-width: 480px) {
+
+    .dashboard-correlacao {
+        padding: 16px 10px;
+    }
+
+    .correlacao-cabecalho h1 {
+        font-size: 20px;
+    }
+
+    .correlacao-kpi h2 {
+        font-size: 25px;
+    }
+
+    .correlacao-card h2 {
+        font-size: 14px;
+    }
+
+    .tabela-correlacao {
+        min-width: 480px;
+    }
+
+    .correlacao-observacao {
+        align-items: flex-start;
+    }
+
+}

@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Noctua | Correlação</title>
+
+    <!-- CSS geral -->
+    <link rel="stylesheet" href="../public/styles/dash-style.css">
+
+    <!-- CSS exclusivo da dashboard -->
+    <link rel="stylesheet" href="../public/styles/dash-correlacao.cssz">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="pagina-correlacao">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <img src="../img/logo.png" alt="Noctua">
+        </div>
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a href="index.html">
+                    <i class="fa-solid fa-house"></i>
+                    Início
+                </a>
+            </li>
+
+            <li>
+                <a href="servidores.html">
+                    <i class="fa-solid fa-server"></i>
+                    Mainframes
+                </a>
+            </li>
+
+            <li>
+                <a href="dashboard-correlacao.html" class="active">
+                    <i class="fa-solid fa-chart-line"></i>
+                    Correlação
+                </a>
+            </li>
+
+            <li>
+                <a href="alertas.html">
+                    <i class="fa-solid fa-bell"></i>
+                    Alertas
+                </a>
+            </li>
+
+            <li>
+                <a href="configuracoes.html">
+                    <i class="fa-solid fa-gear"></i>
+                    Configurações
+                </a>
+            </li>
+
+        </ul>
+
+        <div class="sidebar-user">
+            <a href="#">
+                <div class="user-avatar">
+                    <span>U</span>
+                </div>
+
+                <div class="user-info">
+                    <span id="user-name">Usuário</span>
+                    <span id="user-role">Administrador</span>
+                </div>
+            </a>
+        </div>
+
+    </aside>
+
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-wrapper">
+
+        <section class="dashboard-correlacao">
+
+            <!-- CABEÇALHO -->
+            <header class="correlacao-cabecalho">
+
+                <div>
+                    <h1>Correlação entre recursos</h1>
+                    <p>
+                        Analise como CPU, RAM e Disco se relacionam
+                        nos mainframes.
+                    </p>
+                </div>
+
+                <div class="correlacao-filtros">
+
+                    <select id="filtro-periodo">
+                        <option value="24">Últimas 24 horas</option>
+                        <option value="7">Últimos 7 dias</option>
+                        <option value="30">Últimos 30 dias</option>
+                    </select>
+
+                    <select id="filtro-mainframe">
+                        <option value="todos">Todos os equipamentos</option>
+                        <option value="MF-001">MF-001</option>
+                        <option value="MF-002">MF-002</option>
+                        <option value="MF-003">MF-003</option>
+                    </select>
+
+                </div>
+
+            </header>
+
+
+            <!-- KPIs -->
+            <section class="correlacao-kpis">
+
+                <div class="correlacao-kpi">
+
+                    <div class="kpi-icone">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+
+                    <p>Correlação CPU x RAM</p>
+
+                    <h2>0,82</h2>
+
+                    <span class="correlacao-alta">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Alta correlação
+                    </span>
+
+                </div>
+
+
+                <div class="correlacao-kpi">
+
+                    <div class="kpi-icone">
+                        <i class="fa-solid fa-hard-drive"></i>
+                    </div>
+
+                    <p>Correlação CPU x Disco</p>
+
+                    <h2>0,46</h2>
+
+                    <span class="correlacao-media">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Correlação moderada
+                    </span>
+
+                </div>
+
+
+                <div class="correlacao-kpi">
+
+                    <div class="kpi-icone">
+                        <i class="fa-solid fa-memory"></i>
+                    </div>
+
+                    <p>Correlação RAM x Disco</p>
+
+                    <h2>0,38</h2>
+
+                    <span class="correlacao-fraca">
+                        Correlação fraca
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <!-- GRÁFICOS -->
+            <section class="correlacao-graficos">
+
+                <div class="correlacao-card">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-line"></i>
+                        Evolução dos recursos
+                    </h2>
+
+                    <div class="grafico-container">
+                        <canvas id="grafico-evolucao"></canvas>
+                    </div>
+
+                </div>
+
+
+                <div class="correlacao-card">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-scatter"></i>
+                        Dispersão: CPU x RAM
+                    </h2>
+
+                    <div class="grafico-container">
+                        <canvas id="grafico-dispersao"></canvas>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- MATRIZ E INSIGHTS -->
+            <section class="correlacao-inferior">
+
+                <div class="correlacao-card">
+
+                    <h2>
+                        <i class="fa-solid fa-table-cells"></i>
+                        Matriz de correlação
+                    </h2>
+
+                    <table class="matriz">
+
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>CPU</th>
+                                <th>RAM</th>
+                                <th>Disco</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+                                <th>CPU</th>
+                                <td class="forte">1,00</td>
+                                <td class="forte">0,82</td>
+                                <td class="moderada">0,46</td>
+                            </tr>
+
+                            <tr>
+                                <th>RAM</th>
+                                <td class="forte">0,82</td>
+                                <td class="forte">1,00</td>
+                                <td class="fraca">0,38</td>
+                            </tr>
+
+                            <tr>
+                                <th>Disco</th>
+                                <td class="moderada">0,46</td>
+                                <td class="fraca">0,38</td>
+                                <td class="forte">1,00</td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                    <div class="legenda">
+
+                        <span>
+                            <i class="cor-legenda forte-cor"></i>
+                            Alta
+                        </span>
+
+                        <span>
+                            <i class="cor-legenda moderada-cor"></i>
+                            Moderada
+                        </span>
+
+                        <span>
+                            <i class="cor-legenda fraca-cor"></i>
+                            Fraca
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="correlacao-card">
+
+                    <h2>
+                        <i class="fa-solid fa-lightbulb"></i>
+                        Principais insights
+                    </h2>
+
+                    <div class="tabela-responsiva">
+
+                        <table class="tabela-correlacao">
+
+                            <thead>
+                                <tr>
+                                    <th>Recursos</th>
+                                    <th>Correlação</th>
+                                    <th>Interpretação</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td><strong>CPU x RAM</strong></td>
+                                    <td>0,82</td>
+                                    <td>Alta relação entre os recursos.</td>
+                                </tr>
+
+                                <tr>
+                                    <td><strong>CPU x Disco</strong></td>
+                                    <td>0,46</td>
+                                    <td>Relação moderada.</td>
+                                </tr>
+
+                                <tr>
+                                    <td><strong>RAM x Disco</strong></td>
+                                    <td>0,38</td>
+                                    <td>Relação fraca.</td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- OBSERVAÇÃO -->
+            <div class="correlacao-observacao">
+
+                <i class="fa-solid fa-circle-info"></i>
+
+                <p>
+                    A correlação indica como dois recursos variam em conjunto.
+                    Uma correlação alta não significa necessariamente que um
+                    recurso causa o aumento do outro.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- GRÁFICOS -->
+    <script>
+
+        // Gráfico de evolução dos recursos
+
+        new Chart(document.getElementById('grafico-evolucao'), {
+
+            type: 'line',
+
+            data: {
+                labels: [
+                    '00h', '04h', '08h',
+                    '12h', '16h', '20h'
+                ],
+
+                datasets: [
+
+                    {
+                        label: 'CPU',
+                        data: [40, 50, 55, 75, 65, 70],
+                        borderColor: '#2563EB',
+                        tension: 0.4
+                    },
+
+                    {
+                        label: 'RAM',
+                        data: [30, 38, 45, 60, 50, 52],
+                        borderColor: '#059669',
+                        tension: 0.4
+                    },
+
+                    {
+                        label: 'Disco',
+                        data: [20, 25, 30, 42, 40, 43],
+                        borderColor: '#D97706',
+                        tension: 0.4
+                    }
+
+                ]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            callback: value => value + '%'
+                        }
+                    }
+                }
+            }
+
+        });
+
+
+        // Gráfico de dispersão CPU x RAM
+
+        new Chart(document.getElementById('grafico-dispersao'), {
+
+            type: 'scatter',
+
+            data: {
+                datasets: [{
+                    label: 'CPU x RAM',
+
+                    data: [
+                        {x: 10, y: 15},
+                        {x: 20, y: 25},
+                        {x: 30, y: 35},
+                        {x: 40, y: 42},
+                        {x: 50, y: 55},
+                        {x: 60, y: 60},
+                        {x: 70, y: 75},
+                        {x: 80, y: 82},
+                        {x: 90, y: 90}
+                    ],
+
+                    backgroundColor: '#2563EB'
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+                    x: {
+                        min: 0,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'CPU (%)'
+                        }
+                    },
+
+                    y: {
+                        min: 0,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'RAM (%)'
+                        }
+                    }
+                }
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>
