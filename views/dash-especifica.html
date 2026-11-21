@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Nome Servidor</title>
+    <title>Detalhes do servidor | Noctua</title>
     <link rel="stylesheet" href="/styles/dash-especifica.css">
     <link rel="stylesheet" href="/styles/dashboard-sidebar.css">
     <link rel="stylesheet" href="/styles/editar-usuario.css">
@@ -29,6 +29,7 @@
                 <div class="status-mainframe" id="statusMainframe">
                 </div>
             </section>
+            <p id="aviso-monitoramento" role="status"></p>
     
             <section class="sessao-fundo opcoes-monitoramento">
                 <ul>
@@ -98,7 +99,7 @@
     
             <section class="sessao-fundo sessao-historico">
                 <h2 class="titulo-lista">
-                    Histórico de Eventos e Histórico Detalhado
+                    Histórico de medições
                 </h2>
 
                  <table>
@@ -115,6 +116,7 @@
     
 <div id="editar-usuario" style="display: none;"></div>
 <script src="/js/api.js"></script>
+    <script src="/js/monitoramento.js"></script>
 <script src="/js/dashboard-sidebar.js"></script>
 <script src="/js/user-sidebar.js"></script>
 <script src="/js/editar-usuario.js"></script>

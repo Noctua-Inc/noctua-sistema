@@ -1,32 +1,13 @@
 // ==========================================================
 // CONFIGURAÇÕES DO GRÁFICO E KPIS
 // ==========================================================
-const kpiContextData = {
-    cpu: {
-        color: '#DC2626',
-        kpi1: { label: 'Uso Total MIPS / CPU', sub: 'Pico crítico: 90%' },
-        kpi2: { label: 'Threads em Execução', sub: 'Média aceitável: 1.200' },
-        kpi3: { label: 'Fila de Processamento', sub: 'Aguardando CPU' }
-    },
-    ram: {
-        color: '#2563EB',
-        kpi1: { label: 'Uso Total de RAM', sub: 'Capacidade máxima próxima' },
-        kpi2: { label: 'Memória em Swap', sub: 'Limite de alerta: 5.0 GB' },
-        kpi3: { label: 'Taxa de Paginação', sub: 'Status de paginação' }
-    },
-    disco: {
-        color: '#7C3AED',
-        kpi1: { label: 'Taxa I/O de Disco', sub: 'Limite físico: 15K IOPS' },
-        kpi2: { label: 'Latência Média', sub: 'Tempo de resposta (ms)' },
-        kpi3: { label: 'Fila I/O (Wait)', sub: 'Operações em buffer' }
-    }
+const metricasProcessos = {
+    cpu: { cor: '#dc2626', total: 'CPU da máquina', grafico: 'CPU da máquina por coleta', tabela: 'Processos com maior uso de CPU' },
+    ram: { cor: '#2563eb', total: 'Memória dos processos', grafico: 'Memória dos processos por coleta', tabela: 'Processos com maior uso de memória' },
+    disco: { cor: '#7c3aed', total: 'Volume de I/O acumulado', grafico: 'Contadores acumulados de I/O por coleta', tabela: 'Processos com maior volume de I/O' }
 };
-
-const chartTitles = {
-    cpu: { title: 'Evolução Temporal - Consumo de CPU (MIPS)', table: 'Top Processos Consumindo CPU' },
-    ram: { title: 'Evolução Temporal - Alocação de Memória RAM', table: 'Top Processos Alocando RAM' },
-    disco: { title: 'Evolução Temporal - Taxa I/O de Disco', table: 'Top Processos com Maior I/O' }
-};
+const unidadesProcessos = { cpu: '%', ram: ' MiB', disco: ' MiB' };
+let consultaProcessos = 0;
 
 let chartInstance = null;
 
@@ -62,93 +43,78 @@ async function buscarProcessosAPI(idMainframe, metrica) {
 // ATUALIZAÇÃO DINÂMICA DA INTERFACE
 // ==========================================================
 async function switchMetric(metric) {
-    // 1. Atualiza os botões visuais
+    const consulta = ++consultaProcessos;
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.metric === metric);
     });
-
     const idMainframe = document.getElementById('mainframeSelect').value;
     if (!idMainframe) return;
 
-    let dadosReais;
+    atualizarProcessos(metric, null, 'Carregando processos…');
     try {
-        dadosReais = await buscarProcessosAPI(idMainframe, metric);
+        const dados = await buscarProcessosAPI(idMainframe, metric);
+        if (consulta === consultaProcessos) atualizarProcessos(metric, dados);
     } catch (erro) {
-        console.error('Erro ao buscar dados da API:', erro);
-        renderErroProcessos(erro.message);
-        return;
+        if (consulta === consultaProcessos) atualizarProcessos(metric, null, erro.message);
     }
-
-    // 3. Trata ausência de dados
-    if (!dadosReais || dadosReais.processos.length === 0) {
-        renderTabelaVazia();
-        return;
-    }
-
-    // 4. Atualiza Títulos
-    document.getElementById('chartTitle').innerText = chartTitles[metric].title;
-    document.getElementById('tableTitle').innerText = chartTitles[metric].table;
-
-    // 5. Atualiza Gráfico
-    chartInstance.data.labels = dadosReais.grafico.labels; // Ex: ['11:30', '11:35', '11:40']
-    chartInstance.data.datasets = dadosReais.grafico.datasets.map(ds => ({ ...ds, fill: true }));
-    chartInstance.update();
-
-    // 6. Atualiza KPIs e Tabela
-    updateKPIs(metric, dadosReais.kpis, dadosReais.processos[0]);
-    renderTable(metric, dadosReais.processos);
 }
 
-function updateKPIs(metric, kpiData, topProc) {
-    const context = kpiContextData[metric];
-
-    // Atualiza KPIs estruturais
-    for (let i = 1; i <= 3; i++) {
-        document.getElementById(`kpi${i}-label`).innerText = context[`kpi${i}`].label;
-        document.getElementById(`kpi${i}-value`).innerText = kpiData[`valor${i}`];
-        document.getElementById(`kpi${i}-value`).style.color = context.color;
-        document.getElementById(`kpi${i}-sub`).innerText = context[`kpi${i}`].sub;
-    }
-
-    // Atualiza o KPI de Maior Ofensor (Card 4)
-    document.getElementById('kpi4-value').innerText = topProc.job;
-    
-    let subtextoOfensor = '';
-    if (metric === 'cpu') subtextoOfensor = `Consumindo ${topProc.cpu}% da CPU`;
-    if (metric === 'ram') subtextoOfensor = `Alocando ${topProc.ram} MB de RAM`;
-    if (metric === 'disco') subtextoOfensor = `Gerando ${topProc.disco} IOPS`;
-    
-    document.getElementById('kpi4-sub').innerText = subtextoOfensor;
+function formatarProcesso(valor, metrica) {
+    return Number.isFinite(valor)
+        ? valor.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + unidadesProcessos[metrica]
+        : '—';
 }
 
-function renderTable(metric, processos) {
-    const tbody = document.getElementById('processTableBody');
-    tbody.innerHTML = '';
-
-    processos.forEach(proc => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${proc.pid}</td>
-            <td><strong>${proc.job}</strong></td>
-            <td class="${metric === 'cpu' ? 'highlight-col' : ''}" style="${metric === 'cpu' ? 'color: #DC2626;' : ''}">${proc.cpu}%</td>
-            <td class="${metric === 'ram' ? 'highlight-col' : ''}" style="${metric === 'ram' ? 'color: #2563EB;' : ''}">${proc.ram} MB</td>
-            <td class="${metric === 'disco' ? 'highlight-col' : ''}" style="${metric === 'disco' ? 'color: #7C3AED;' : ''}">${proc.disco} IOPS</td>
-            <td>${proc.threads}</td>
-            <td><span class="badge-status status-${proc.status.toLowerCase()}">${proc.status}</span></td>
-        `;
-        tbody.appendChild(tr);
+function atualizarProcessos(metrica, dados, aviso) {
+    const contexto = metricasProcessos[metrica];
+    const rotulos = [contexto.total, 'Processos capturados', 'Última captura'];
+    rotulos.forEach((rotulo, i) => {
+        const n = i + 1;
+        document.getElementById('kpi' + n + '-label').textContent = rotulo;
+        const valor = document.getElementById('kpi' + n + '-value');
+        valor.textContent = dados?.kpis?.['valor' + n] ?? '—';
+        valor.style.color = contexto.cor;
+        document.getElementById('kpi' + n + '-sub').textContent = '';
     });
-}
+    const primeiro = dados?.processos.find(processo => Number.isFinite(processo[metrica]));
+    document.getElementById('kpi4-value').textContent = primeiro?.job ?? '—';
+    document.getElementById('kpi4-sub').textContent = formatarProcesso(primeiro?.[metrica], metrica);
+    document.getElementById('chartTitle').textContent = contexto.grafico;
+    document.getElementById('tableTitle').textContent = contexto.tabela;
+    document.getElementById('aviso-processos').textContent = aviso
+        ?? (dados?.grafico.datasets.length ? '' : 'Sem série para a métrica nesta captura.');
 
-function renderTabelaVazia() {
-    const tbody = document.getElementById('processTableBody');
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Nenhum dado de processo encontrado para este servidor no momento.</td></tr>';
-}
+    if (chartInstance) {
+        chartInstance.data.labels = dados?.grafico.labels ?? [];
+        const cores = [contexto.cor, '#059669'];
+        chartInstance.data.datasets = (dados?.grafico.datasets ?? []).map((serie, i) => ({
+            ...serie, borderColor: cores[i], backgroundColor: cores[i]
+        }));
+        chartInstance.update();
+    }
 
-function renderErroProcessos(mensagem) {
-    const tbody = document.getElementById('processTableBody');
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;"></td></tr>';
-    tbody.querySelector('td').textContent = mensagem;
+    const tabela = document.getElementById('processTableBody');
+    tabela.replaceChildren();
+    for (const processo of dados?.processos ?? []) {
+        const linha = tabela.insertRow();
+        linha.insertCell().textContent = processo.pid;
+        linha.insertCell().textContent = processo.job;
+        for (const campo of Object.keys(unidadesProcessos)) {
+            const celula = linha.insertCell();
+            celula.textContent = formatarProcesso(processo[campo], campo);
+            celula.classList.toggle('highlight-col', campo === metrica);
+            if (campo === 'cpu') {
+                celula.title = processo.cpu_normalizada ? 'Percentual da máquina' : 'Percentual bruto do processo';
+            }
+        }
+        const status = { Normal: 'Normal', Atencao: 'Atenção', Critico: 'Crítico' };
+        linha.insertCell().textContent = status[processo.status] ?? '—';
+    }
+    if (!tabela.rows.length) {
+        const celula = tabela.insertRow().insertCell();
+        celula.colSpan = 6;
+        celula.textContent = aviso ?? 'Sem processos para este mainframe.';
+    }
 }
 
 async function carregarMainframes() {
@@ -173,7 +139,7 @@ async function carregarMainframes() {
     if (mainframes.length === 0) {
         seletor.add(new Option('Nenhum mainframe cadastrado', ''));
         seletor.disabled = true;
-        renderTabelaVazia();
+        atualizarProcessos('cpu', null, 'Nenhum mainframe cadastrado.');
         return false;
     }
 
@@ -190,7 +156,7 @@ window.onload = async () => {
         return;
     }
 
-    initChart();
+    if (typeof Chart !== 'undefined') initChart();
 
     // Eventos de clique nas abas (CPU, RAM, DISCO)
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -209,9 +175,10 @@ window.onload = async () => {
         if (!await carregarMainframes()) return;
     } catch (erro) {
         console.error('Erro ao carregar mainframes:', erro);
-        renderErroProcessos(erro.message);
+        atualizarProcessos('cpu', null, erro.message);
         return;
     }
 
     switchMetric('cpu');
+    setInterval(() => switchMetric(document.querySelector('.tab-btn.active').dataset.metric), 60000);
 };

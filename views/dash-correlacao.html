@@ -48,23 +48,22 @@
 
                 <div class="correlacao-filtros">
 
-                    <select id="filtro-periodo">
+                    <select id="filtro-periodo" aria-label="Período das medições">
                         <option value="24">Últimas 24 horas</option>
-                        <option value="7">Últimos 7 dias</option>
-                        <option value="30">Últimos 30 dias</option>
+                        <option value="168">Últimos 7 dias</option>
+                        <option value="672">Últimos 28 dias</option>
                     </select>
 
-                    <select id="filtro-mainframe">
+                    <select id="filtro-mainframe" aria-label="Mainframe">
                         <option value="todos">Todos os equipamentos</option>
-                        <option value="MF-001">MF-001</option>
-                        <option value="MF-002">MF-002</option>
-                        <option value="MF-003">MF-003</option>
                     </select>
 
                 </div>
 
             </header>
 
+
+            <p id="aviso-correlacao" role="status"></p>
 
             <!-- KPIs -->
             <section class="correlacao-kpis">
@@ -77,12 +76,9 @@
 
                     <p>Correlação CPU x RAM</p>
 
-                    <h2>0,82</h2>
+                    <h2>—</h2>
 
-                    <span class="correlacao-alta">
-                        <i class="fa-solid fa-arrow-up"></i>
-                        Alta correlação
-                    </span>
+                    <span></span>
 
                 </div>
 
@@ -95,12 +91,9 @@
 
                     <p>Correlação CPU x Disco</p>
 
-                    <h2>0,46</h2>
+                    <h2>—</h2>
 
-                    <span class="correlacao-media">
-                        <i class="fa-solid fa-arrow-up"></i>
-                        Correlação moderada
-                    </span>
+                    <span></span>
 
                 </div>
 
@@ -113,11 +106,9 @@
 
                     <p>Correlação RAM x Disco</p>
 
-                    <h2>0,38</h2>
+                    <h2>—</h2>
 
-                    <span class="correlacao-fraca">
-                        Correlação fraca
-                    </span>
+                    <span></span>
 
                 </div>
 
@@ -178,30 +169,7 @@
                             </tr>
                         </thead>
 
-                        <tbody>
-
-                            <tr>
-                                <th>CPU</th>
-                                <td class="forte">1,00</td>
-                                <td class="forte">0,82</td>
-                                <td class="moderada">0,46</td>
-                            </tr>
-
-                            <tr>
-                                <th>RAM</th>
-                                <td class="forte">0,82</td>
-                                <td class="forte">1,00</td>
-                                <td class="fraca">0,38</td>
-                            </tr>
-
-                            <tr>
-                                <th>Disco</th>
-                                <td class="moderada">0,46</td>
-                                <td class="fraca">0,38</td>
-                                <td class="forte">1,00</td>
-                            </tr>
-
-                        </tbody>
+                        <tbody id="matriz-correlacao"></tbody>
 
                     </table>
 
@@ -246,27 +214,7 @@
                                 </tr>
                             </thead>
 
-                            <tbody>
-
-                                <tr>
-                                    <td><strong>CPU x RAM</strong></td>
-                                    <td>0,82</td>
-                                    <td>Alta relação entre os recursos.</td>
-                                </tr>
-
-                                <tr>
-                                    <td><strong>CPU x Disco</strong></td>
-                                    <td>0,46</td>
-                                    <td>Relação moderada.</td>
-                                </tr>
-
-                                <tr>
-                                    <td><strong>RAM x Disco</strong></td>
-                                    <td>0,38</td>
-                                    <td>Relação fraca.</td>
-                                </tr>
-
-                            </tbody>
+                            <tbody id="insights-correlacao"></tbody>
 
                         </table>
 
@@ -296,123 +244,12 @@
 
     <div id="editar-usuario" style="display: none;"></div>
     <script src="/js/api.js"></script>
+    <script src="/js/monitoramento.js"></script>
     <script src="/js/dashboard-sidebar.js"></script>
     <script src="/js/user-sidebar.js"></script>
     <script src="/js/editar-usuario.js"></script>
 
-    <!-- GRÁFICOS -->
-    <script>
-
-        // Gráfico de evolução dos recursos
-
-        new Chart(document.getElementById('grafico-evolucao'), {
-
-            type: 'line',
-
-            data: {
-                labels: [
-                    '00h', '04h', '08h',
-                    '12h', '16h', '20h'
-                ],
-
-                datasets: [
-
-                    {
-                        label: 'CPU',
-                        data: [40, 50, 55, 75, 65, 70],
-                        borderColor: '#2563EB',
-                        tension: 0.4
-                    },
-
-                    {
-                        label: 'RAM',
-                        data: [30, 38, 45, 60, 50, 52],
-                        borderColor: '#059669',
-                        tension: 0.4
-                    },
-
-                    {
-                        label: 'Disco',
-                        data: [20, 25, 30, 42, 40, 43],
-                        borderColor: '#D97706',
-                        tension: 0.4
-                    }
-
-                ]
-            },
-
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-
-                scales: {
-                    y: {
-                        min: 0,
-                        max: 100,
-                        ticks: {
-                            callback: value => value + '%'
-                        }
-                    }
-                }
-            }
-
-        });
-
-
-        // Gráfico de dispersão CPU x RAM
-
-        new Chart(document.getElementById('grafico-dispersao'), {
-
-            type: 'scatter',
-
-            data: {
-                datasets: [{
-                    label: 'CPU x RAM',
-
-                    data: [
-                        {x: 10, y: 15},
-                        {x: 20, y: 25},
-                        {x: 30, y: 35},
-                        {x: 40, y: 42},
-                        {x: 50, y: 55},
-                        {x: 60, y: 60},
-                        {x: 70, y: 75},
-                        {x: 80, y: 82},
-                        {x: 90, y: 90}
-                    ],
-
-                    backgroundColor: '#2563EB'
-                }]
-            },
-
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-
-                scales: {
-                    x: {
-                        min: 0,
-                        max: 100,
-                        title: {
-                            display: true,
-                            text: 'CPU (%)'
-                        }
-                    },
-
-                    y: {
-                        min: 0,
-                        max: 100,
-                        title: {
-                            display: true,
-                            text: 'RAM (%)'
-                        }
-                    }
-                }
-            }
-
-        });
-
-    </script>
+    <script src="/js/dash-correlacao.js"></script>
 
 </body>
 </html>

@@ -20,6 +20,7 @@
         <main class="dashboard-alertas" id="dashboard-alertas">
             <header class="alertas-cabecalho">
                 <h1>Central de alertas</h1>
+                <p id="aviso-alertas" role="status"></p>
                 <p class="alertas-atualizacao">Atualizado em <time id="data-atualizacao"></time></p>
             </header>
 
@@ -133,7 +134,6 @@
                 <div class="alertas-abas" role="group" aria-label="Filtrar histórico por status">
                     <button type="button" class="ativa" data-status="todos" aria-pressed="true">Todos <span id="contador-todos">0</span></button>
                     <button type="button" data-status="aberto" aria-pressed="false">Abertos <span id="contador-aberto">0</span></button>
-                    <button type="button" data-status="investigacao" aria-pressed="false">Em investigação <span id="contador-investigacao">0</span></button>
                     <button type="button" data-status="resolvido" aria-pressed="false">Resolvidos <span id="contador-resolvido">0</span></button>
                 </div>
                 <div class="alertas-tabela-scroll" tabindex="0" role="region" aria-label="Tabela de alertas, com rolagem horizontal em telas menores">
@@ -154,6 +154,7 @@
     <div id="editar-usuario" style="display: none;"></div>
 
     <script src="/js/api.js"></script>
+    <script src="/js/monitoramento.js"></script>
     <script src="/js/dashboard-sidebar.js"></script>
     <script src="/js/user-sidebar.js"></script>
     <script src="/js/editar-usuario.js"></script>
