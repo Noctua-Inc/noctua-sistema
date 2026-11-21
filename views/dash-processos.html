@@ -8,38 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/styles/dash-processos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="/styles/dashboard-sidebar.css">
+    <link rel="stylesheet" href="/styles/editar-usuario.css">
 </head>
-<body>
+<body class="pagina-dashboard">
 
-    <!-- Sidebar Padrão Noctua (#1A1F71) -->
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <span class="brand-title">NOCTUA</span>
-        </div>
-        
-        <ul class="sidebar-menu">
-            <li><a href="/dash-servidores.html">Dashboard Geral</a></li>
-            <li><a href="/dash-correlacao.html">Correlação</a></li>
-            <li><a href="/dash-alertas.html">Alertas</a></li>
-            <li><a href="/dash-processos.html" class="active" aria-current="page">Análise de Processos</a></li>
-            <li><a href="/mainframes.html">Configurações</a></li>
-        </ul>
-
-        <div class="sidebar-user">
-            <a href="#">
-                <div class="user-avatar">
-                    <span id="user-avatar-letter">B</span>
-                </div>
-                <div class="user-info">
-                    <span id="user-name">Bianca</span>
-                    <span id="user-role">Analista Infra</span>
-                </div>
-            </a>
-        </div>
-    </aside>
+    <aside class="sidebar" data-dashboard-sidebar="dash-processos.html"></aside>
 
     <!-- Conteúdo Principal -->
-    <div class="main-wrapper">
+    <div class="main-wrapper" id="container_main" onclick="fecharEditarUsuario()">
         <header class="header">
             <h1 class="header-title">Monitoramento de Processos</h1>
         </header>
@@ -129,7 +107,12 @@
         </main>
     </div>
 
+    <div id="editar-usuario" style="display: none;"></div>
+
     <script src="/js/api.js"></script>
+    <script src="/js/dashboard-sidebar.js"></script>
+    <script src="/js/user-sidebar.js"></script>
+    <script src="/js/editar-usuario.js"></script>
     <script src="/js/dash-processos.js"></script>
 </body>
 </html>

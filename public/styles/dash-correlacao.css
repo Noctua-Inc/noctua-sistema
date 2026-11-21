@@ -3,8 +3,6 @@
 
 .pagina-correlacao .main-wrapper {
     min-width: 0;
-    margin-left: 240px;
-    width: calc(100% - 240px);
     display: block;
     background-color: #F8F9FA;
 }
@@ -320,45 +318,6 @@
 /* TABLETS E CELULARES */
 
 @media (max-width: 760px) {
-
-    .pagina-correlacao .sidebar {
-        width: 72px;
-        padding: 24px 8px 0;
-    }
-
-    .pagina-correlacao .sidebar-brand {
-        padding: 0;
-        justify-content: center;
-    }
-
-    .pagina-correlacao .sidebar-brand img {
-        width: 54px;
-    }
-
-    .pagina-correlacao .sidebar-menu a {
-        justify-content: center;
-        padding: 14px 8px;
-        font-size: 0;
-        gap: 0;
-    }
-
-    .pagina-correlacao .sidebar-menu i {
-        font-size: 17px;
-    }
-
-    .pagina-correlacao .sidebar-user {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .pagina-correlacao .user-info {
-        display: none;
-    }
-
-    .pagina-correlacao .main-wrapper {
-        margin-left: 72px;
-        width: calc(100% - 72px);
-    }
 
     .dashboard-correlacao {
         padding: 20px 14px;

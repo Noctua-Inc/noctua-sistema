@@ -654,44 +654,6 @@
     }
 
     @media (max-width: 760px) {
-        .pagina-alertas .sidebar {
-            width: 72px;
-            padding: 24px 8px 0;
-        }
-
-        .pagina-alertas .sidebar-brand {
-            padding: 0;
-            justify-content: center;
-        }
-
-        .pagina-alertas .sidebar-brand img {
-            width: 54px;
-        }
-
-        .pagina-alertas .sidebar-menu a {
-            justify-content: center;
-            padding: 14px 8px;
-            font-size: 0;
-            gap: 0;
-        }
-
-        .pagina-alertas .sidebar-menu i {
-            font-size: 17px;
-        }
-
-        .pagina-alertas .sidebar-user {
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .pagina-alertas .user-info {
-            display: none;
-        }
-
-        .pagina-alertas .alertas-wrapper {
-            margin-left: 72px;
-        }
-
         .dashboard-alertas {
             padding: 20px 14px;
             gap: 14px;

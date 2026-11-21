@@ -15,79 +15,23 @@
     <link rel="stylesheet" href="/styles/dash-correlacao.css">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/styles/dashboard-sidebar.css">
+    <link rel="stylesheet" href="/styles/editar-usuario.css">
 </head>
 
-<body class="pagina-correlacao">
+<body class="pagina-correlacao pagina-dashboard">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="sidebar-brand">
-            <img src="/assets/noctua-logo-branca.png" alt="Noctua">
-        </div>
-
-        <ul class="sidebar-menu">
-
-            <li>
-                <a href="index.html">
-                    <i class="fa-solid fa-house"></i>
-                    Início
-                </a>
-            </li>
-
-            <li>
-                <a href="/dash-servidores.html">
-                    <i class="fa-solid fa-server"></i>
-                    Mainframes
-                </a>
-            </li>
-
-            <li>
-                <a href="/dash-correlacao.html" class="active" aria-current="page">
-                    <i class="fa-solid fa-chart-line"></i>
-                    Correlação
-                </a>
-            </li>
-
-            <li>
-                <a href="/dash-alertas.html">
-                    <i class="fa-solid fa-bell"></i>
-                    Alertas
-                </a>
-            </li>
-
-            <li>
-                <a href="/mainframes.html">
-                    <i class="fa-solid fa-gear"></i>
-                    Configurações
-                </a>
-            </li>
-
-        </ul>
-
-        <div class="sidebar-user">
-            <a href="#">
-                <div class="user-avatar">
-                    <span>U</span>
-                </div>
-
-                <div class="user-info">
-                    <span id="user-name">Usuário</span>
-                    <span id="user-role">Administrador</span>
-                </div>
-            </a>
-        </div>
-
-    </aside>
+    <aside class="sidebar" data-dashboard-sidebar="dash-correlacao.html"></aside>
 
 
     <!-- CONTEÚDO PRINCIPAL -->
-    <main class="main-wrapper">
+    <main class="main-wrapper" id="container_main" onclick="fecharEditarUsuario()">
 
         <section class="dashboard-correlacao">
 
@@ -350,6 +294,11 @@
 
     </main>
 
+    <div id="editar-usuario" style="display: none;"></div>
+    <script src="/js/api.js"></script>
+    <script src="/js/dashboard-sidebar.js"></script>
+    <script src="/js/user-sidebar.js"></script>
+    <script src="/js/editar-usuario.js"></script>
 
     <!-- GRÁFICOS -->
     <script>

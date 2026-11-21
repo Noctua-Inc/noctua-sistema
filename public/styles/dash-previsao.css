@@ -428,31 +428,6 @@
         width: 100%;
         min-width: 0;
     }
-    .pagina-previsao .sidebar {
-        width: 68px;
-        padding: 18px 6px 0;
-    }
-    .pagina-previsao .sidebar-brand {
-        padding: 0;
-        overflow: hidden;
-    }
-    .pagina-previsao .sidebar-brand img {
-        width: 55px;
-    }
-    .pagina-previsao .sidebar-menu a {
-        font-size: 0;
-        justify-content: center;
-        padding: 12px;
-    }
-    .pagina-previsao .sidebar-menu i {
-        font-size: 17px;
-    }
-    .pagina-previsao .user-info, .pagina-previsao .sidebar-user > a:last-child {
-        display: none;
-    }
-    .pagina-previsao .main-wrapper {
-        margin-left: 68px;
-    }
     .dashboard-previsao {
         padding: 18px 12px;
         gap: 14px;

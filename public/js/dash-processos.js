@@ -1,34 +1,5 @@
 // ==========================================================
-// 1. VALIDAÇÃO DE SESSÃO E SIDEBAR
-// ==========================================================
-function validarSessao() {
-    const idUsuario = sessionStorage.getItem('idUsuario');
-    const nomeUsuario = sessionStorage.getItem('nomeUsuario');
-    const cargoUsuario = sessionStorage.getItem('cargoUsuario');
-
-    if (idUsuario == null) {
-        window.location.href = '/login.html';
-        return false;
-    }
-
-    const spanNome = document.getElementById('user-name');
-    const spanCargo = document.getElementById('user-role');
-    const avatarLetra = document.getElementById('user-avatar-letter');
-
-    if (spanNome) spanNome.innerText = nomeUsuario || 'Usuário';
-    if (spanCargo) spanCargo.innerText = cargoUsuario || 'Analista Infra';
-    if (avatarLetra) avatarLetra.innerText = (nomeUsuario || 'U').charAt(0).toUpperCase();
-
-    return true;
-}
-
-function limparSessao() {
-    sessionStorage.clear();
-    window.location = "login.html";
-}
-
-// ==========================================================
-// 2. CONFIGURAÇÕES DO GRÁFICO E KPIS
+// CONFIGURAÇÕES DO GRÁFICO E KPIS
 // ==========================================================
 const kpiContextData = {
     cpu: {
@@ -80,7 +51,7 @@ function initChart() {
 }
 
 // ==========================================================
-// 3. COMUNICAÇÃO COM A API (FETCH)
+// COMUNICAÇÃO COM A API (FETCH)
 // ==========================================================
 async function buscarProcessosAPI(idMainframe, metrica) {
     const idEmpresa = sessionStorage.getItem('idEmpresa');
@@ -88,7 +59,7 @@ async function buscarProcessosAPI(idMainframe, metrica) {
 }
 
 // ==========================================================
-// 4. ATUALIZAÇÃO DINÂMICA DA INTERFACE
+// ATUALIZAÇÃO DINÂMICA DA INTERFACE
 // ==========================================================
 async function switchMetric(metric) {
     // 1. Atualiza os botões visuais
@@ -211,10 +182,13 @@ async function carregarMainframes() {
 }
 
 // ==========================================================
-// 5. INICIALIZAÇÃO
+// INICIALIZAÇÃO
 // ==========================================================
 window.onload = async () => {
-    if (!validarSessao()) return;
+    if (!sessionStorage.getItem('idUsuario')) {
+        window.location.href = '/login.html';
+        return;
+    }
 
     initChart();
 
