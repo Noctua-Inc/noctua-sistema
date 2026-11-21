@@ -27,6 +27,7 @@ function login(event) {
 
                 sessionStorage.setItem("idUsuario", data.usuario.id_usuario);
                 sessionStorage.setItem("idEmpresa", data.usuario.id_empresa);
+                sessionStorage.setItem("nomeUsuario", data.usuario.nome);
                 
                 setTimeout(() => {
                     window.location = '/dash-servidores.html'
