@@ -1,7 +1,7 @@
 import goldModel from '../model/goldModel.js';
 import goldService from '../service/goldService.js';
 
-async function carregar(req, res, caminho) {
+async function carregar(req, res, lerDados) {
     res.set('Cache-Control', 'no-store');
 
     if (!process.env.NOME_BUCKET) {
@@ -9,19 +9,21 @@ async function carregar(req, res, caminho) {
     }
 
     try {
-        const ID_EMPRESA = req.params.idEmpresa;        
-        const empresa = await goldModel.buscarEmpresa(ID_EMPRESA);
+        const empresa = await goldModel.buscarEmpresa(req.params.idEmpresa);
 
         if (!empresa) {
             return res.status(404).json({erro: 'Empresa não encontrada.'});
         }
 
-        const prefixoEmpresa = empresa.razao_social.toLowerCase().replaceAll(' ', '_');
-        const dados = await goldService.lerJson(prefixoEmpresa, caminho);
+        const dados = await lerDados(goldService.prefixoEmpresa(empresa.razao_social));
+
+        if (dados === null) {
+            return res.status(404).json({erro: 'Arquivo ainda não disponível no Gold.'});
+        }
 
         return res.json(dados);
     } catch (erro) {
-        if (erro.name === 'NoSuchKey' || erro.name === 'NotFound') {
+        if (goldService.arquivoAusente(erro)) {
             return res.status(404).json({erro: 'Arquivo ainda não disponível no Gold.'});
         }
         console.error('Erro ao carregar JSON do Gold:', erro.name, erro.code);

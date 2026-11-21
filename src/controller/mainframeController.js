@@ -131,7 +131,7 @@ async function buscarPorId(req, res) {
     const mainframe = await mainframeModel.buscarPorId(req.params.id);
     if (!mainframe) return res.status(404).json({ erro: 'Mainframe não encontrado.' });
 
-    const parametros = await parametroModel.listarComComponentePorMainframe(req.params.id);
+    const parametros = await parametroModel.listar(req.params.id);
     res.json({ ...mainframe, parametros });
   } catch (err) {
     console.error(err);

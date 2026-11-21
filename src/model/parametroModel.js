@@ -72,18 +72,22 @@ function montarDadosComponente(tipo, dados = {}) {
 }
 
 async function listar(id_mainframe) {
-  const sql = id_mainframe
-    ? 'SELECT * FROM parametro WHERE id_mainframe = ?'
-    : 'SELECT * FROM parametro';
-  const params = id_mainframe ? [id_mainframe] : [];
-
-  const [rows] = await pool.execute(sql, params);
+  const [rows] = await pool.execute(`
+    SELECT p.*, c.tipo
+    FROM parametro p
+    JOIN componente c ON c.id_componente = p.id_componente
+    ${id_mainframe ? 'WHERE p.id_mainframe = ?' : ''}
+    ORDER BY p.id_mainframe, p.id_componente
+  `, id_mainframe ? [id_mainframe] : []);
   return rows;
 }
 
 async function buscarPorId(id_mainframe, id_componente) {
   const [rows] = await pool.execute(
-    'SELECT * FROM parametro WHERE id_mainframe = ? AND id_componente = ?',
+    `SELECT p.*, c.tipo
+     FROM parametro p
+     JOIN componente c ON c.id_componente = p.id_componente
+     WHERE p.id_mainframe = ? AND p.id_componente = ?`,
     [id_mainframe, id_componente]
   );
   return rows[0] || null;
@@ -154,17 +158,6 @@ async function removerPorMainframe(id_mainframe) {
   return result.affectedRows;
 }
 
-async function listarComComponentePorMainframe(id_mainframe) {
-  const [rows] = await pool.execute(`
-    SELECT p.*, c.tipo
-    FROM parametro p
-    JOIN componente c ON c.id_componente = p.id_componente
-    WHERE p.id_mainframe = ?
-    ORDER BY p.id_componente
-  `, [id_mainframe]);
-  return rows;
-}
-
 async function removerPorMainframeComConexao(conn, id_mainframe) {
   await conn.execute('DELETE FROM parametro WHERE id_mainframe = ?', [id_mainframe]);
 }
@@ -202,7 +195,6 @@ export default {
   atualizar,
   remover,
   removerPorMainframe,
-  listarComComponentePorMainframe,
   removerPorMainframeComConexao,
   criarComConexao,
 };
