@@ -38,25 +38,6 @@
     font-weight: 600;
 }
 
-.previsao-relatorio {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 14px;
-    border: 1px solid #3435a7;
-    border-radius: 7px;
-    background: #4546c5;
-    color: #fff;
-    box-shadow: 0 2px 3px rgba(34, 36, 121, .1);
-    font: inherit;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.previsao-relatorio:disabled {
-    cursor: not-allowed;
-}
-
 .previsao-controles {
     display: flex;
     flex-wrap: wrap;
@@ -93,6 +74,27 @@
     margin-top: 3px;
     color: #64748b;
     font-size: 11px;
+}
+
+.previsao-relatorio {
+    min-width: 0;
+    text-align: right;
+}
+
+.previsao-relatorio button {
+    border: 1px solid #1a1f71;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: #1a1f71;
+    color: white;
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+}
+
+.previsao-relatorio button:disabled {
+    opacity: 0.7;
+    cursor: wait;
 }
 
 .previsao-mainframe .previsao-filtro-mainframe {

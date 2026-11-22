@@ -1,6 +1,5 @@
 const ID_EMPRESA = sessionStorage.getItem("idEmpresa");
 const ID_MAINFRAME = window.location.href.split("id_mainframe=")[1];
-const URL_LAMBDA_RELATORIO = "https://2klm53i2unudbwa64g6gkg3boy0vdbdq.lambda-url.us-east-1.on.aws/";
 
 // Cada aba lê um tipo de arquivo do Gold: geral=todos, rede, cpu, ram e disco.
 const TIPO_MONITORAMENTO_POR_ABA = ["todos", "rede", "cpu", "ram", "disco"];
@@ -1014,7 +1013,8 @@ async function baixarRelatorio() {
     const razaoSocial = await buscarRazaoSocial();
     if (!razaoSocial) throw new Error("Empresa não encontrada.");
 
-    const resposta = await fetch(URL_LAMBDA_RELATORIO, {
+    const { url: urlRelatorio } = await api.get("/config/relatorio");
+    const resposta = await fetch(urlRelatorio, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -496,7 +496,8 @@ function desenharGrafico(metrica) {
                     },
                     callbacks: {
                         title: function (itens) {
-                            return formatarHorario(itens[0].parsed.x);
+                            const horario = itens[0]?.parsed?.x;
+                            return Number.isFinite(horario) ? formatarHorario(horario) : '';
                         },
                         label: function (item) {
                             let titulo = 'Previsto · média do minuto';
@@ -534,6 +535,46 @@ function desenharGrafico(metrica) {
     });
 }
 
+async function baixarRelatorioCapacidade() {
+    const botao = document.getElementById('baixar-relatorio-capacidade');
+    const status = document.getElementById('status-relatorio-capacidade');
+    botao.disabled = true;
+    status.hidden = false;
+    status.textContent = 'Gerando relatório...';
+
+    try {
+        const { url } = await api.get('/config/relatorio');
+        const resposta = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tipo: 'comparativo-capacidade', idEmpresa }),
+        });
+        const dados = await resposta.json().catch(() => null);
+        if (!resposta.ok || !dados?.pdf) {
+            const mensagem = dados?.erro || dados?.errorMessage || (resposta.ok
+                ? 'A Lambda respondeu sem o arquivo PDF.'
+                : 'A Lambda retornou HTTP ' + resposta.status + '.');
+            throw new Error(mensagem);
+        }
+
+        const bytes = Uint8Array.from(atob(dados.pdf), caractere => caractere.charCodeAt(0));
+        const link = document.createElement('a');
+        const arquivo = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+        link.href = arquivo;
+        link.download = dados.nomeArquivo || 'relatorio-capacidade.pdf';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(arquivo), 1000);
+        status.textContent = 'Relatório pronto para download.';
+    } catch (erro) {
+        status.textContent = erro.message;
+    } finally {
+        botao.disabled = false;
+    }
+}
+
+document.getElementById('baixar-relatorio-capacidade').addEventListener('click', baixarRelatorioCapacidade);
 carregarMainframes();
 
 setInterval(async function () {

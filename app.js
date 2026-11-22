@@ -35,6 +35,14 @@ app.use('/api/cargo', routesCargo);
 app.use('/api/gold', routesGold);
 app.use('/api/processos', routesProcessos);
 
+app.get('/api/config/relatorio', (_req, res) => {
+    const url = process.env.URL_LAMBDA_RELATORIO?.trim();
+    if (!url) {
+        return res.status(503).json({ erro: 'A URL da Lambda de relatórios ainda não foi configurada.' });
+    }
+    return res.json({ url });
+});
+
 app.listen(port, () => {
     console.log(`
 

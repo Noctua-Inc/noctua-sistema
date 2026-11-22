@@ -29,11 +29,6 @@
                             <time id="atualizacao-previsao">—</time>
                         </p>
                     </div>
-                    <button type="button" class="previsao-relatorio" disabled
-                        aria-label="Gerar relatório (indisponível)" title="Aguardando integração com o gerador Java">
-                        <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
-                        Gerar relatório
-                    </button>
                 </header>
                 <p id="mensagem-mainframes" role="status" hidden>
                 </p>
@@ -149,6 +144,10 @@
                             <div>
                                 <h2 id="titulo-secao-empresa">Visão da empresa · CPU</h2>
                                 <p>Todas as mainframes · acompanha o componente escolhido no topo.</p>
+                            </div>
+                            <div class="previsao-relatorio">
+                                <button type="button" id="baixar-relatorio-capacidade">Baixar relatório de capacidade</button>
+                                <p id="status-relatorio-capacidade" role="status" hidden></p>
                             </div>
                         </header>
                         <div class="previsao-inferior">
