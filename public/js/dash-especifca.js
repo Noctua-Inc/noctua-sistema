@@ -13,7 +13,6 @@ let intervaloTempo = [];
 let grafico;
 let sessaoAtual = 0;
 let statusRisco = 0;
-let nomeMainframeGlobal = "";
 
 // Dados dashboard Geral
 let dadosCpu = [];
@@ -28,8 +27,7 @@ async function buscarMainframe() {
     );
     let mainframe = resposta[0];
 
-    nomeMainframe.innerHTML = mainframe.hostname;
-    nomeMainframeGlobal = mainframe.hostname;
+    nomeMainframe.textContent = mainframe.hostname;
 
     return mainframe;
   } catch (erro) {
@@ -51,10 +49,6 @@ function obterParametroPorTipo(parametros, tipo) {
   return parametros.find((p) => p.tipo === tipo) || null;
 }
 
-function obterCaminhoBase(nomeHost) {
-  return `/api/gold/empresa/${ID_EMPRESA}/${nomeHost}/monitoramentoComponentes/`;
-}
-
 function criarKPI(titulo, dado, observacao, classe = "") {
   let kpi = `
     <div class="kpi">
@@ -68,10 +62,14 @@ function criarKPI(titulo, dado, observacao, classe = "") {
 }
 
 function obterMedia(valores) {
-  if (valores.length === 0) return 0;
   let soma = 0;
-  for (let i = 0; i < valores.length; i++) soma += valores[i];
-  return Number((soma / valores.length).toFixed(2));
+  let quantidade = 0;
+  for (const valor of valores) {
+    if (!Number.isFinite(valor)) continue;
+    soma += valor;
+    quantidade++;
+  }
+  return quantidade === 0 ? 0 : Number((soma / quantidade).toFixed(2));
 }
 
 function obterMomentoMaisUtilizado(dados) {
@@ -83,8 +81,8 @@ function obterMomentoMaisUtilizado(dados) {
 
     for (let campo in atual) {
       if (campo === "hora_de_captura") continue;
-      let valorAtual = Number(atual[campo]);
-      let valorAnterior = Number(anterior[campo]);
+      let valorAtual = atual[campo];
+      let valorAnterior = anterior[campo];
       if (!Number.isFinite(valorAtual) || !Number.isFinite(valorAnterior)) continue;
       if (valorAtual > valorAnterior) componentesSuperiores++;
     }
@@ -170,143 +168,93 @@ function adicionarLinhasParametro(
   return datasets;
 }
 
-async function puxarJsonS3(quaisRegistros) {
-  let registros = null;
-
-  try {
-    let mainframe = await buscarMainframe();
-    let nomeHost = mainframe.hostname;
-
-    const horarioAtual = new Date();
-    let ano = horarioAtual.getFullYear();
-    let mes = String(horarioAtual.getMonth() + 1).padStart(2, "0");
-    let dia = String(horarioAtual.getDate()).padStart(2, "0");
-
-    let hora = String(horarioAtual.getHours()).padStart(2, "0");
-    let minutoAtual = horarioAtual.getMinutes();
-
-    let dataHoraFormatado = `${ano}-${mes}-${dia}_${hora}-${String(minutoAtual).padStart(2, "0")}`;
-
-    let nomeArquivo = encodeURIComponent(
-      `${nomeMainframeGlobal}_${dataHoraFormatado}_${quaisRegistros}_registros.json`
-    );
-    let caminho = obterCaminhoBase(nomeHost) + nomeArquivo;
-    let resposta = await fetch(caminho);
-
-    if (resposta.ok) {
-      registros = await resposta.json();
-    } else {
-      registros = null;
-    }
-  } catch (erro) {
-    registros = null;
+function montarHistoricoHora(historico) {
+  const { amostras, colunas, atualizado_em } = historico;
+  const hora = atualizado_em.slice(0, 13);
+  const indices = {};
+  for (let i = 0; i < colunas.length; i++) {
+    indices[colunas[i]] = i;
   }
 
-  return registros;
-}
-
-async function carregarHistoricoHora(quaisRegistros) {
-  let listaDados = [];
-  let listaLabels = [];
-  let dadosCpuArr = [];
-  let dadosRamArr = [];
-  let dadosSwapArr = [];
-  let dadosDiscoArr = [];
-  let dadosRedeTrafegoArr = [];
-  let dadosRedeTxArr = [];
-  let dadosRedeRxArr = [];
-  let dadosCpuMediaArr = [];
-  let dadosCpuFrequenciaArr = [];
-  let dadosRamMediaArr = [];
-  let dadosRamLivreArr = [];
-  let dadosDiscoMediaArr = [];
-  let dadosDiscoLivreArr = [];
-  let dadosDiscoEscritaArr = [];
-  let dadosDiscoLeituraArr = [];
-  let dadosRedeTxMediaArr = [];
-  let dadosRedeRxMediaArr = [];
-  let dadosRedePerdidosArr = [];
-  let dadosRedeTwArr = [];
-
-  try {
-    let mainframe = await buscarMainframe();
-    let nomeHost = mainframe ? mainframe.hostname : nomeMainframeGlobal;
-
-    const horarioAtual = new Date();
-    let ano = horarioAtual.getFullYear();
-    let mes = String(horarioAtual.getMonth() + 1).padStart(2, "0");
-    let dia = String(horarioAtual.getDate()).padStart(2, "0");
-    let hora = String(horarioAtual.getHours()).padStart(2, "0");
-    let minutoAtual = horarioAtual.getMinutes();
-
-    for (let m = 0; m <= minutoAtual; m++) {
-      let minutoStr = String(m).padStart(2, "0");
-      let dataHoraFormatado = `${ano}-${mes}-${dia}_${hora}-${minutoStr}`;
-      let nomeArquivo = encodeURIComponent(
-        `${nomeHost}_${dataHoraFormatado}_${quaisRegistros}_registros.json`
-      );
-      let caminho = obterCaminhoBase(nomeHost) + nomeArquivo;
-
-      try {
-        let resposta = await fetch(caminho);
-        if (resposta.ok) {
-          let dadoMinuto = await resposta.json();
-          listaLabels.push(`${hora}:${minutoStr}`);
-          listaDados.push(dadoMinuto);
-        }
-      } catch (err) {}
-    }
-  } catch (erro) {
-    console.error("Erro ao carregar histórico:", erro);
-  }
-
-  for (let i = 0; i < listaDados.length; i++) {
-    let dadoMinuto = listaDados[i];
-
-    dadosCpuArr.push(dadoMinuto.porcentagem_cpu || 0);
-    dadosRamArr.push(dadoMinuto.porcentagem_ram || 0);
-    dadosSwapArr.push(dadoMinuto.media_swap_porcentagem || 0);
-    dadosDiscoArr.push(dadoMinuto.porcentagem_disco || 0);
-    dadosRedeTrafegoArr.push(dadoMinuto.media_trafego_rede || 0);
-    dadosRedeTxArr.push(dadoMinuto.dados_enviados_medio || 0);
-    dadosRedeRxArr.push(dadoMinuto.dados_recebidos_medio || 0);
-    dadosCpuMediaArr.push(dadoMinuto.media_cpu_porcentagem || 0);
-    dadosCpuFrequenciaArr.push(dadoMinuto.media_cpu_frequencia || 0);
-    dadosRamMediaArr.push(dadoMinuto.media_ram_porcentagem || 0);
-    dadosRamLivreArr.push(dadoMinuto.media_ram_disponivel || 0);
-    dadosDiscoMediaArr.push(dadoMinuto.media_disco_porcentagem || 0);
-    dadosDiscoLivreArr.push(dadoMinuto.media_disco_disponivel || 0);
-    dadosDiscoEscritaArr.push(dadoMinuto.media_qtd_requisicao_escrita || 0);
-    dadosDiscoLeituraArr.push(dadoMinuto.media_qtd_requisicao_leitura || 0);
-    dadosRedeTxMediaArr.push(dadoMinuto.media_dados_enviados || 0);
-    dadosRedeRxMediaArr.push(dadoMinuto.media_dados_recebidos || 0);
-    dadosRedePerdidosArr.push(dadoMinuto.media_dados_perdidos || 0);
-    dadosRedeTwArr.push(dadoMinuto.media_sockets_tw || 0);
-  }
-
-  return {
-    labels: listaLabels.length > 0 ? listaLabels : ["00min"],
-    dados: listaDados,
-    cpu: dadosCpuArr,
-    ram: dadosRamArr,
-    swap: dadosSwapArr,
-    disco: dadosDiscoArr,
-    redeTrafego: dadosRedeTrafegoArr,
-    redeTx: dadosRedeTxArr,
-    redeRx: dadosRedeRxArr,
-    cpuMedia: dadosCpuMediaArr,
-    cpuFrequencia: dadosCpuFrequenciaArr,
-    ramMedia: dadosRamMediaArr,
-    ramLivre: dadosRamLivreArr,
-    discoMedia: dadosDiscoMediaArr,
-    discoLivre: dadosDiscoLivreArr,
-    discoEscrita: dadosDiscoEscritaArr,
-    discoLeitura: dadosDiscoLeituraArr,
-    redeTxMedia: dadosRedeTxMediaArr,
-    redeRxMedia: dadosRedeRxMediaArr,
-    redePerdidos: dadosRedePerdidosArr,
-    redeTw: dadosRedeTwArr,
+  const resultado = {
+    dados: [],
+    labels: [],
+    cpu: [],
+    ram: [],
+    swap: [],
+    disco: [],
+    redeTrafego: [],
+    cpuMedia: [],
+    cpuFrequencia: [],
+    ramMedia: [],
+    ramLivre: [],
+    discoMedia: [],
+    discoLivre: [],
+    discoEscrita: [],
+    discoLeitura: [],
+    redeTxMedia: [],
+    redeRxMedia: [],
+    redePerdidos: [],
+    redeTw: [],
   };
+
+  for (const linha of amostras) {
+    const horario = linha[indices.horario];
+    if (typeof horario !== "string" || !horario.startsWith(hora)) continue;
+
+    const cpu = linha[indices.cpu];
+    const ram = linha[indices.ram];
+    const disco = linha[indices.disco];
+    const txMib = linha[indices.enviados_mib];
+    const rxMib = linha[indices.recebidos_mib];
+    const tx = Number.isFinite(txMib) ? txMib * (1024 ** 2) / (1000 ** 4) : null;
+    const rx = Number.isFinite(rxMib) ? rxMib * (1024 ** 2) / (1000 ** 4) : null;
+
+    const dado = {
+      hora_de_captura: horario.slice(11, 16),
+      porcentagem_cpu: cpu,
+      porcentagem_ram: ram,
+      porcentagem_disco: disco,
+      media_swap_porcentagem: linha[indices.swap],
+      media_trafego_rede: tx === null || rx === null ? null : tx + rx,
+      dados_enviados_medio: tx,
+      dados_recebidos_medio: rx,
+      media_cpu_porcentagem: cpu,
+      media_cpu_frequencia: linha[indices.frequencia_ghz],
+      media_ram_porcentagem: ram,
+      media_ram_disponivel: linha[indices.ram_livre_gib],
+      media_disco_porcentagem: disco,
+      media_disco_disponivel: linha[indices.disco_livre_gib],
+      media_qtd_requisicao_escrita: linha[indices.escritas_acumuladas],
+      media_qtd_requisicao_leitura: linha[indices.leituras_acumuladas],
+      media_dados_enviados: tx,
+      media_dados_recebidos: rx,
+      media_dados_perdidos: linha[indices.erros_recebimento],
+      media_sockets_tw: linha[indices.sockets_time_wait],
+    };
+
+    resultado.dados.push(dado);
+    resultado.labels.push(dado.hora_de_captura);
+    resultado.cpu.push(dado.porcentagem_cpu);
+    resultado.ram.push(dado.porcentagem_ram);
+    resultado.swap.push(dado.media_swap_porcentagem);
+    resultado.disco.push(dado.porcentagem_disco);
+    resultado.redeTrafego.push(dado.media_trafego_rede);
+    resultado.cpuMedia.push(dado.media_cpu_porcentagem);
+    resultado.cpuFrequencia.push(dado.media_cpu_frequencia);
+    resultado.ramMedia.push(dado.media_ram_porcentagem);
+    resultado.ramLivre.push(dado.media_ram_disponivel);
+    resultado.discoMedia.push(dado.media_disco_porcentagem);
+    resultado.discoLivre.push(dado.media_disco_disponivel);
+    resultado.discoEscrita.push(dado.media_qtd_requisicao_escrita);
+    resultado.discoLeitura.push(dado.media_qtd_requisicao_leitura);
+    resultado.redeTxMedia.push(dado.media_dados_enviados);
+    resultado.redeRxMedia.push(dado.media_dados_recebidos);
+    resultado.redePerdidos.push(dado.media_dados_perdidos);
+    resultado.redeTw.push(dado.media_sockets_tw);
+  }
+
+  return resultado;
 }
 
 function trocarTempo(indice) {
@@ -371,21 +319,35 @@ async function trocarMonitoramento(indice) {
     }
   }
 
-  await buscarMainframe();
-  let mainframeDetalhado = await buscarParametrosMainframe();
-  let parametros = mainframeDetalhado ? mainframeDetalhado.parametros : [];
-
   opcoesBotoesMonitoramento[indice].classList.add(
     "opcao-monitoramento-selecionada"
   );
 
-  let historico = { 
-    labels: [], 
-    cpu: [], 
-    ram: [], 
-    swap: [], 
-    disco: [] 
-};
+  const mainframe = await buscarMainframe();
+  if (!mainframe) return;
+
+  const hostname = encodeURIComponent(mainframe.hostname);
+  let historico;
+  let mainframeDetalhado;
+  try {
+    const [dadosGold, detalhes] = await Promise.all([
+      api.get(`/gold/empresa/${ID_EMPRESA}/${hostname}/monitoramento/historico.json`),
+      buscarParametrosMainframe(),
+    ]);
+    historico = montarHistoricoHora(dadosGold);
+    mainframeDetalhado = detalhes;
+  } catch (erro) {
+    if (sessaoAtual === indice) sessaoKpis.textContent = erro.message;
+    return;
+  }
+
+  if (sessaoAtual !== indice) return;
+  if (historico.dados.length === 0) {
+    sessaoKpis.textContent = "Sem amostras de monitoramento disponíveis.";
+    return;
+  }
+
+  const parametros = mainframeDetalhado?.parametros ?? [];
 
   switch (indice) {
     case 0: {
@@ -397,13 +359,7 @@ async function trocarMonitoramento(indice) {
         "Uso Médio Disco",
         "Tráfego de Rede (Tx/Rx)",
       ];
-      let dadosCapturadosGeral = await puxarJsonS3("todos");
-      historico = await carregarHistoricoHora("todos");
-
-      if (!dadosCapturadosGeral && historico.dados.length > 0) {
-        dadosCapturadosGeral = historico.dados[historico.dados.length - 1];
-      }
-      if (!dadosCapturadosGeral) return;
+      const dadosCapturadosGeral = historico.dados[historico.dados.length - 1];
 
       let parametroCpu = obterParametroPorTipo(parametros, "CPU");
       let parametroDisco = obterParametroPorTipo(parametros, "DISCO");
@@ -566,9 +522,6 @@ async function trocarMonitoramento(indice) {
         "Erros Pacotes Entrada (errin)",
         "Sockets TIME_WAIT",
       ];
-      historico = await carregarHistoricoHora("rede");
-      if (historico.dados.length === 0) return;
-
       let parametroRede = obterParametroPorTipo(parametros, "REDE");
       let mediaTx = obterMedia(historico.redeTxMedia);
       let mediaRx = obterMedia(historico.redeRxMedia);
@@ -660,9 +613,6 @@ async function trocarMonitoramento(indice) {
         "Uso Médio CPU",
         "Frequência Média CPU",
       ];
-      historico = await carregarHistoricoHora("cpu");
-      if (historico.dados.length === 0) return;
-
       let parametroCpu = obterParametroPorTipo(parametros, "CPU");
       let mediaCpu = obterMedia(historico.cpuMedia);
       let mediaFrequencia = obterMedia(historico.cpuFrequencia);
@@ -736,9 +686,6 @@ async function trocarMonitoramento(indice) {
         "GB Livre RAM",
         "Uso Médio SWAP",
       ];
-      historico = await carregarHistoricoHora("ram");
-      if (historico.dados.length === 0) return;
-
       let parametroRam = obterParametroPorTipo(parametros, "RAM");
       let parametroSwap = obterParametroPorTipo(parametros, "SWAP");
       let mediaRam = obterMedia(historico.ramMedia);
@@ -828,9 +775,6 @@ async function trocarMonitoramento(indice) {
         "Quantidade requisição (Escrita)",
         "Quantidade requisição (Leitura)",
       ];
-      historico = await carregarHistoricoHora("disco");
-      if (historico.dados.length === 0) return;
-
       let parametroDisco = obterParametroPorTipo(parametros, "DISCO");
       let mediaDisco = obterMedia(historico.discoMedia);
       let mediaLivre = obterMedia(historico.discoLivre);
