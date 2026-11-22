@@ -7,6 +7,9 @@ const router = express.Router();
 router.get('/empresa/:idEmpresa/previsoes/resumo.json', (req, res) =>
     goldController.carregar(req, res, empresa => goldService.lerJson(empresa, 'previsoes/resumo.json')));
 
+router.get('/empresa/:idEmpresa/alertas/resumo.json', (req, res) =>
+    goldController.carregar(req, res, empresa => goldService.lerJson(empresa, 'alertas/resumo.json')));
+
 router.get('/empresa/:idEmpresa/:prefixoMainframe/previsoes.json', (req, res) =>
     goldController.carregar(req, res, empresa => goldService.lerJson(empresa, `${req.params.prefixoMainframe}/previsoes.json`)));
 
