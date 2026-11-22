@@ -211,3 +211,21 @@ main {
 .container-main .sessao-historico table tbody td {
     text-align: center;
 }
+.container-main .sessao-historico .filtros-tabela {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.container-main .sessao-historico .filtros-tabela select {
+    height: 38px;
+    border: 1px solid #d7dfed;
+    border-radius: 6px;
+    background: #fff;
+    color: #475569;
+    font: inherit;
+    font-size: 12px;
+    padding: 0 12px;
+    cursor: pointer;
+}

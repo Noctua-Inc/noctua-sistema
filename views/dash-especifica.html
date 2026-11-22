@@ -108,6 +108,28 @@
                     Histórico de medições
                 </h2>
 
+                <div class="filtros-tabela">
+                    <select id="filtro-componente-tabela" aria-label="Filtrar por componente">
+                        <option value="0">Geral (Visão Geral)</option>
+                        <option value="1">Rede e Conectividade</option>
+                        <option value="2">Processador (CPU)</option>
+                        <option value="3">Memória RAM & SWAP</option>
+                        <option value="4">Armazenamento (Disco)</option>
+                    </select>
+                    <select id="filtro-status-tabela" aria-label="Filtrar por status">
+                        <option value="">Todos os status</option>
+                        <option value="Ok">Ok</option>
+                        <option value="Em Atenção!">Em Atenção</option>
+                        <option value="Em Alerta!">Em Alerta</option>
+                    </select>
+                    <select id="filtro-tempo-tabela" aria-label="Filtrar por intervalo de tempo">
+                        <option value="">Todo o período</option>
+                        <option value="15">Últimos 15 min</option>
+                        <option value="30">Últimos 30 min</option>
+                        <option value="60">Última 1 hora</option>
+                    </select>
+                </div>
+
                  <table>
                     <thead>
                         <tr class="titulo-grafico" id="tituloTabela">

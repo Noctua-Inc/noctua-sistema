@@ -17,6 +17,8 @@ let intervaloTempo = [];
 let grafico;
 let sessaoAtual = 0;
 let statusRisco = 0;
+let linhasTabela = [];
+let cabecalhoTabela = "";
 
 // Dados dashboard Geral
 let dadosCpu = [];
@@ -170,6 +172,61 @@ function adicionarLinhasParametro(
     );
   }
   return datasets;
+}
+
+function obterEstiloStatus(status) {
+  if (status === "Em Alerta!") return 'style="color:#E11D48; font-weight:600;"';
+  if (status === "Em Atenção!") return 'style="color:#D97706; font-weight:600;"';
+  if (status === "Ok") return 'style="color:#059669; font-weight:600;"';
+  return "";
+}
+
+function obterStatusLinhaGeral(dado, parametros) {
+  let risco = 0;
+  let parametroCpu = obterParametroPorTipo(parametros, "CPU");
+  let parametroDisco = obterParametroPorTipo(parametros, "DISCO");
+  let parametroRam = obterParametroPorTipo(parametros, "RAM");
+  let parametroRede = obterParametroPorTipo(parametros, "REDE");
+
+  if (parametroCpu && parametroCpu.cpu_pct_max != null && dado.porcentagem_cpu >= Number(parametroCpu.cpu_pct_max)) risco++;
+  if (parametroDisco && parametroDisco.disco_pct_max != null && dado.porcentagem_disco >= Number(parametroDisco.disco_pct_max)) risco++;
+  if (parametroRam && parametroRam.ram_pct_max != null && dado.porcentagem_ram >= Number(parametroRam.ram_pct_max)) risco++;
+  if (parametroRede && parametroRede.tb_max != null && dado.dados_enviados_medio >= Number(parametroRede.tb_max)) risco++;
+
+  if (risco > 2) return "Em Alerta!";
+  if (risco > 0) return "Em Atenção!";
+  return "Ok";
+}
+
+function renderizarTabela() {
+  const filtroStatus = document.querySelector("#filtro-status-tabela")?.value || "";
+  const filtroTempo = document.querySelector("#filtro-tempo-tabela")?.value || "";
+  const agora = new Date();
+
+  tituloTabela.innerHTML = cabecalhoTabela;
+
+  let temStatus = linhasTabela.some((linha) => linha.status);
+  let linhasFiltradas = linhasTabela.filter((linha) => {
+    if (filtroStatus && temStatus && linha.status !== filtroStatus) return false;
+
+    if (filtroTempo) {
+      const minutos = Number(filtroTempo);
+      const [hora, minuto] = String(linha.hora_de_captura).split(":").map(Number);
+      if (Number.isFinite(hora) && Number.isFinite(minuto)) {
+        const dataLinha = new Date(agora);
+        dataLinha.setHours(hora, minuto, 0, 0);
+        if (dataLinha.getTime() > agora.getTime()) dataLinha.setDate(dataLinha.getDate() - 1);
+        const diffMin = (agora.getTime() - dataLinha.getTime()) / 60000;
+        if (diffMin > minutos) return false;
+      }
+    }
+
+    return true;
+  });
+
+  linhasFiltradas.sort((a, b) => String(b.hora_de_captura).localeCompare(String(a.hora_de_captura)));
+
+  corpoTabela.innerHTML = linhasFiltradas.map((linha) => linha.html).join("");
 }
 
 function montarHistoricoHora(historico) {
@@ -428,6 +485,8 @@ async function trocarMonitoramento(indice) {
   let statusRiscoCalculo = 0;
 
   sessaoAtual = indice;
+  const filtroComponenteTabela = document.querySelector("#filtro-componente-tabela");
+  if (filtroComponenteTabela) filtroComponenteTabela.value = String(indice);
 
   for (let i = 0; i < opcoesBotoesMonitoramento.length; i++) {
     if (
@@ -555,7 +614,7 @@ async function trocarMonitoramento(indice) {
 
       sessaoKpis.innerHTML = todasKpis;
 
-      tituloTabela.innerHTML = `
+      cabecalhoTabela = `
                 <th>Data Hora</th>
                 <th>CPU</th>
                 <th>RAM</th>
@@ -566,9 +625,12 @@ async function trocarMonitoramento(indice) {
                 <th>Status</th>
             `;
 
-      corpoTabela.innerHTML = historico.dados
-        .map(
-          (dado) => `
+      linhasTabela = historico.dados.map((dado) => {
+        const statusLinha = obterStatusLinhaGeral(dado, parametros);
+        return {
+          hora_de_captura: dado.hora_de_captura,
+          status: statusLinha,
+          html: `
                 <tr>
                     <td>${dado.hora_de_captura}</td>
                     <td>${dado.porcentagem_cpu}%</td>
@@ -577,11 +639,13 @@ async function trocarMonitoramento(indice) {
                     <td>${dado.media_swap_porcentagem}%</td>
                     <td>${dado.dados_enviados_medio} TB</td>
                     <td>${dado.dados_recebidos_medio} TB</td>
-                    <td>${statusMainframe.innerHTML}</td>
-                </tr>    
-            `
-        )
-        .join("");
+                    <td ${obterEstiloStatus(statusLinha)}>${statusLinha}</td>
+                </tr>
+            `,
+        };
+      });
+
+      renderizarTabela();
 
       if (grafico) {
         grafico.data.labels =
@@ -673,7 +737,7 @@ async function trocarMonitoramento(indice) {
 
       sessaoKpis.innerHTML = todasKpis;
 
-      tituloTabela.innerHTML = `
+      cabecalhoTabela = `
                 <th>Data Hora</th>
                 <th>Dados Enviados</th>
                 <th>Dados Recebidos</th>
@@ -681,19 +745,21 @@ async function trocarMonitoramento(indice) {
                 <th>Sockets TIME_WAIT</th>
             `;
 
-      corpoTabela.innerHTML = historico.dados
-        .map(
-          (dado) => `
+      linhasTabela = historico.dados.map((dado) => ({
+        hora_de_captura: dado.hora_de_captura,
+        status: "",
+        html: `
                 <tr>
                     <td>${dado.hora_de_captura}</td>
                     <td>${dado.media_dados_enviados} TB</td>
                     <td>${dado.media_dados_recebidos} TB</td>
                     <td>${dado.media_dados_perdidos}</td>
                     <td>${dado.media_sockets_tw}</td>
-                </tr>    
-            `
-        )
-        .join("");
+                </tr>
+            `,
+      }));
+
+      renderizarTabela();
 
       if (grafico) {
         grafico.data.labels = historico.labels;
@@ -758,23 +824,25 @@ async function trocarMonitoramento(indice) {
 
       sessaoKpis.innerHTML = todasKpis;
 
-      tituloTabela.innerHTML = `
+      cabecalhoTabela = `
                 <th>Data Hora</th>
                 <th>CPU</th>
                 <th>Frequência CPU</th>
             `;
 
-      corpoTabela.innerHTML = historico.dados
-        .map(
-          (dado) => `
+      linhasTabela = historico.dados.map((dado) => ({
+        hora_de_captura: dado.hora_de_captura,
+        status: "",
+        html: `
                 <tr>
                     <td>${dado.hora_de_captura}</td>
                     <td>${dado.media_cpu_porcentagem}%</td>
                     <td>${dado.media_cpu_frequencia} GHz</td>
-                </tr>    
-            `
-        )
-        .join("");
+                </tr>
+            `,
+      }));
+
+      renderizarTabela();
 
       if (grafico) {
         grafico.data.labels = historico.labels;
@@ -835,25 +903,27 @@ async function trocarMonitoramento(indice) {
 
       sessaoKpis.innerHTML = todasKpis;
 
-      tituloTabela.innerHTML = `
+      cabecalhoTabela = `
                 <th>Data Hora</th>
                 <th>RAM</th>
                 <th>SWAP</th>
                 <th>RAM Disponível</th>
             `;
 
-      corpoTabela.innerHTML = historico.dados
-        .map(
-          (dado) => `
+      linhasTabela = historico.dados.map((dado) => ({
+        hora_de_captura: dado.hora_de_captura,
+        status: "",
+        html: `
                 <tr>
                     <td>${dado.hora_de_captura}</td>
                     <td>${dado.media_ram_porcentagem}%</td>
                     <td>${dado.media_swap_porcentagem}%</td>
                     <td>${dado.media_ram_disponivel} GB</td>
-                </tr>    
-            `
-        )
-        .join("");
+                </tr>
+            `,
+      }));
+
+      renderizarTabela();
 
       if (grafico) {
         grafico.data.labels = historico.labels;
@@ -926,7 +996,7 @@ async function trocarMonitoramento(indice) {
 
       sessaoKpis.innerHTML = todasKpis;
 
-      tituloTabela.innerHTML = `
+      cabecalhoTabela = `
                 <th>Data Hora</th>
                 <th>Disco</th>
                 <th>Disco Disponível</th>
@@ -934,19 +1004,21 @@ async function trocarMonitoramento(indice) {
                 <th>Dados Recebidos</th>
             `;
 
-      corpoTabela.innerHTML = historico.dados
-        .map(
-          (dado) => `
+      linhasTabela = historico.dados.map((dado) => ({
+        hora_de_captura: dado.hora_de_captura,
+        status: "",
+        html: `
                 <tr>
                     <td>${dado.hora_de_captura}</td>
                     <td>${dado.media_disco_porcentagem}%</td>
                     <td>${dado.media_disco_disponivel} GB</td>
                     <td>${dado.media_qtd_requisicao_escrita}</td>
                     <td>${dado.media_qtd_requisicao_leitura}</td>
-                </tr>    
-            `
-        )
-        .join("");
+                </tr>
+            `,
+      }));
+
+      renderizarTabela();
 
       if (grafico) {
         grafico.data.labels = historico.labels;
@@ -1142,6 +1214,12 @@ async function inicializarPagina() {
       },
     },
   });
+
+  document.querySelector("#filtro-componente-tabela")?.addEventListener("change", (e) => {
+    trocarMonitoramento(Number(e.target.value));
+  });
+  document.querySelector("#filtro-status-tabela")?.addEventListener("change", renderizarTabela);
+  document.querySelector("#filtro-tempo-tabela")?.addEventListener("change", renderizarTabela);
 
   trocarTempo(0);
   await trocarMonitoramento(0);

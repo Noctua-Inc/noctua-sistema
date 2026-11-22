@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabela = document.getElementById('lista-mainframes');
     const atualizacao = document.getElementById('data-atualizacao');
     const aviso = document.getElementById('erro-servidores');
-    const todosComponentes = ["CPU", "DISCO", "RAM", "SWAP"]
+    const todosComponentes = ["CPU", "DISCO", "RAM", "SWAP"];
     let mainframes = [];
     let carregando = false;
 
@@ -19,9 +19,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="progress-bar-fill" style="width: ${Math.min(100, Math.max(0, usoComponente))}%;"></div>
             </div>
             <span>${usoComponente.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%</span>
-        `
+        `;
 
         return estruturaUsoComponente;
+    }
+
+    function formatarParte(valor) {
+        return String(valor).padStart(2, '0');
+    }
+
+    function nomeArquivoTodos(hostname, data) {
+        const ano = data.getFullYear();
+        const mes = formatarParte(data.getMonth() + 1);
+        const dia = formatarParte(data.getDate());
+        const hora = formatarParte(data.getHours());
+        const minuto = formatarParte(data.getMinutes());
+        return `${hostname}_${ano}-${mes}-${dia}_${hora}-${minuto}_todos_registros.json`;
+    }
+
+    async function buscarTelemetria(hostname) {
+        const agora = new Date();
+        for (let i = 0; i < 10; i++) {
+            const tentativa = new Date(agora.getTime() - i * 60000);
+            tentativa.setSeconds(0, 0);
+            const arquivo = nomeArquivoTodos(hostname, tentativa);
+            try {
+                return await api.get(`/gold/empresa/${idEmpresa}/${encodeURIComponent(hostname)}/monitoramentoComponentes/arquivo/${arquivo}`);
+            } catch (erro) {
+                // tenta o minuto anterior
+            }
+        }
+        return null;
     }
 
     function atualizarIndicadores() {
@@ -67,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tabela.innerHTML = '';
         const linha = document.createElement('tr');
         const celula = criarCelula(linha, texto);
-        celula.colSpan = 6;
+        celula.colSpan = 9;
         celula.className = 'servidores-vazio';
         tabela.appendChild(linha);
     }
@@ -85,31 +113,48 @@ document.addEventListener('DOMContentLoaded', () => {
             const linha = document.createElement('tr');
             linha.className = 'servidores-linha';
             criarCelula(linha, mainframe.hostname);
-           
-            let componentesMainframe = String(mainframe.componentes || '').replaceAll(" ", "").split(",");
+
+            const telemetria = mainframe.telemetria;
+            const camposComponentes = {
+                CPU: 'porcentagem_cpu',
+                DISCO: 'porcentagem_disco',
+                RAM: 'porcentagem_ram',
+                SWAP: 'media_swap_porcentagem'
+            };
 
             for (const componente of todosComponentes) {
-                if (!componentesMainframe.includes(componente)) {
-                    criarCelula(linha, 'Não monitorado');
-                    continue;
-                }
-                const [campo, , maximo] = monitoramento.metricas[componente];
-                const uso = mainframe.telemetria?.valores[campo];
+                const campo = camposComponentes[componente];
+                const uso = telemetria ? Number(telemetria[campo]) : NaN;
                 const celula = criarCelula(linha, Number.isFinite(uso) ? '' : 'Sem dados');
                 if (!Number.isFinite(uso)) continue;
                 celula.innerHTML = gerarEstrutura(uso);
-                celula.title = 'Coleta em ' + monitoramento.horario(mainframe.telemetria.atualizado_em);
+                celula.title = 'Coleta em ' + (telemetria.hora_de_captura || '—');
+
                 const barra = celula.querySelector('.progress-bar-fill');
                 const limite = mainframe.parametrosDetalhados.find(parametro => parametro.tipo === componente);
-                if (monitoramento.desvio(uso, limite) > 0) {
-                    barra.classList.replace('progress-bar-fill', 'progress-bar-fill-alert');
-                } else if (limite?.[maximo] != null && Number(limite[maximo]) - uso <= 15) {
-                    barra.classList.replace('progress-bar-fill', 'progress-bar-fill-attention');
+                if (limite) {
+                    const metrica = monitoramento.metricas[componente];
+                    if (metrica) {
+                        const [, minimo, maximo] = metrica;
+                        if ((limite[maximo] != null && uso >= Number(limite[maximo])) || (limite[minimo] != null && uso <= Number(limite[minimo]))) {
+                            barra.classList.replace('progress-bar-fill', 'progress-bar-fill-alert');
+                        } else if (limite[maximo] != null && Number(limite[maximo]) - uso <= 15) {
+                            barra.classList.replace('progress-bar-fill', 'progress-bar-fill-attention');
+                        }
+                    }
                 }
             }
 
+            const tx = telemetria ? Number(telemetria.dados_enviados_medio) : NaN;
+            const rx = telemetria ? Number(telemetria.dados_recebidos_medio) : NaN;
+            if (Number.isFinite(tx) && Number.isFinite(rx)) {
+                const celulaRede = criarCelula(linha, `Tx: ${tx.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} TB / Rx: ${rx.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} TB`);
+                celulaRede.title = 'Coleta em ' + (telemetria.hora_de_captura || '—');
+            } else {
+                criarCelula(linha, 'Sem dados');
+            }
+
             criarCelula(linha, `${mainframe.sis_operacional} ${mainframe.versao_so}`);
-            criarCelula(linha, mainframe.componentes || 'Nenhum componente');
 
             const status = document.createElement('span');
             status.className = `servidores-status ${classesStatus[mainframe.status] || ''}`;
@@ -152,20 +197,24 @@ document.addEventListener('DOMContentLoaded', () => {
             await Promise.all(mainframes.map(async mainframe => {
                 const [limites, coleta] = await Promise.allSettled([
                     api.get(`/parametro?id_mainframe=${mainframe.id_mainframe}`),
-                    monitoramento.ler(idEmpresa, mainframe.hostname, 'atual')
+                    buscarTelemetria(mainframe.hostname)
                 ]);
                 mainframe.parametrosDetalhados = limites.value ?? [];
                 mainframe.telemetria = coleta.value ?? null;
-                if (coleta.status === 'rejected' || limites.status === 'rejected') falhaTelemetria = true;
+                if (coleta.status === 'rejected' || limites.status === 'rejected' || !mainframe.telemetria) falhaTelemetria = true;
             }));
 
             preencherLocalizacoes();
             atualizarIndicadores();
             atualizarTabela();
-            const ultimaColeta = mainframes.map(m => m.telemetria?.atualizado_em).filter(Boolean)
-                .sort((a, b) => Date.parse(b) - Date.parse(a))[0];
+
+            const ultimaColeta = mainframes
+                .map(m => m.telemetria?.hora_de_captura)
+                .filter(Boolean)
+                .sort()
+                .at(-1);
             atualizacao.dateTime = ultimaColeta ?? '';
-            atualizacao.textContent = monitoramento.horario(ultimaColeta);
+            atualizacao.textContent = ultimaColeta || '—';
             aviso.textContent = 'Parte dos dados de monitoramento não pôde ser consultada.';
             aviso.hidden = !falhaTelemetria;
         } catch (erro) {
