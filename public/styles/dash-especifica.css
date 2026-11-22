@@ -55,6 +55,31 @@ main {
     padding-top: 0.4%;
 }
 
+.container-main .navbar .acoes-mainframe {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.container-main .navbar .botao-relatorio {
+    height: 45px;
+    padding: 0 18px;
+
+    background-color: #4F46E5;
+    color: #FFF;
+    border: none;
+    border-radius: 20px;
+
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.container-main .navbar .botao-relatorio:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
 .container-main .sessao-fundo {
     background-color: #FFF;
     border: 1px solid #F1F5F9;

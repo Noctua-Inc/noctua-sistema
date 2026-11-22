@@ -1,5 +1,10 @@
 const ID_EMPRESA = sessionStorage.getItem("idEmpresa");
 const ID_MAINFRAME = window.location.href.split("id_mainframe=")[1];
+const URL_LAMBDA_RELATORIO = "https://2klm53i2unudbwa64g6gkg3boy0vdbdq.lambda-url.us-east-1.on.aws/";
+
+// Cada aba lê um tipo de arquivo do Gold: geral=todos, rede, cpu, ram e disco.
+const TIPO_MONITORAMENTO_POR_ABA = ["todos", "rede", "cpu", "ram", "disco"];
+const registrosEmCache = new Map();
 
 let nomeMainframe = document.querySelector("#nomeMainframe");
 let opcoesBotoesMonitoramento = document.querySelectorAll(".opcao-monitoramento");
@@ -233,27 +238,145 @@ function montarHistoricoHora(historico) {
       media_sockets_tw: linha[indices.sockets_time_wait],
     };
 
-    resultado.dados.push(dado);
-    resultado.labels.push(dado.hora_de_captura);
-    resultado.cpu.push(dado.porcentagem_cpu);
-    resultado.ram.push(dado.porcentagem_ram);
-    resultado.swap.push(dado.media_swap_porcentagem);
-    resultado.disco.push(dado.porcentagem_disco);
-    resultado.redeTrafego.push(dado.media_trafego_rede);
-    resultado.cpuMedia.push(dado.media_cpu_porcentagem);
-    resultado.cpuFrequencia.push(dado.media_cpu_frequencia);
-    resultado.ramMedia.push(dado.media_ram_porcentagem);
-    resultado.ramLivre.push(dado.media_ram_disponivel);
-    resultado.discoMedia.push(dado.media_disco_porcentagem);
-    resultado.discoLivre.push(dado.media_disco_disponivel);
-    resultado.discoEscrita.push(dado.media_qtd_requisicao_escrita);
-    resultado.discoLeitura.push(dado.media_qtd_requisicao_leitura);
-    resultado.redeTxMedia.push(dado.media_dados_enviados);
-    resultado.redeRxMedia.push(dado.media_dados_recebidos);
-    resultado.redePerdidos.push(dado.media_dados_perdidos);
-    resultado.redeTw.push(dado.media_sockets_tw);
+    adicionarAoHistorico(resultado, dado);
   }
 
+  return resultado;
+}
+
+function adicionarAoHistorico(resultado, dado) {
+  resultado.dados.push(dado);
+  resultado.labels.push(dado.hora_de_captura);
+  resultado.cpu.push(dado.porcentagem_cpu);
+  resultado.ram.push(dado.porcentagem_ram);
+  resultado.swap.push(dado.media_swap_porcentagem);
+  resultado.disco.push(dado.porcentagem_disco);
+  resultado.redeTrafego.push(dado.media_trafego_rede);
+  resultado.cpuMedia.push(dado.media_cpu_porcentagem);
+  resultado.cpuFrequencia.push(dado.media_cpu_frequencia);
+  resultado.ramMedia.push(dado.media_ram_porcentagem);
+  resultado.ramLivre.push(dado.media_ram_disponivel);
+  resultado.discoMedia.push(dado.media_disco_porcentagem);
+  resultado.discoLivre.push(dado.media_disco_disponivel);
+  resultado.discoEscrita.push(dado.media_qtd_requisicao_escrita);
+  resultado.discoLeitura.push(dado.media_qtd_requisicao_leitura);
+  resultado.redeTxMedia.push(dado.media_dados_enviados);
+  resultado.redeRxMedia.push(dado.media_dados_recebidos);
+  resultado.redePerdidos.push(dado.media_dados_perdidos);
+  resultado.redeTw.push(dado.media_sockets_tw);
+}
+
+function criarHistoricoVazio() {
+  return {
+    dados: [],
+    labels: [],
+    cpu: [],
+    ram: [],
+    swap: [],
+    disco: [],
+    redeTrafego: [],
+    cpuMedia: [],
+    cpuFrequencia: [],
+    ramMedia: [],
+    ramLivre: [],
+    discoMedia: [],
+    discoLivre: [],
+    discoEscrita: [],
+    discoLeitura: [],
+    redeTxMedia: [],
+    redeRxMedia: [],
+    redePerdidos: [],
+    redeTw: [],
+  };
+}
+
+function numeroOuNulo(valor) {
+  return Number.isFinite(valor) ? valor : null;
+}
+
+function partesMinuto(minuto) {
+  const ano = minuto.getFullYear();
+  const mes = String(minuto.getMonth() + 1).padStart(2, "0");
+  const dia = String(minuto.getDate()).padStart(2, "0");
+  const hora = String(minuto.getHours()).padStart(2, "0");
+  const min = String(minuto.getMinutes()).padStart(2, "0");
+  return { data: `${ano}-${mes}-${dia}`, hora: `${hora}-${min}` };
+}
+
+function nomeArquivoRegistro(hostname, minuto, tipo) {
+  const { data, hora } = partesMinuto(minuto);
+  return `${hostname}_${data}_${hora}_${tipo}_registros.json`;
+}
+
+function chaveRegistro(tipo, hostname, minuto) {
+  const { data, hora } = partesMinuto(minuto);
+  return `${tipo}|${hostname}|${data} ${hora.replace("-", ":")}`;
+}
+
+async function carregarRegistros(tipo, hostname) {
+  const agora = new Date();
+  const minutoInicial = new Date(agora);
+  minutoInicial.setMinutes(0, 0, 0);
+
+  const minutos = [];
+  for (
+    let minuto = new Date(minutoInicial);
+    minuto <= agora;
+    minuto = new Date(minuto.getTime() + 60000)
+  ) {
+    minutos.push(new Date(minuto));
+  }
+
+  const pendentes = minutos.filter(
+    (minuto) => !registrosEmCache.has(chaveRegistro(tipo, hostname, minuto))
+  );
+
+  await Promise.all(
+    pendentes.map(async (minuto) => {
+      const arquivo = nomeArquivoRegistro(hostname, minuto, tipo);
+      try {
+        const registro = await api.get(
+          `/gold/empresa/${ID_EMPRESA}/${encodeURIComponent(hostname)}/monitoramentoComponentes/arquivo/${arquivo}`
+        );
+        registrosEmCache.set(chaveRegistro(tipo, hostname, minuto), registro);
+      } catch (erro) {
+        // O arquivo do minuto ainda não foi publicado no Gold.
+      }
+    })
+  );
+
+  return minutos
+    .map((minuto) => registrosEmCache.get(chaveRegistro(tipo, hostname, minuto)))
+    .filter((registro) => registro !== undefined);
+}
+
+function montarHistoricoRegistros(registros) {
+  const resultado = criarHistoricoVazio();
+  for (const registro of registros) {
+    const dado = {
+      hora_de_captura: registro.hora_de_captura || "",
+      porcentagem_cpu: numeroOuNulo(registro.porcentagem_cpu),
+      porcentagem_ram: numeroOuNulo(registro.porcentagem_ram),
+      porcentagem_disco: numeroOuNulo(registro.porcentagem_disco),
+      media_swap_porcentagem: numeroOuNulo(registro.media_swap_porcentagem),
+      media_trafego_rede: numeroOuNulo(registro.media_trafego_rede),
+      dados_enviados_medio: numeroOuNulo(registro.dados_enviados_medio),
+      dados_recebidos_medio: numeroOuNulo(registro.dados_recebidos_medio),
+      media_cpu_porcentagem: numeroOuNulo(registro.media_cpu_porcentagem),
+      media_cpu_frequencia: numeroOuNulo(registro.media_cpu_frequencia),
+      media_ram_porcentagem: numeroOuNulo(registro.media_ram_porcentagem),
+      media_ram_disponivel: numeroOuNulo(registro.media_ram_disponivel),
+      media_disco_porcentagem: numeroOuNulo(registro.media_disco_porcentagem),
+      media_disco_disponivel: numeroOuNulo(registro.media_disco_disponivel),
+      media_qtd_requisicao_escrita: numeroOuNulo(registro.media_qtd_requisicao_escrita),
+      media_qtd_requisicao_leitura: numeroOuNulo(registro.media_qtd_requisicao_leitura),
+      media_dados_enviados: numeroOuNulo(registro.media_dados_enviados),
+      media_dados_recebidos: numeroOuNulo(registro.media_dados_recebidos),
+      media_dados_perdidos: numeroOuNulo(registro.media_dados_perdidos),
+      media_sockets_tw: numeroOuNulo(registro.media_sockets_tw),
+    };
+    adicionarAoHistorico(resultado, dado);
+  }
   return resultado;
 }
 
@@ -326,15 +449,16 @@ async function trocarMonitoramento(indice) {
   const mainframe = await buscarMainframe();
   if (!mainframe) return;
 
-  const hostname = encodeURIComponent(mainframe.hostname);
+  const hostname = mainframe.hostname;
+  const tipo = TIPO_MONITORAMENTO_POR_ABA[indice];
   let historico;
   let mainframeDetalhado;
   try {
-    const [dadosGold, detalhes] = await Promise.all([
-      api.get(`/gold/empresa/${ID_EMPRESA}/${hostname}/monitoramento/historico.json`),
+    const [registros, detalhes] = await Promise.all([
+      carregarRegistros(tipo, hostname),
       buscarParametrosMainframe(),
     ]);
-    historico = montarHistoricoHora(dadosGold);
+    historico = montarHistoricoRegistros(registros);
     mainframeDetalhado = detalhes;
   } catch (erro) {
     if (sessaoAtual === indice) sessaoKpis.textContent = erro.message;
@@ -862,7 +986,83 @@ async function trocarMonitoramento(indice) {
   }
 }
 
+function prefixoEmpresa(razaoSocial) {
+  return razaoSocial.toLowerCase().replaceAll(" ", "_");
+}
+
+async function buscarRazaoSocial() {
+  const mainframes = await api.get(`/mainframe/empresa/${ID_EMPRESA}`);
+  const atual = mainframes.find(
+    (item) => String(item.id_mainframe) === String(ID_MAINFRAME)
+  );
+  return atual?.nome_empresa || null;
+}
+
+async function baixarRelatorio() {
+  const botao = document.querySelector("#btn-gerar-relatorio");
+  const aviso = document.querySelector("#aviso-monitoramento");
+  const htmlOriginal = botao.innerHTML;
+
+  botao.disabled = true;
+  botao.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Gerando...';
+  aviso.textContent = "Gerando relatório...";
+
+  try {
+    const hostname = nomeMainframe.textContent.trim();
+    if (!hostname) throw new Error("Mainframe não carregado.");
+
+    const razaoSocial = await buscarRazaoSocial();
+    if (!razaoSocial) throw new Error("Empresa não encontrada.");
+
+    const resposta = await fetch(URL_LAMBDA_RELATORIO, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        empresa: prefixoEmpresa(razaoSocial),
+        hostname: hostname,
+        idMainframe: String(ID_MAINFRAME),
+      }),
+    });
+
+    if (!resposta.ok) {
+      throw new Error(`Erro ${resposta.status} ao chamar a Lambda.`);
+    }
+
+    const dados = await resposta.json();
+    const bytes = Uint8Array.from(atob(dados.pdf), (caractere) =>
+      caractere.charCodeAt(0)
+    );
+    const url = URL.createObjectURL(
+      new Blob([bytes], { type: "application/pdf" })
+    );
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = dados.nomeArquivo || `relatorio-${hostname}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    aviso.textContent = "Relatório baixado com sucesso.";
+  } catch (erro) {
+    console.error(erro);
+    aviso.textContent = "Não foi possível gerar o relatório: " + erro.message;
+  } finally {
+    botao.disabled = false;
+    botao.innerHTML = htmlOriginal;
+  }
+}
+
+function configurarBotaoRelatorio() {
+  document
+    .querySelector("#btn-gerar-relatorio")
+    ?.addEventListener("click", baixarRelatorio);
+}
+
 async function inicializarPagina() {
+  configurarBotaoRelatorio();
+
   const ctx = document.getElementById("grafico").getContext("2d");
 
   grafico = new Chart(ctx, {

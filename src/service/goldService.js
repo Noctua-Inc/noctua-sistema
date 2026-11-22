@@ -66,4 +66,8 @@ async function lerMonitoramento(empresa, hostname, arquivo) {
     return dados;
 }
 
-export default {arquivoAusente, lerJson, lerMonitoramento, prefixoEmpresa};
+async function lerArquivoMonitoramento(empresa, hostname, arquivo) {
+    return lerJson(empresa, `${hostname}/monitoramentoComponentes/${arquivo}`);
+}
+
+export default {arquivoAusente, lerJson, lerMonitoramento, lerArquivoMonitoramento, prefixoEmpresa};
