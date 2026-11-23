@@ -1,15 +1,7 @@
 import pool from '../database/config.js';
 
 async function listar() {
-  const [rows] = await pool.query(`
-    SELECT 
-        c.id_componente,
-        c.tipo,
-        f.nome_fabricante
-    FROM componente c
-    INNER JOIN fabricante f 
-        ON f.id_fabricante = c.fk_fabricante
-    ORDER BY c.tipo, f.nome_fabricante;`)
+  const [rows] = await pool.query('SELECT id_componente, tipo FROM componente ORDER BY tipo');
   return rows;
 }
 
@@ -23,13 +15,8 @@ async function buscarPorId(id) {
 
 async function listarPorEmpresa(idEmpresa) {
   const [rows] = await pool.execute(
-    `SELECT DISTINCT
-        c.id_componente,
-        c.tipo,
-        f.nome_fabricante
+    `SELECT DISTINCT c.id_componente, c.tipo
      FROM componente c
-     INNER JOIN fabricante f
-        ON f.id_fabricante = c.fk_fabricante
      INNER JOIN parametro p
         ON p.id_componente = c.id_componente
      INNER JOIN mainframe m
@@ -40,20 +27,20 @@ async function listarPorEmpresa(idEmpresa) {
   );
 
   return rows;
-} 
+}
 
-async function criar({ tipo, fabricante}) {
+async function criar(tipo) {
   const [result] = await pool.execute(
-    'INSERT INTO componente (tipo, fk_fabricante) VALUES (?, (SELECT id_fabricante FROM fabricante WHERE nome_fabricante = ?))',
-    [tipo, fabricante]
+    'INSERT INTO componente (tipo) VALUES (?)',
+    [tipo]
   );
   return result.insertId;
 }
 
-async function atualizar(id, { tipo, fabricante }) {
+async function atualizar(id, tipo) {
   const [result] = await pool.execute(
-    'UPDATE componente SET tipo = ?, fk_fabricante = (SELECT id_fabricante FROM fabricante WHERE nome_fabricante = ?) WHERE id_componente = ?',
-    [tipo, fabricante, id]
+    'UPDATE componente SET tipo = ? WHERE id_componente = ?',
+    [tipo, id]
   );
   return result.affectedRows;
 }

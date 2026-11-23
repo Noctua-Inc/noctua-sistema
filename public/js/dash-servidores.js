@@ -10,17 +10,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let mainframes = [];
     let carregando = false;
 
-    let usoComponente = 0;
-
     const nomesStatus = { ativo: 'Ativo', inativo: 'Inativo', 'manutenção': 'Manutenção' };
     const classesStatus = { ativo: 'ativo', inativo: 'inativo', 'manutenção': 'manutencao' };
 
     function gerarEstrutura(usoComponente) {
         const estruturaUsoComponente = `
             <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width: ${usoComponente}%;"></div>
+                <div class="progress-bar-fill" style="width: ${Math.min(100, Math.max(0, usoComponente))}%;"></div>
             </div>
-            <span>${usoComponente}%</span>
+            <span>${usoComponente.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%</span>
         `
 
         return estruturaUsoComponente;
@@ -60,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function criarCelula(linha, texto) {
         const celula = document.createElement('td');
-        celula.innerHTML = texto;
+        celula.textContent = texto;
         linha.appendChild(celula);
         return celula;
     }
@@ -88,31 +86,28 @@ document.addEventListener('DOMContentLoaded', () => {
             linha.className = 'servidores-linha';
             criarCelula(linha, mainframe.hostname);
            
-            let componentesMainframe = String(mainframe.componentes).replaceAll(" ", "").split(",");
-            let parametrosMainframe = String(mainframe.parametros).replaceAll(" ", "").split(",");            
+            let componentesMainframe = String(mainframe.componentes || '').replaceAll(" ", "").split(",");
 
-            for (let i = 0; i < todosComponentes.length; i++) {
-                let usoComponente = Number((Math.random() * (100 - 60) + 60).toFixed(0));
-                let componenteAtual = todosComponentes[i];
-
-                if (componentesMainframe.includes(componenteAtual)) {
-                    let celulaCriada = criarCelula(linha, gerarEstrutura(usoComponente));
-
-                    let barraProcresso = celulaCriada.querySelector(".progress-bar-fill");
-
-                    let indexMainframe = componentesMainframe.indexOf(componenteAtual);
-                    let parametroAtual = Number(parametrosMainframe[indexMainframe]);
-
-                    if (parametroAtual <= usoComponente) {
-                        barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-alert");
-                    } else if(Math.abs(parametroAtual - usoComponente) <= 15) {
-                        barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-attention");
-                    }
-                } else {
-                    criarCelula(linha, "Não Monitorado");
+            for (const componente of todosComponentes) {
+                if (!componentesMainframe.includes(componente)) {
+                    criarCelula(linha, 'Não monitorado');
+                    continue;
+                }
+                const [campo, , maximo] = monitoramento.metricas[componente];
+                const uso = mainframe.telemetria?.valores[campo];
+                const celula = criarCelula(linha, Number.isFinite(uso) ? '' : 'Sem dados');
+                if (!Number.isFinite(uso)) continue;
+                celula.innerHTML = gerarEstrutura(uso);
+                celula.title = 'Coleta em ' + monitoramento.horario(mainframe.telemetria.atualizado_em);
+                const barra = celula.querySelector('.progress-bar-fill');
+                const limite = mainframe.parametrosDetalhados.find(parametro => parametro.tipo === componente);
+                if (monitoramento.desvio(uso, limite) > 0) {
+                    barra.classList.replace('progress-bar-fill', 'progress-bar-fill-alert');
+                } else if (limite?.[maximo] != null && Number(limite[maximo]) - uso <= 15) {
+                    barra.classList.replace('progress-bar-fill', 'progress-bar-fill-attention');
                 }
             }
-            
+
             criarCelula(linha, `${mainframe.sis_operacional} ${mainframe.versao_so}`);
             criarCelula(linha, mainframe.componentes || 'Nenhum componente');
 
@@ -152,19 +147,27 @@ document.addEventListener('DOMContentLoaded', () => {
         carregando = true;
         try {
             mainframes = await api.get(`/mainframe/empresa/${idEmpresa}`);
+
+            let falhaTelemetria = false;
+            await Promise.all(mainframes.map(async mainframe => {
+                const [limites, coleta] = await Promise.allSettled([
+                    api.get(`/parametro?id_mainframe=${mainframe.id_mainframe}`),
+                    monitoramento.ler(idEmpresa, mainframe.hostname, 'atual')
+                ]);
+                mainframe.parametrosDetalhados = limites.value ?? [];
+                mainframe.telemetria = coleta.value ?? null;
+                if (coleta.status === 'rejected' || limites.status === 'rejected') falhaTelemetria = true;
+            }));
+
             preencherLocalizacoes();
             atualizarIndicadores();
             atualizarTabela();
-
-            // Mostra a última consulta bem-sucedida, não o horário de execução da ETL.
-            const agora = new Date();
-            atualizacao.dateTime = agora.toISOString();
-            atualizacao.textContent = agora.toLocaleString('pt-BR', {
-                timeZone: 'America/Sao_Paulo',
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit',
-            });
-            aviso.hidden = true;
+            const ultimaColeta = mainframes.map(m => m.telemetria?.atualizado_em).filter(Boolean)
+                .sort((a, b) => Date.parse(b) - Date.parse(a))[0];
+            atualizacao.dateTime = ultimaColeta ?? '';
+            atualizacao.textContent = monitoramento.horario(ultimaColeta);
+            aviso.textContent = 'Parte dos dados de monitoramento não pôde ser consultada.';
+            aviso.hidden = !falhaTelemetria;
         } catch (erro) {
             console.error(erro);
             aviso.textContent = 'Não foi possível atualizar as mainframes. Uma nova tentativa será feita automaticamente.';
@@ -180,55 +183,4 @@ document.addEventListener('DOMContentLoaded', () => {
     filtroStatus.addEventListener('change', atualizarTabela);
     carregarMainframes();
     setInterval(carregarMainframes, 60000);
-
-    setInterval(() => {
-        let linhas = tabela.getElementsByClassName('servidores-linha');
-
-        for (let l = 0; l < linhas.length; l++) {
-            let linhaAtual = linhas[l];
-            let mainframeObj = mainframes[l];
-
-            let componentesMainframe = String(mainframeObj.componentes).replaceAll(" ", "").split(",");
-            let parametrosMainframe = String(mainframeObj.parametros).replaceAll(" ", "").split(",");
-            let celulas = linhaAtual.getElementsByTagName('td');
-
-            for (let i = 0; i < todosComponentes.length; i++) {
-                let celulaAtual = celulas[i + 1];
-                let componenteAtual = todosComponentes[i];
-
-                if (componentesMainframe.includes(componenteAtual) && celulaAtual) {
-                    let spanValor = celulaAtual.querySelector('span');
-                    let barraProcresso = celulaAtual.querySelector('.progress-bar-bg div');
-
-                    if (spanValor && barraProcresso) {
-                        let valorAtual = Number(spanValor.textContent.replace('%', ''));
-                        
-                        let variacao = 0;
-                        if (componenteAtual != "DISCO") {
-                            variacao = Number((Math.random() * (10 - (-10)) + (-10)).toFixed(0));
-                        } 
-
-                        usoComponente = Number((valorAtual + variacao).toFixed(0));
-
-                        if (usoComponente > 100) usoComponente = 100;
-                        if (usoComponente < 0) usoComponente = 0;
-
-                        barraProcresso.style.width = usoComponente + '%';
-                        spanValor.textContent = usoComponente + '%';
-
-                        barraProcresso.className = "progress-bar-fill";
-
-                        let indexMainframe = componentesMainframe.indexOf(componenteAtual);
-                        let parametroAtual = Number(parametrosMainframe[indexMainframe]);
-
-                        if (parametroAtual <= usoComponente) {
-                            barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-alert");
-                        } else if (Math.abs(parametroAtual - usoComponente) <= 15) {
-                            barraProcresso.classList.replace("progress-bar-fill", "progress-bar-fill-attention");
-                        }
-                    }
-                }
-            }
-        }
-    }, 5000);
 });

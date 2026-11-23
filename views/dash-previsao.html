@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            Previsão de consumo | Noctua
+        </title>
+        <link rel="icon" href="/assets/icon.png">
+        <link rel="stylesheet" href="/styles/dash-style.css">
+        <link rel="stylesheet" href="/styles/dashboard-sidebar.css">
+        <link rel="stylesheet" href="/styles/editar-usuario.css">
+        <link rel="stylesheet" href="/styles/dash-previsao.css">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    </head>
+    <body class="pagina-previsao pagina-dashboard">
+        <aside class="sidebar" data-dashboard-sidebar="dash-previsao.html"></aside>
+        <div class="main-wrapper" id="container_main" onclick="fecharEditarUsuario()">
+            <main class="dashboard-previsao">
+                <header class="previsao-cabecalho">
+                    <div>
+                        <h1>
+                            Previsão de consumo
+                        </h1>
+                        <p class="previsao-atualizacao">
+                            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                            Última atualização:
+                            <time id="atualizacao-previsao">—</time>
+                        </p>
+                    </div>
+                    <button type="button" class="previsao-relatorio" disabled
+                        aria-label="Gerar relatório (indisponível)" title="Aguardando integração com o gerador Java">
+                        <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                        Gerar relatório
+                    </button>
+                </header>
+                <p id="mensagem-mainframes" role="status" hidden>
+                </p>
+                <div class="previsao-controles" id="controles-previsao">
+                    <div class="previsao-campo">
+                        <span id="label-componente">
+                            Componente · toda a dashboard
+                        </span>
+                        <div class="previsao-opcoes" id="componentes-previsao" role="group" aria-labelledby="label-componente">
+                            <button type="button" id="botao-CPU" data-componente="CPU" onclick="escolherComponente('CPU')" aria-pressed="true">
+                                CPU
+                            </button>
+                            <button type="button" id="botao-RAM" data-componente="RAM" onclick="escolherComponente('RAM')" aria-pressed="false">
+                                RAM
+                            </button>
+                            <button type="button" id="botao-DISCO" data-componente="DISCO" onclick="escolherComponente('DISCO')" aria-pressed="false">
+                                Disco
+                            </button>
+                        </div>
+                    </div>
+                    <div class="previsao-campo" id="campo-metrica-disco" hidden>
+                        <span id="label-disco">
+                            Métrica do disco
+                        </span>
+                        <div class="previsao-opcoes" id="metricas-disco" role="group" aria-labelledby="label-disco">
+                            <button type="button" id="botao-ocupacao" data-metrica="ocupacao" onclick="escolherMetricaDisco('ocupacao')" aria-pressed="true">
+                                Ocupação
+                            </button>
+                            <button type="button" id="botao-leitura" data-metrica="leitura" onclick="escolherMetricaDisco('leitura')" aria-pressed="false">
+                                Leitura
+                            </button>
+                            <button type="button" id="botao-escrita" data-metrica="escrita" onclick="escolherMetricaDisco('escrita')" aria-pressed="false">
+                                Escrita
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="conteudo-previsao">
+                    <section class="previsao-mainframe" aria-labelledby="titulo-secao-mainframe">
+                        <header class="previsao-secao-cabecalho">
+                            <div>
+                                <h2 id="titulo-secao-mainframe">Previsão por mainframe</h2>
+                                <p>A mainframe selecionada filtra os três indicadores e o gráfico desta seção.</p>
+                            </div>
+                            <div class="previsao-campo previsao-filtro-mainframe">
+                                <label for="mainframe-previsao">Mainframe</label>
+                                <select id="mainframe-previsao" onchange="selecionarMainframe()" disabled>
+                                    <option>Carregando mainframes...</option>
+                                </select>
+                            </div>
+                        </header>
+                        <div id="conteudo-mainframe" hidden>
+                    <section class="previsao-kpis" aria-label="Resumo do período previsto" aria-live="polite">
+                        <article class="previsao-kpi" id="kpi-proximo-desvio">
+                            <h2>Tempo até o próximo desvio</h2>
+                            <strong id="primeira-saida">—</strong>
+                            <p id="detalhe-saida">—</p>
+                            <span class="previsao-tendencia" id="comparacao-tempo">Sem comparação</span>
+                        </article>
+                        <article class="previsao-kpi">
+                            <h2>Duração do próximo desvio</h2>
+                            <strong id="duracao-desvio">—</strong>
+                            <p id="detalhe-duracao">Duração ainda indisponível.</p>
+                            <span class="previsao-tendencia" id="comparacao-duracao">Sem comparação</span>
+                        </article>
+                        <article class="previsao-kpi">
+                            <h2>Intensidade do desvio</h2>
+                            <strong id="intensidade-desvio">—</strong>
+                            <p id="detalhe-intensidade">Intensidade ainda indisponível.</p>
+                            <span class="previsao-tendencia" id="comparacao-intensidade">Sem comparação</span>
+                        </article>
+                    </section>
+                    <section class="previsao-painel" aria-labelledby="titulo-grafico-previsao">
+                        <h2 id="titulo-grafico-previsao">
+                            Histórico e previsão de consumo
+                        </h2>
+                        <p class="previsao-subtitulo" id="subtitulo-grafico">
+                        </p>
+                        <div class="previsao-grafico-scroll">
+                            <div class="previsao-chart">
+                                <canvas id="grafico-previsao" role="img" aria-label="Histórico, previsão e limites configurados">
+                                    Gráfico de previsão de consumo.
+                                </canvas>
+                            </div>
+                        </div>
+                        <div class="previsao-legenda" aria-label="Legenda do gráfico">
+                            <span>
+                                <i>
+                                </i>
+                                Observado
+                            </span>
+                            <span>
+                                <i class="linha-prevista">
+                                </i>
+                                Previsto
+                            </span>
+                            <span>
+                                <i class="linha-minima">
+                                </i>
+                                Limite mínimo
+                            </span>
+                            <span>
+                                <i class="linha-maxima">
+                                </i>
+                                Limite máximo
+                            </span>
+                        </div>
+                    </section>
+                        </div>
+                    </section>
+                    <section class="previsao-empresa" aria-labelledby="titulo-secao-empresa">
+                        <header class="previsao-secao-cabecalho">
+                            <div>
+                                <h2 id="titulo-secao-empresa">Visão da empresa · CPU</h2>
+                                <p>Todas as mainframes · acompanha o componente escolhido no topo.</p>
+                            </div>
+                        </header>
+                        <div class="previsao-inferior">
+                        <section class="previsao-kpis-empresa" aria-label="Previsões da empresa" aria-live="polite">
+                            <article class="previsao-kpi">
+                                <h2>Horário com tendência de maior concentração de desvios</h2>
+                                <strong id="horario-concentracao">—</strong>
+                                <p id="detalhe-concentracao">Resumo da empresa ainda não disponível.</p>
+                                <span class="previsao-tendencia" id="comparacao-concentracao">Sem comparação</span>
+                            </article>
+                            <article class="previsao-kpi">
+                                <h2>Mainframes com desvios previstos</h2>
+                                <strong id="mainframes-com-desvio">—</strong>
+                                <p id="detalhe-mainframes-desvio">Resumo da empresa ainda não disponível.</p>
+                                <span class="previsao-tendencia" id="comparacao-mainframes">Sem comparação</span>
+                            </article>
+                        </section>
+                        <section class="previsao-painel" aria-labelledby="titulo-comparacao">
+                            <h2 id="titulo-comparacao">
+                                Mainframes por tendência de criticidade
+                            </h2>
+                            <p class="previsao-subtitulo" id="unidade-tabela">
+                                Período previsto
+                            </p>
+                            <div class="previsao-tabela-scroll">
+                                <table class="previsao-tabela">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                Mainframe
+                                            </th>
+                                            <th scope="col">
+                                                Prev. mín – máx
+                                            </th>
+                                            <th scope="col">
+                                                Limites
+                                            </th>
+                                            <th scope="col">
+                                                Situação
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabela-previsao">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+        <div id="editar-usuario" style="display:none">
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js">
+        </script>
+        <script src="/js/api.js">
+        </script>
+        <script src="/js/dashboard-sidebar.js"></script>
+        <script src="/js/user-sidebar.js">
+        </script>
+        <script src="/js/editar-usuario.js">
+        </script>
+        <script src="/js/dash-previsao.js">
+        </script>
+    </body>
+</html>

@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Noctua | Correlação</title>
+
+    <!-- CSS geral -->
+    <link rel="stylesheet" href="/styles/dash-style.css">
+
+    <!-- CSS exclusivo da dashboard -->
+    <link rel="stylesheet" href="/styles/dash-correlacao.css">
+
+    <!-- Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/styles/dashboard-sidebar.css">
+    <link rel="stylesheet" href="/styles/editar-usuario.css">
+</head>
+
+<body class="pagina-correlacao pagina-dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" data-dashboard-sidebar="dash-correlacao.html"></aside>
+
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-wrapper" id="container_main" onclick="fecharEditarUsuario()">
+
+        <section class="dashboard-correlacao">
+
+            <!-- CABEÇALHO -->
+            <header class="correlacao-cabecalho">
+
+                <div>
+                    <h1>Correlação entre recursos</h1>
+                    <p>
+                        Analise como CPU, RAM e Disco se relacionam
+                        nos mainframes.
+                    </p>
+                </div>
+
+                <div class="correlacao-filtros">
+
+                    <select id="filtro-periodo" aria-label="Período das medições">
+                        <option value="24">Últimas 24 horas</option>
+                        <option value="168">Últimos 7 dias</option>
+                        <option value="672">Últimos 28 dias</option>
+                    </select>
+
+                    <select id="filtro-mainframe" aria-label="Mainframe">
+                        <option value="todos">Todos os equipamentos</option>
+                    </select>
+
+                </div>
+
+            </header>
+
+
+            <p id="aviso-correlacao" role="status"></p>
+
+            <!-- KPIs -->
+            <section class="correlacao-kpis">
+
+                <div class="correlacao-kpi">
+
+                    <div class="kpi-icone">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+
+                    <p>Correlação CPU x RAM</p>
+
+                    <h2>—</h2>
+
+                    <span></span>
+
+                </div>
+
+
+                <div class="correlacao-kpi">
+
+                    <div class="kpi-icone">
+                        <i class="fa-solid fa-hard-drive"></i>
+                    </div>
+
+                    <p>Correlação CPU x Disco</p>
+
+                    <h2>—</h2>
+
+                    <span></span>
+
+                </div>
+
+
+                <div class="correlacao-kpi">
+
+                    <div class="kpi-icone">
+                        <i class="fa-solid fa-memory"></i>
+                    </div>
+
+                    <p>Correlação RAM x Disco</p>
+
+                    <h2>—</h2>
+
+                    <span></span>
+
+                </div>
+
+            </section>
+
+
+            <!-- GRÁFICOS -->
+            <section class="correlacao-graficos">
+
+                <div class="correlacao-card">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-line"></i>
+                        Evolução dos recursos
+                    </h2>
+
+                    <div class="grafico-container">
+                        <canvas id="grafico-evolucao"></canvas>
+                    </div>
+
+                </div>
+
+
+                <div class="correlacao-card">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-scatter"></i>
+                        Dispersão: CPU x RAM
+                    </h2>
+
+                    <div class="grafico-container">
+                        <canvas id="grafico-dispersao"></canvas>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- MATRIZ E INSIGHTS -->
+            <section class="correlacao-inferior">
+
+                <div class="correlacao-card">
+
+                    <h2>
+                        <i class="fa-solid fa-table-cells"></i>
+                        Matriz de correlação
+                    </h2>
+
+                    <table class="matriz">
+
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>CPU</th>
+                                <th>RAM</th>
+                                <th>Disco</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="matriz-correlacao"></tbody>
+
+                    </table>
+
+                    <div class="legenda">
+
+                        <span>
+                            <i class="cor-legenda forte-cor"></i>
+                            Alta
+                        </span>
+
+                        <span>
+                            <i class="cor-legenda moderada-cor"></i>
+                            Moderada
+                        </span>
+
+                        <span>
+                            <i class="cor-legenda fraca-cor"></i>
+                            Fraca
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="correlacao-card">
+
+                    <h2>
+                        <i class="fa-solid fa-lightbulb"></i>
+                        Principais insights
+                    </h2>
+
+                    <div class="tabela-responsiva">
+
+                        <table class="tabela-correlacao">
+
+                            <thead>
+                                <tr>
+                                    <th>Recursos</th>
+                                    <th>Correlação</th>
+                                    <th>Interpretação</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="insights-correlacao"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- OBSERVAÇÃO -->
+            <div class="correlacao-observacao">
+
+                <i class="fa-solid fa-circle-info"></i>
+
+                <p>
+                    A correlação indica como dois recursos variam em conjunto.
+                    Uma correlação alta não significa necessariamente que um
+                    recurso causa o aumento do outro.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <div id="editar-usuario" style="display: none;"></div>
+    <script src="/js/api.js"></script>
+    <script src="/js/monitoramento.js"></script>
+    <script src="/js/dashboard-sidebar.js"></script>
+    <script src="/js/user-sidebar.js"></script>
+    <script src="/js/editar-usuario.js"></script>
+
+    <script src="/js/dash-correlacao.js"></script>
+
+</body>
+</html>

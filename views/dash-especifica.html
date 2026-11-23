@@ -3,223 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Nome Servidor</title>
+    <title>Detalhes do servidor | Noctua</title>
     <link rel="stylesheet" href="/styles/dash-especifica.css">
+    <link rel="stylesheet" href="/styles/dashboard-sidebar.css">
     <link rel="stylesheet" href="/styles/editar-usuario.css">
     <link rel="icon" href="/assets/icon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="pagina-dashboard">
     <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-        <a href="dash-servidores.html">
-            <img class="logo" src="/assets/noctua-logo-branca.png" alt="Noctua Logo">
-        </a>
-        </div>
-
-        <ul class="sidebar-menu">
-        <li><a href="dash-servidores.html" class="active" aria-current="page"><i class="fa-solid fa-server"></i>Servidores</a></li>
-        <li><a href="dash-alertas.html"><i class="fa-solid fa-triangle-exclamation"></i>Alertas</a></li>
-        <li><a href="mainframes.html"><i class="fa-solid fa-pen-to-square"></i>Editar Servidores</a></li>
-        <li id="cargos-html" class="hidden"><a href="cargos.html"><i class="fa-solid fa-user-tag" aria-hidden="true"></i>Cargos</a></li>
-        <li id="funcionarios-html" class="hidden"><a href="cadastro-func.html"><i class="fa-solid fa-users" aria-hidden="true"></i>Usuários</a></li>
-        </ul>
-
-        <div class="sidebar-user">
-        <a href="#" onclick="abrirEditarUsuario(); return false;" aria-label="Editar meu perfil">
-            <div class="user-avatar"><span id="user-avatar">-</span></div>
-            <div class="user-info">
-            <span id="user-name">-</span>
-            <span id="user-role">-</span>
-            </div>
-        </a>
-        <a href="index.html" aria-label="Sair">
-            <i class="fa-solid fa-right-from-bracket" style="color:rgb(255,102,102);"></i>
-        </a>
-        </div>
-    </aside>
+    <aside class="sidebar" data-dashboard-sidebar="dash-servidores.html"></aside>
 
     <main id="container_main" onclick="fecharEditarUsuario()">
-        <nav class="navbar">
-            <div class="parte-esquerda">
-                <h1 class="tituto-servidor" id="nomeServidor">
+        <div class="container-main">
+            <section class="navbar">
+                <h2 class="titulo-mainframe">
                     Detalhes do Servidor: 
-                </h1>
-            </div>
-
-            <div class="parte-direita">
-                <p class="estado-servidor" id="estadoServidor">
-                </p>
-            </div>
+                    <span class="nome-mainframe" id="nomeMainframe"></span>
+                </h2>
     
-        </nav>
-
-        <section class="kpis">
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Previsão de Riso
-                </p>
-                <h2 class="componente" id="kpiRisco">
-                    Risco: 
-                </h2>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Momento mais utilizado
-                </p>
-                <h2 class="componente horario" id="kpiHorario">
-
-                </h2>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Uso Médio CPU
-                </p>
-                <h2 class="componente" id="kpiCPUPor">
-                    CPU: 
-                </h2>
-                <p class="observacao" id="observacaoCpu">
-                    Aumentou 8.2% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Frequência Médio CPU
-                </p>
-                <h2 class="componente" id="kpiCPUFreq">
-                    Freq CPU:
-                </h2>
-                <p class="observacao" id="observacaoCPUFrq">
-                    Aumentou 8.2% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Uso Médio RAM
-                </p>
-                <h2 class="componente" id="kpiRAMPor">
-                    RAM: 
-                </h2>
-                <p class="observacao" id="observacaoRAM">
-                    Diminuiu 1% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Uso Médio SWAP
-                </p>
-                <h2 class="componente" id="kpiSWAPPor">
-                    SWAP:
-                </h2>
-                <p class="observacao" id="observacaoSWAP">
-                    Diminuiu 5% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Quantidade Média RAM Livre
-                </p>
-                <h2 class="componente" id="kpiRAMUso">
-                    RAM: 
-                </h2>
-                <p class="observacao" id="observacaoRAMUso">
-                    Diminuiu 1GM nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Uso Médio Disco
-                </p>
-                <h2 class="componente" id="kpiDiscoPor">
-                    Disco:
-                </h2>
-                <p class="observacao" id="observacaoDisco">
-                    Aumentou 4% nos 
-                </p>
-            </div>
-
-            <div class="kpi">
-                <p class="titulo-kpi">
-                    Quantidade Média Disco Livre
-                </p>
-                <h2 class="componente" id="kpiDiscoUso">
-                    Disco:
-                </h2>
-                <p class="observacao" id="observacaoDiscoUso">
-                    Aumentou 2GM nos 
-                </p>
-            </div>
-        </section>
-
-        <section class="sessao-grafico">
-            <div class="sessao-acima">
-                <h2 class="titulo-sessao">
-                    Monitoramento de Componentes
-                </h2>
-
-                <div class="botoes-tempo">
-                    <button class="botao-tempo botao-escolhido" onclick="trocarTempo(0)">
-                        1h
-                    </button>
-
-                    <button class="botao-tempo" onclick="trocarTempo(1)">
-                        12h
-                    </button>
-
-                    <button class="botao-tempo" onclick="trocarTempo(2)">
-                        24h
-                    </button>
-                    
-                    <button class="botao-tempo" onclick="trocarTempo(3)">
-                        7 dias
-                    </button>
+                <div class="status-mainframe" id="statusMainframe">
                 </div>
-            </div>
-            
-            <canvas id="grafico"></canvas>
+            </section>
+            <p id="aviso-monitoramento" role="status"></p>
+    
+            <section class="sessao-fundo opcoes-monitoramento">
+                <ul>
+                    <li>
+                        <button class="opcao-monitoramento opcao-monitoramento-selecionada" onclick="trocarMonitoramento(0)">
+                            Geral (Visão Geral)
+    
+                        </button>
+                    </li>
+                    <li>
+                        <button class="opcao-monitoramento" onclick="trocarMonitoramento(1)">
+                            Rede e Conectividade
+    
+                        </button>
+                    </li>
+                    <li>
+                        <button class="opcao-monitoramento" onclick="trocarMonitoramento(2)">
+                            Processador (CPU)
+    
+                        </button>
+                    </li>
+                    <li>
+                        <button class="opcao-monitoramento" onclick="trocarMonitoramento(3)">
+                            Memória RAM & SWAP
+    
+                        </button>
+                    </li>
+                    <li>
+                        <button class="opcao-monitoramento" onclick="trocarMonitoramento(4)">
+                            Armazenamento (Disco)
+    
+                        </button>
+                    </li>
+                </ul>
+            </section>
+    
+            <section class="sessao-kpis" id="sessaoKpis">
+            </section>
+    
+            <section class="sessao-fundo sessao-grafico">
+                <div class="parte-acima">
+                    <h2 class="titulo-grafico"></h2>
+    
+                    <div class="opcoes-tempo">
+                        <button class="opcao-tempo opcao-tempo-selecionada" onclick="trocarTempo(0)">
+                            1h
+                        </button>
+    
+                        <button class="opcao-tempo" onclick="trocarTempo(1)">
+                            12h
+                        </button>
+    
+                        <button class="opcao-tempo" onclick="trocarTempo(2)">
+                            24h
+                        </button>
+    
+                        <button class="opcao-tempo" onclick="trocarTempo(3)">
+                            7 dias
+                        </button>
+                    </div>
+                </div>
+    
+                <section class="sessao-grafico">
+                    <canvas id="grafico"></canvas>
+                </section>
+            </section>
+    
+            <section class="sessao-fundo sessao-historico">
+                <h2 class="titulo-lista">
+                    Histórico de medições
+                </h2>
 
-        </section>
-
-        <section class="historico">
-            <h2 class="titulo-sessao">
-                Histórico Detalhado de Métricas
-            </h2>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data e Hora</th>
-                        <th>CPU(%)</th>
-                        <th>Freq CPU</th>
-                        <th>RAM(%)</th>
-                        <th>Quantidade RAM</th>
-                        <th>SWAP (%)</th>
-                        <th>Disco(%)</th>
-                        <th>Quantidade Disco</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="corpoTabela">
-                </tbody>
-            </table>            
-        </section>
+                 <table>
+                    <thead>
+                        <tr class="titulo-grafico" id="tituloTabela">
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabela">
+                    </tbody>
+                </table>
+            </section>
+        </div>
     </main>
-
+    
 <div id="editar-usuario" style="display: none;"></div>
 <script src="/js/api.js"></script>
+    <script src="/js/monitoramento.js"></script>
+<script src="/js/dashboard-sidebar.js"></script>
 <script src="/js/user-sidebar.js"></script>
 <script src="/js/editar-usuario.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

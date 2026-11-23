@@ -4,8 +4,8 @@ import componenteController from '../controller/componenteController.js';
 const router = express.Router();
 
 router.get('/', componenteController.listar);
+router.get('/empresa/:idEmpresa', componenteController.listarPorEmpresa);
 router.get('/:id', componenteController.buscarPorId);
-router.get('/:id', componenteController.listarPorEmpresa);
 router.post('/', componenteController.criar);
 router.put('/:id', componenteController.atualizar);
 router.delete('/:id', componenteController.remover);

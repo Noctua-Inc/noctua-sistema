@@ -5,13 +5,14 @@ async function listar(idEmpresa) {
   const [rows] = await pool.query(`
     SELECT
         m.*,
+        e.razao_social AS nome_empresa,
         l.nome AS localizacao_nome,
         l.estado,
         l.cidade,
         l.cep,
-        comp.componentes,
-        param.parametros
+        comp.componentes
     FROM mainframe m
+    JOIN empresa e ON e.id_empresa = m.fk_empresa
     LEFT JOIN localizacao l
         ON l.id_localizacao = m.fk_localizacao
     LEFT JOIN (
@@ -26,18 +27,6 @@ async function listar(idEmpresa) {
         INNER JOIN componente c ON c.id_componente = p.id_componente
         GROUP BY p.id_mainframe
     ) comp ON comp.id_mainframe = m.id_mainframe
-
-    LEFT JOIN (
-        SELECT 
-            id_mainframe,
-            GROUP_CONCAT(
-                pico_max
-                SEPARATOR ', '
-            ) AS parametros
-        FROM parametro
-        GROUP BY id_mainframe
-    ) param ON param.id_mainframe = m.id_mainframe
-
     WHERE m.fk_empresa = ?
     ORDER BY m.hostname;	
   `, [idEmpresa]);
@@ -49,8 +38,7 @@ async function listaPorIdMainframeId(idEmpresa, idMainFrame) {
     `
     SELECT
         m.hostname,
-        comp.componentes,
-        param.parametros
+        comp.componentes
     FROM mainframe m
     LEFT JOIN localizacao l
         ON l.id_localizacao = m.fk_localizacao
@@ -66,18 +54,6 @@ async function listaPorIdMainframeId(idEmpresa, idMainFrame) {
         INNER JOIN componente c ON c.id_componente = p.id_componente
         GROUP BY p.id_mainframe
     ) comp ON comp.id_mainframe = m.id_mainframe
-
-    LEFT JOIN (
-        SELECT 
-            id_mainframe,
-            GROUP_CONCAT(
-                pico_max
-                SEPARATOR ', '
-            ) AS parametros
-        FROM parametro
-        GROUP BY id_mainframe
-    ) param ON param.id_mainframe = m.id_mainframe
-
     WHERE m.fk_empresa = ? AND m.id_mainframe = ?
     ORDER BY m.hostname;	
     `,
@@ -95,11 +71,20 @@ async function buscarPorId(id) {
   return rows[0] || null;
 }
 
+async function salvarParametros(conn, id_mainframe, parametros = {}) {
+  for (const [tipo, dadosComponente] of Object.entries(parametros)) {
+    const id_componente = parametroModel.COMPONENTES[tipo];
+    if (!id_componente) continue;
+
+    await parametroModel.criarComConexao(conn, id_mainframe, id_componente, dadosComponente);
+  }
+}
+
 async function criar(dados) {
   const {
-    hostname, fabricante, modelo, numero_serie, status,
+    hostname, numero_serie, status,
     sis_operacional, versao_so, fk_empresa, fk_localizacao,
-    parametros = [],
+    parametros = {},
   } = dados;
 
   const conn = await pool.getConnection();
@@ -108,16 +93,14 @@ async function criar(dados) {
 
     const [result] = await conn.execute(
       `INSERT INTO mainframe
-        (hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao]
+        (hostname, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [hostname, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao]
     );
 
     const id_mainframe = result.insertId;
 
-    for (const p of parametros) {
-      await parametroModel.criarComConexao(conn, { ...p, id_mainframe: id_mainframe });
-    }
+    await salvarParametros(conn, id_mainframe, parametros);
 
     await conn.commit();
     return id_mainframe;
@@ -131,7 +114,7 @@ async function criar(dados) {
 
 async function atualizar(id, dados) {
   const {
-    hostname, fabricante, modelo, numero_serie, status,
+    hostname, numero_serie, status,
     sis_operacional, versao_so, fk_empresa, fk_localizacao,
     parametros,
   } = dados;
@@ -142,10 +125,10 @@ async function atualizar(id, dados) {
 
     const [result] = await conn.execute(
       `UPDATE mainframe SET
-        hostname = ?, fabricante = ?, modelo = ?, numero_serie = ?, status = ?,
+        hostname = ?, numero_serie = ?, status = ?,
         sis_operacional = ?, versao_so = ?, fk_empresa = ?, fk_localizacao = ?
        WHERE id_mainframe = ?`,
-      [hostname, fabricante, modelo, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao, id]
+      [hostname, numero_serie, status, sis_operacional, versao_so, fk_empresa, fk_localizacao, id]
     );
 
     if (result.affectedRows === 0) {
@@ -153,12 +136,9 @@ async function atualizar(id, dados) {
       return 0;
     }
 
-    // Só altera os componentes quando a tela envia essa lista.
     if (parametros) {
       await parametroModel.removerPorMainframeComConexao(conn, id);
-      for (const p of parametros) {
-        await parametroModel.criarComConexao(conn, { ...p, id_mainframe: id });
-      }
+      await salvarParametros(conn, id, parametros);
     }
 
     await conn.commit();
@@ -194,16 +174,4 @@ async function remover(id) {
   }
 }
 
-async function buscarDetalhesMainframe(idMainframe) {
-    const instrucaoSql = `
-        SELECT m.hostname, c.tipo AS componente, p.pico_max
-        FROM mainframe m
-        JOIN parametro p ON m.id_mainframe = p.id_mainframe
-        JOIN componente c ON p.id_componente = c.id_componente
-        WHERE m.id_mainframe = ?;
-    `;
-    const [rows] = await pool.execute(instrucaoSql, [idMainframe]);
-    return rows;
-}
-
-export default { listar, listaPorIdMainframeId, buscarPorId, criar, atualizar, remover, buscarDetalhesMainframe };
+export default { listar, listaPorIdMainframeId, buscarPorId, criar, atualizar, remover };

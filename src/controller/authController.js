@@ -34,6 +34,16 @@ class AuthController {
                 });
             }
 
+            const empresa = await authModel.buscarNomeEmpresa(
+                usuario.id_usuario
+            );
+
+            if (!empresa) {
+                return res.status(401).json({
+                    mensagem: 'Empresa não encontrada ou não vinculada à um usuário'
+                });
+            }
+
             const mainframes = await authModel.buscarMainframe(
                 usuario.id_empresa
             );
@@ -48,20 +58,24 @@ class AuthController {
             if (!hostname) {
                 return res.status(200).json({
                     autenticado: true,
-                    empresa: {
-                        razao_social: usuario.razao_social
-                    },
+                    empresa: empresa,
                     mainframe: mainframes
                 });
             }
 
-            const mainframe = await mainframes.find(mf => {
+            const mainframe = mainframes.find(mf => {
                 return mf.hostname === hostname
             });
 
             if (!mainframe) {
-                return res.status(401).json({
-                    mensagem: 'Hostname não encontrado ou não pertence à empresa do usuário'
+                return res.status(404).json({
+                    mensagem: `Não foi encontrada nenhuma mainframe com o hostname "${hostname}" na empresa do usuário. Cadastre essa mainframe no sistema antes.`
+                });
+            }
+
+            if (mainframe.status !== 'ativo') {
+                return res.status(403).json({
+                    mensagem: 'A mainframe não está ativa. A captura não foi autorizada.'
                 });
             }
 
@@ -78,9 +92,7 @@ class AuthController {
 
             return res.status(200).json({
                 autenticado: true,
-                empresa: {
-                    razao_social: usuario.razao_social
-                },
+                empresa: empresa,
                 mainframe: {
                     hostname: mainframe.hostname
                 },

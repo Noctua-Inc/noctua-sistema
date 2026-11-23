@@ -8,11 +8,12 @@ let graficoFluxo;
 let graficoComponentes;
 let graficoTempo;
 
-const agora = new Date(DADOS_DASHBOARD.atualizadoEm).getTime();
+let agora = Date.now();
+let DADOS_DASHBOARD = { mainframes: [], localizacoes: [], alertas: [], fusoHorario: monitoramento.fuso };
 const umaHora = 60 * 60 * 1000;
 const itensPorPagina = 5;
 const nomesSeveridade = { critica: 'Crítica', alta: 'Alta', moderada: 'Moderada' };
-const nomesStatus = { aberto: 'Aberto', investigacao: 'Em investigação', resolvido: 'Resolvido' };
+const nomesStatus = { aberto: 'Aberto', resolvido: 'Encerrado' };
 const nomesComponentes = { RAM: 'RAM', CPU: 'CPU', DISCO: 'Disco', SWAP: 'Swap' };
 
 const campoPeriodo = document.getElementById('filtro-periodo');
@@ -56,29 +57,21 @@ function buscarLocalizacao(hostname) {
 }
 
 function preencherLocalizacoes() {
-    let opcoes = '<option value="">Todas as localidades</option>';
-    for (let i = 0; i < DADOS_DASHBOARD.localizacoes.length; i++) {
-        let local = DADOS_DASHBOARD.localizacoes[i];
-        opcoes += '<option value="' + local + '">' + local + '</option>';
-    }
-    campoLocalizacao.innerHTML = opcoes;
+    const atual = campoLocalizacao.value;
+    campoLocalizacao.replaceChildren(new Option('Todas as localidades', ''));
+    for (const local of DADOS_DASHBOARD.localizacoes) campoLocalizacao.add(new Option(local, local));
+    if (DADOS_DASHBOARD.localizacoes.includes(atual)) campoLocalizacao.value = atual;
 }
 
 function preencherMainframes() {
-    let escolhidoAntes = campoMainframe.value;
-    let aindaExiste = false;
-    let opcoes = '<option value="">Todos os mainframes</option>';
-
-    for (let i = 0; i < DADOS_DASHBOARD.mainframes.length; i++) {
-        let mainframe = DADOS_DASHBOARD.mainframes[i];
-        if (campoLocalizacao.value == '' || mainframe.localizacao == campoLocalizacao.value) {
-            opcoes += '<option value="' + mainframe.hostname + '">' + mainframe.hostname + '</option>';
-            if (mainframe.hostname == escolhidoAntes) aindaExiste = true;
+    const escolhido = campoMainframe.value;
+    campoMainframe.replaceChildren(new Option('Todos os mainframes', ''));
+    for (const mainframe of DADOS_DASHBOARD.mainframes) {
+        if (!campoLocalizacao.value || mainframe.localizacao === campoLocalizacao.value) {
+            campoMainframe.add(new Option(mainframe.hostname, mainframe.hostname));
         }
     }
-
-    campoMainframe.innerHTML = opcoes;
-    if (aindaExiste) campoMainframe.value = escolhidoAntes;
+    if ([...campoMainframe.options].some(opcao => opcao.value === escolhido)) campoMainframe.value = escolhido;
 }
 
 function criarGraficos() {
@@ -184,7 +177,7 @@ function separarAlertas() {
 function atualizarIndicadores() {
     let totalMonitorados = 0;
     for (const mainframe of DADOS_DASHBOARD.mainframes) {
-        if (correspondeAosFiltros(mainframe.hostname)) totalMonitorados++;
+        if (mainframe.monitorado && correspondeAosFiltros(mainframe.hostname)) totalMonitorados++;
     }
 
     const mainframesComAlertas = [];
@@ -316,7 +309,7 @@ function atualizarDashboard() {
 
 function atualizarTabela() {
     let lista = [];
-    let contadores = { todos: 0, aberto: 0, investigacao: 0, resolvido: 0 };
+    let contadores = { todos: 0, aberto: 0, resolvido: 0 };
     let busca = campoBusca.value.trim().toLowerCase();
 
     for (let i = 0; i < alertasDoPeriodo.length; i++) {
@@ -331,7 +324,6 @@ function atualizarTabela() {
 
     escreverNaTela('contador-todos', contadores.todos);
     escreverNaTela('contador-aberto', contadores.aberto);
-    escreverNaTela('contador-investigacao', contadores.investigacao);
     escreverNaTela('contador-resolvido', contadores.resolvido);
 
     let totalPaginas = Math.ceil(lista.length / itensPorPagina);
@@ -344,9 +336,8 @@ function atualizarTabela() {
     let linhas = '';
     for (let i = primeiro; i < ultimo; i++) {
         let alerta = lista[i];
-        // Todos os valores inseridos aqui vêm da constante de dados simulados.
         linhas += `<tr>
-            <td><strong>${alerta.mainframe}</strong></td>
+            <td><strong></strong></td>
             <td><span class="alertas-badge severidade-${alerta.severidade}">${nomesSeveridade[alerta.severidade]}</span></td>
             <td>${nomesComponentes[alerta.componente]}</td>
             <td><time datetime="${alerta.inicio}">${formatarData(alerta.inicio)}</time></td>
@@ -362,6 +353,9 @@ function atualizarTabela() {
         escreverNaTela('resumo-paginacao', 'Mostrando ' + (primeiro + 1) + '–' + ultimo + ' de ' + lista.length + ' alertas');
     }
     document.getElementById('corpo-alertas').innerHTML = linhas;
+    document.querySelectorAll('#corpo-alertas strong').forEach((texto, i) => {
+        texto.textContent = lista[primeiro + i].mainframe;
+    });
     montarPaginacao(totalPaginas, lista.length);
 }
 
@@ -440,10 +434,25 @@ for (let i = 0; i < botoesStatus.length; i++) {
     };
 }
 
-let dataAtualizacao = DADOS_DASHBOARD.atualizadoEm;
-escreverNaTela('data-atualizacao', dataAtualizacao.substring(8, 10) + '/' + dataAtualizacao.substring(5, 7) + '/' + dataAtualizacao.substring(0, 4) + ' às ' + dataAtualizacao.substring(11, 16));
-document.getElementById('data-atualizacao').setAttribute('datetime', dataAtualizacao);
-preencherLocalizacoes();
-preencherMainframes();
-criarGraficos();
-atualizarDashboard();
+async function iniciarAlertas() {
+    const aviso = document.getElementById('aviso-alertas');
+    criarGraficos();
+    aviso.textContent = 'Carregando histórico de medições…';
+    try {
+        const dados = await carregarDadosAlertas(sessionStorage.getItem('idEmpresa'));
+        DADOS_DASHBOARD = { ...dados, fusoHorario: monitoramento.fuso };
+        agora = Date.now();
+        const dataAtualizacao = document.getElementById('data-atualizacao');
+        dataAtualizacao.textContent = monitoramento.horario(dados.atualizadoEm);
+        if (dados.atualizadoEm) dataAtualizacao.dateTime = dados.atualizadoEm;
+        aviso.textContent = dados.monitoradas ? '' : 'Sem medições com limites cadastrados.';
+        preencherLocalizacoes();
+        preencherMainframes();
+    } catch (erro) {
+        console.error(erro);
+        aviso.textContent = 'Não foi possível consultar as medições para gerar alertas.';
+    }
+    atualizarDashboard();
+}
+
+iniciarAlertas();
