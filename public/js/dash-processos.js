@@ -33,21 +33,21 @@ function limparSessao() {
 const kpiContextData = {
     cpu: {
         color: '#DC2626',
-        kpi1: { label: 'Uso de CPU', sub: 'Unidade: percentual' },
-        kpi2: { label: 'Processos capturados', sub: 'Quantidade no período' },
-        kpi3: { label: 'Última captura', sub: 'Horário informado pelo Gold' }
+        kpi1: { label: 'Uso atual da CPU', sub: 'Percentual da máquina' },
+        kpi2: { label: 'Pico de CPU', sub: 'Maior percentual no período' },
+        kpi3: { label: 'Processos em atenção', sub: 'Processos acima de 10%' }
     },
     ram: {
         color: '#2563EB',
-        kpi1: { label: 'Memória por processo', sub: 'Unidade: MB' },
-        kpi2: { label: 'Processos capturados', sub: 'Quantidade no período' },
-        kpi3: { label: 'Última captura', sub: 'Horário informado pelo Gold' }
+        kpi1: { label: 'Memória dos processos', sub: 'Total na última captura' },
+        kpi2: { label: 'Pico de memória', sub: 'Maior total no período' },
+        kpi3: { label: 'Processos em atenção', sub: 'Processos acima de 500 MiB' }
     },
     disco: {
         color: '#7C3AED',
-        kpi1: { label: 'Bytes lidos', sub: 'Valor acumulado informado' },
-        kpi2: { label: 'Bytes escritos', sub: 'Valor acumulado informado' },
-        kpi3: { label: 'Última captura', sub: 'Horário informado pelo Gold' }
+        kpi1: { label: 'Total lido', sub: 'Na última captura' },
+        kpi2: { label: 'Total escrito', sub: 'Na última captura' },
+        kpi3: { label: 'I/O total', sub: 'Leitura + escrita' }
     }
 };
 
@@ -58,6 +58,31 @@ const chartTitles = {
 };
 
 let chartInstance = null;
+let metricaAtual = 'cpu';
+
+/**
+ * Formata bytes para uma unidade mais fácil de ler sem alterar o valor bruto
+ * recebido da API. Como os dados vêm do sistema operacional, usamos unidades
+ * binárias: KiB, MiB, GiB e TiB.
+ */
+function formatarBytes(bytes) {
+    const valor = Number(bytes);
+
+    if (!Number.isFinite(valor)) return '--';
+    if (valor === 0) return '0 B';
+
+    const unidades = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+    const indice = Math.min(
+        Math.floor(Math.log(Math.abs(valor)) / Math.log(1024)),
+        unidades.length - 1
+    );
+    const convertido = valor / (1024 ** indice);
+
+    return `${convertido.toLocaleString('pt-BR', {
+        minimumFractionDigits: indice === 0 ? 0 : 2,
+        maximumFractionDigits: indice === 0 ? 0 : 2
+    })} ${unidades[indice]}`;
+}
 
 function initChart() {
     const ctx = document.getElementById('processChart').getContext('2d');
@@ -68,12 +93,31 @@ function initChart() {
             responsive: true,
             maintainAspectRatio: false,
             tension: 0.35,
-            plugins: { 
-                legend: { position: 'top', labels: { color: '#64748B', font: { family: 'Poppins', size: 12 } } } 
-            },
             scales: {
-                y: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B' } },
+                y: {
+                    grid: { color: '#E2E8F0' },
+                    ticks: {
+                        color: '#64748B',
+                        callback: valor => metricaAtual === 'disco'
+                            ? formatarBytes(valor)
+                            : valor
+                    }
+                },
                 x: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B' } }
+            },
+            plugins: {
+                legend: { position: 'top', labels: { color: '#64748B', font: { family: 'Poppins', size: 12 } } },
+                tooltip: {
+                    callbacks: {
+                        label: contexto => {
+                            const nome = contexto.dataset.label
+                                ? `${contexto.dataset.label}: `
+                                : '';
+                            const valor = contexto.parsed.y;
+                            return `${nome}${metricaAtual === 'disco' ? formatarBytes(valor) : valor}`;
+                        }
+                    }
+                }
             }
         }
     });
@@ -91,6 +135,8 @@ async function buscarProcessosAPI(idMainframe, metrica) {
 // 4. ATUALIZAÇÃO DINÂMICA DA INTERFACE
 // ==========================================================
 async function switchMetric(metric) {
+    metricaAtual = metric;
+
     // 1. Atualiza os botões visuais
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.metric === metric);
@@ -108,8 +154,12 @@ async function switchMetric(metric) {
         return;
     }
 
-    const dados = normalizarDadosGold(dadosReais);
+    const dados = normalizarDadosGold(dadosReais, metric);
     if (dados.processos.length === 0) {
+        chartInstance.data.labels = [];
+        chartInstance.data.datasets = [];
+        chartInstance.update();
+        limparKPIs();
         renderTabelaVazia();
         return;
     }
@@ -128,11 +178,33 @@ async function switchMetric(metric) {
     renderTable(metric, dados.processos);
 }
 
-function normalizarDadosGold(resposta) {
+function normalizarDadosGold(resposta, metrica = 'cpu') {
     const processos = Array.isArray(resposta)
         ? resposta
         : Array.isArray(resposta?.processos) ? resposta.processos : [];
     const primeiro = processos[0] || {};
+
+    const processosNormalizados = processos.map(processo => ({
+        pid: processo.PID ?? processo.pid ?? '--',
+        job: processo.Nome_Processo ?? processo.job ?? '--',
+        cpu: processo.CPU_percentual_maquina ?? processo.cpu ?? processo.CPU_percentual ?? '--',
+        ram: processo.Memoria_MB ?? processo.ram ?? '--',
+        bytesLidos: processo.Bytes_Lidos ?? processo.bytesLidos ?? '--',
+        bytesEscritos: processo.Bytes_Escritos ?? processo.bytesEscritos ?? '--',
+        status: processo.status ?? 'Sem dados',
+        timestamp: processo.Timestamp ?? processo.timestamp ?? '--'
+    }));
+
+    const valorNumerico = valor => Number.isFinite(Number(valor)) ? Number(valor) : 0;
+    processosNormalizados.sort((a, b) => {
+        if (metrica === 'ram') return valorNumerico(b.ram) - valorNumerico(a.ram);
+        if (metrica === 'disco') {
+            const discoA = valorNumerico(a.bytesLidos) + valorNumerico(a.bytesEscritos);
+            const discoB = valorNumerico(b.bytesLidos) + valorNumerico(b.bytesEscritos);
+            return discoB - discoA;
+        }
+        return valorNumerico(b.cpu) - valorNumerico(a.cpu);
+    });
 
     return {
         kpis: resposta?.kpis || {
@@ -141,17 +213,17 @@ function normalizarDadosGold(resposta) {
             valor3: primeiro.Timestamp ?? primeiro.timestamp ?? '--'
         },
         grafico: resposta?.grafico || { labels: [], datasets: [] },
-        processos: processos.map(processo => ({
-            pid: processo.PID ?? processo.pid ?? '--',
-            job: processo.Nome_Processo ?? processo.job ?? '--',
-            cpu: processo.CPU_percentual ?? processo.cpu ?? '--',
-            ram: processo.Memoria_MB ?? processo.ram ?? '--',
-            bytesLidos: processo.Bytes_Lidos ?? processo.bytesLidos ?? '--',
-            bytesEscritos: processo.Bytes_Escritos ?? processo.bytesEscritos ?? '--',
-            status: processo.status ?? 'Sem dados',
-            timestamp: processo.Timestamp ?? processo.timestamp ?? '--'
-        }))
+        processos: processosNormalizados
     };
+}
+
+function limparKPIs() {
+    for (let i = 1; i <= 4; i++) {
+        const valor = document.getElementById(`kpi${i}-value`);
+        const sub = document.getElementById(`kpi${i}-sub`);
+        if (valor) valor.innerText = '--';
+        if (sub) sub.innerText = 'Sem dados para este servidor';
+    }
 }
 
 function updateKPIs(metric, kpiData, topProc) {
@@ -160,7 +232,10 @@ function updateKPIs(metric, kpiData, topProc) {
     // Atualiza KPIs estruturais
     for (let i = 1; i <= 3; i++) {
         document.getElementById(`kpi${i}-label`).innerText = context[`kpi${i}`].label;
-        document.getElementById(`kpi${i}-value`).innerText = kpiData[`valor${i}`];
+        const valor = kpiData[`valor${i}`];
+        document.getElementById(`kpi${i}-value`).innerText = metric === 'disco'
+            ? formatarBytes(valor)
+            : valor;
         document.getElementById(`kpi${i}-value`).style.color = context.color;
         document.getElementById(`kpi${i}-sub`).innerText = context[`kpi${i}`].sub;
     }
@@ -171,7 +246,9 @@ function updateKPIs(metric, kpiData, topProc) {
     let subtextoOfensor = '';
     if (metric === 'cpu') subtextoOfensor = `Consumindo ${topProc.cpu}% da CPU`;
     if (metric === 'ram') subtextoOfensor = `Alocando ${topProc.ram} MB de RAM`;
-    if (metric === 'disco') subtextoOfensor = `Lendo ${topProc.bytesLidos} bytes`;
+    if (metric === 'disco') {
+        subtextoOfensor = `Lendo ${formatarBytes(topProc.bytesLidos)}`;
+    }
     
     document.getElementById('kpi4-sub').innerText = subtextoOfensor;
 }
@@ -187,8 +264,8 @@ function renderTable(metric, processos) {
             <td><strong>${proc.job}</strong></td>
             <td class="${metric === 'cpu' ? 'highlight-col' : ''}" style="${metric === 'cpu' ? 'color: #DC2626;' : ''}">${proc.cpu}%</td>
             <td class="${metric === 'ram' ? 'highlight-col' : ''}" style="${metric === 'ram' ? 'color: #2563EB;' : ''}">${proc.ram} MB</td>
-            <td class="${metric === 'disco' ? 'highlight-col' : ''}" style="${metric === 'disco' ? 'color: #7C3AED;' : ''}">${proc.bytesLidos}</td>
-            <td>${proc.bytesEscritos}</td>
+            <td class="${metric === 'disco' ? 'highlight-col' : ''}" style="${metric === 'disco' ? 'color: #7C3AED;' : ''}">${formatarBytes(proc.bytesLidos)}</td>
+            <td>${formatarBytes(proc.bytesEscritos)}</td>
             <td><span class="badge-status status-${proc.status.toLowerCase()}">${proc.status}</span></td>
         `;
         tbody.appendChild(tr);
