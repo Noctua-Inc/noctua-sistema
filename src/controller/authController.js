@@ -48,6 +48,9 @@ class AuthController {
             if (!hostname) {
                 return res.status(200).json({
                     autenticado: true,
+                    empresa: {
+                        razao_social: usuario.razao_social
+                    },
                     mainframe: mainframes
                 });
             }
@@ -55,6 +58,12 @@ class AuthController {
             const mainframe = await mainframes.find(mf => {
                 return mf.hostname === hostname
             });
+
+            if (!mainframe) {
+                return res.status(401).json({
+                    mensagem: 'Hostname não encontrado ou não pertence à empresa do usuário'
+                });
+            }
 
             const componentes = await authModel.buscarComponentes(
                 mainframe.id_mainframe
@@ -69,6 +78,9 @@ class AuthController {
 
             return res.status(200).json({
                 autenticado: true,
+                empresa: {
+                    razao_social: usuario.razao_social
+                },
                 mainframe: {
                     hostname: mainframe.hostname
                 },
