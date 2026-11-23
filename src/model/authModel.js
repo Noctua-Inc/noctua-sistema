@@ -11,10 +11,8 @@ class AuthModel {
             fk_empresa AS id_empresa, 
             nome,
             email_institucional,
-            senha,
-            e.razao_social
+            senha
         FROM usuario
-        INNER JOIN empresa e ON e.id_empresa = usuario.fk_empresa
         WHERE email_institucional = ?
         `,
         [email]
