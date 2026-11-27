@@ -13,6 +13,11 @@ router.get('/empresa/:idEmpresa/alertas/resumo.json', (req, res) =>
 router.get('/empresa/:idEmpresa/:prefixoMainframe/previsoes.json', (req, res) =>
     goldController.carregar(req, res, empresa => goldService.lerJson(empresa, `${req.params.prefixoMainframe}/previsoes.json`)));
 
+router.get('/empresa/:idEmpresa/:prefixoMainframe/monitoramento/componentes', (req, res) => {
+    const { prefixoMainframe } = req.params;
+    return goldController.carregar(req, res, empresa => goldService.lerComponentes(empresa, prefixoMainframe));
+});
+
 router.get('/empresa/:idEmpresa/:prefixoMainframe/monitoramentoComponentes/arquivo/:arquivo', (req, res) => {
     const { prefixoMainframe, arquivo } = req.params;
     return goldController.carregar(req, res, empresa => goldService.lerArquivoMonitoramento(empresa, prefixoMainframe, arquivo));

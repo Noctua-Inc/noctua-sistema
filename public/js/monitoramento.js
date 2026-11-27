@@ -9,11 +9,16 @@ const monitoramento = {
 
     async ler(idEmpresa, hostname, arquivo) {
         const caminho = '/api/gold/empresa/' + encodeURIComponent(idEmpresa)
-            + '/' + encodeURIComponent(hostname) + '/monitoramento/' + arquivo + '.json';
+            + '/' + encodeURIComponent(hostname) + '/monitoramento/'
+            + (arquivo === 'atual' ? 'componentes' : arquivo + '.json');
         const resposta = await fetch(caminho, { cache: 'no-store' });
         if (resposta.status === 404) return null;
         if (!resposta.ok) throw new Error('Não foi possível consultar a Gold.');
         return resposta.json();
+    },
+
+    async atual(idEmpresa, hostname) {
+        return this.ler(idEmpresa, hostname, 'atual');
     },
 
     async historico(idEmpresa, hostname) {

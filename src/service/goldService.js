@@ -66,8 +66,27 @@ async function lerMonitoramento(empresa, hostname, arquivo) {
     return dados;
 }
 
+async function lerComponentes(empresa, hostname) {
+    const prefixo = `${empresa}/03-gold/${hostname}/monitoramento/componentes_`;
+    const paginas = paginateListObjectsV2({client: s3}, {
+        Bucket: process.env.NOME_BUCKET,
+        Prefix: prefixo
+    });
+    let arquivo = null;
+    for await (const pagina of paginas) {
+        for (const {Key} of pagina.Contents ?? []) {
+            const nome = Key.slice(prefixo.length);
+            if (/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}\.json$/.test(nome) && (arquivo === null || nome > arquivo)) {
+                arquivo = nome;
+            }
+        }
+    }
+    if (!arquivo) return null;
+    return lerJson(empresa, `${hostname}/monitoramento/componentes_${arquivo}`);
+}
+
 async function lerArquivoMonitoramento(empresa, hostname, arquivo) {
     return lerJson(empresa, `${hostname}/monitoramentoComponentes/${arquivo}`);
 }
 
-export default {arquivoAusente, lerJson, lerMonitoramento, lerArquivoMonitoramento, prefixoEmpresa};
+export default {arquivoAusente, lerJson, lerMonitoramento, lerComponentes, lerArquivoMonitoramento, prefixoEmpresa};

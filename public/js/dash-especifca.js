@@ -1,8 +1,7 @@
 const ID_EMPRESA = sessionStorage.getItem("idEmpresa");
 const ID_MAINFRAME = window.location.href.split("id_mainframe=")[1];
 
-// Cada aba lê um tipo de arquivo do Gold: geral=todos, rede, cpu, ram e disco.
-const TIPO_MONITORAMENTO_POR_ABA = ["todos", "rede", "cpu", "ram", "disco"];
+// Todas as abas leem os snapshots datados de componentes do Gold.
 const registrosEmCache = new Map();
 
 let nomeMainframe = document.querySelector("#nomeMainframe");
@@ -78,22 +77,42 @@ function obterMedia(valores) {
   return quantidade === 0 ? 0 : Number((soma / quantidade).toFixed(2));
 }
 
-function obterMomentoMaisUtilizado(dados) {
+function obterMomentoMaisUtilizado(dados, camposPercentuais = [
+  "porcentagem_cpu", "porcentagem_ram", "porcentagem_disco", "media_swap_porcentagem"
+]) {
   let momento = "--";
-  for (let i = 1; i < dados.length; i++) {
-    let anterior = dados[i - 1];
-    let atual = dados[i];
-    let componentesSuperiores = 0;
+  let maiorValor = -Infinity;
 
-    for (let campo in atual) {
-      if (campo === "hora_de_captura") continue;
-      let valorAtual = atual[campo];
-      let valorAnterior = anterior[campo];
-      if (!Number.isFinite(valorAtual) || !Number.isFinite(valorAnterior)) continue;
-      if (valorAtual > valorAnterior) componentesSuperiores++;
+  for (const dado of dados) {
+    let maiorDoMomento = -Infinity;
+    for (const campo of camposPercentuais) {
+      const valor = dado[campo];
+      if (Number.isFinite(valor) && valor > maiorDoMomento) maiorDoMomento = valor;
     }
 
-    if (componentesSuperiores >= 3) momento = atual.hora_de_captura;
+    if (maiorDoMomento > maiorValor) {
+      maiorValor = maiorDoMomento;
+      momento = dado.hora_de_captura;
+    }
+  }
+
+  return momento;
+}
+
+function obterMomentoMaiorRecebimento(dados) {
+  let momento = "--";
+  let maiorValor = -Infinity;
+
+  for (const dado of dados) {
+    const enviados = dado.dados_enviados_medio;
+    const recebidos = dado.dados_recebidos_medio;
+    if (!Number.isFinite(enviados) || !Number.isFinite(recebidos) || enviados <= 0) continue;
+
+    const razao = recebidos / enviados;
+    if (razao > maiorValor) {
+      maiorValor = razao;
+      momento = dado.hora_de_captura;
+    }
   }
 
   return momento;
@@ -350,6 +369,12 @@ function numeroOuNulo(valor) {
   return Number.isFinite(valor) ? valor : null;
 }
 
+function formatarRedeEmMiB(valorTb) {
+  if (!Number.isFinite(valorTb)) return '—';
+  const mib = valorTb * (1000 ** 4) / (1024 ** 2);
+  return mib.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+}
+
 function partesMinuto(minuto) {
   const ano = minuto.getFullYear();
   const mes = String(minuto.getMonth() + 1).padStart(2, "0");
@@ -359,17 +384,17 @@ function partesMinuto(minuto) {
   return { data: `${ano}-${mes}-${dia}`, hora: `${hora}-${min}` };
 }
 
-function nomeArquivoRegistro(hostname, minuto, tipo) {
+function nomeArquivoComponentes(minuto) {
   const { data, hora } = partesMinuto(minuto);
-  return `${hostname}_${data}_${hora}_${tipo}_registros.json`;
+  return `componentes_${data}_${hora}.json`;
 }
 
-function chaveRegistro(tipo, hostname, minuto) {
+function chaveRegistro(hostname, minuto) {
   const { data, hora } = partesMinuto(minuto);
-  return `${tipo}|${hostname}|${data} ${hora.replace("-", ":")}`;
+  return `${hostname}|${data} ${hora.replace("-", ":")}`;
 }
 
-async function carregarRegistros(tipo, hostname) {
+async function carregarRegistros(hostname) {
   const agora = new Date();
   const minutoInicial = new Date(agora);
   minutoInicial.setMinutes(0, 0, 0);
@@ -384,52 +409,59 @@ async function carregarRegistros(tipo, hostname) {
   }
 
   const pendentes = minutos.filter(
-    (minuto) => !registrosEmCache.has(chaveRegistro(tipo, hostname, minuto))
+    (minuto) => !registrosEmCache.has(chaveRegistro(hostname, minuto))
   );
 
   await Promise.all(
     pendentes.map(async (minuto) => {
-      const arquivo = nomeArquivoRegistro(hostname, minuto, tipo);
+      const arquivo = nomeArquivoComponentes(minuto);
       try {
         const registro = await api.get(
-          `/gold/empresa/${ID_EMPRESA}/${encodeURIComponent(hostname)}/monitoramentoComponentes/arquivo/${arquivo}`
+          `/gold/empresa/${ID_EMPRESA}/${encodeURIComponent(hostname)}/monitoramento/${arquivo}`
         );
-        registrosEmCache.set(chaveRegistro(tipo, hostname, minuto), registro);
+        registrosEmCache.set(chaveRegistro(hostname, minuto), registro);
       } catch (erro) {
-        // O arquivo do minuto ainda não foi publicado no Gold.
+        // O snapshot do minuto ainda não foi publicado no Gold.
       }
     })
   );
 
   return minutos
-    .map((minuto) => registrosEmCache.get(chaveRegistro(tipo, hostname, minuto)))
+    .map((minuto) => registrosEmCache.get(chaveRegistro(hostname, minuto)))
     .filter((registro) => registro !== undefined);
+}
+
+function mibParaTb(valor) {
+  return Number.isFinite(valor) ? valor * (1024 ** 2) / (1000 ** 4) : null;
 }
 
 function montarHistoricoRegistros(registros) {
   const resultado = criarHistoricoVazio();
   for (const registro of registros) {
+    const valores = registro.valores || {};
+    const tx = mibParaTb(valores.enviados_mib);
+    const rx = mibParaTb(valores.recebidos_mib);
     const dado = {
-      hora_de_captura: registro.hora_de_captura || "",
-      porcentagem_cpu: numeroOuNulo(registro.porcentagem_cpu),
-      porcentagem_ram: numeroOuNulo(registro.porcentagem_ram),
-      porcentagem_disco: numeroOuNulo(registro.porcentagem_disco),
-      media_swap_porcentagem: numeroOuNulo(registro.media_swap_porcentagem),
-      media_trafego_rede: numeroOuNulo(registro.media_trafego_rede),
-      dados_enviados_medio: numeroOuNulo(registro.dados_enviados_medio),
-      dados_recebidos_medio: numeroOuNulo(registro.dados_recebidos_medio),
-      media_cpu_porcentagem: numeroOuNulo(registro.media_cpu_porcentagem),
-      media_cpu_frequencia: numeroOuNulo(registro.media_cpu_frequencia),
-      media_ram_porcentagem: numeroOuNulo(registro.media_ram_porcentagem),
-      media_ram_disponivel: numeroOuNulo(registro.media_ram_disponivel),
-      media_disco_porcentagem: numeroOuNulo(registro.media_disco_porcentagem),
-      media_disco_disponivel: numeroOuNulo(registro.media_disco_disponivel),
-      media_qtd_requisicao_escrita: numeroOuNulo(registro.media_qtd_requisicao_escrita),
-      media_qtd_requisicao_leitura: numeroOuNulo(registro.media_qtd_requisicao_leitura),
-      media_dados_enviados: numeroOuNulo(registro.media_dados_enviados),
-      media_dados_recebidos: numeroOuNulo(registro.media_dados_recebidos),
-      media_dados_perdidos: numeroOuNulo(registro.media_dados_perdidos),
-      media_sockets_tw: numeroOuNulo(registro.media_sockets_tw),
+      hora_de_captura: String(registro.atualizado_em || "").slice(11, 16),
+      porcentagem_cpu: numeroOuNulo(valores.cpu),
+      porcentagem_ram: numeroOuNulo(valores.ram),
+      porcentagem_disco: numeroOuNulo(valores.disco),
+      media_swap_porcentagem: numeroOuNulo(valores.swap),
+      media_trafego_rede: tx === null || rx === null ? null : tx + rx,
+      dados_enviados_medio: tx,
+      dados_recebidos_medio: rx,
+      media_cpu_porcentagem: numeroOuNulo(valores.cpu),
+      media_cpu_frequencia: numeroOuNulo(valores.frequencia_ghz),
+      media_ram_porcentagem: numeroOuNulo(valores.ram),
+      media_ram_disponivel: numeroOuNulo(valores.ram_livre_gib),
+      media_disco_porcentagem: numeroOuNulo(valores.disco),
+      media_disco_disponivel: numeroOuNulo(valores.disco_livre_gib),
+      media_qtd_requisicao_escrita: numeroOuNulo(valores.escritas_acumuladas),
+      media_qtd_requisicao_leitura: numeroOuNulo(valores.leituras_acumuladas),
+      media_dados_enviados: tx,
+      media_dados_recebidos: rx,
+      media_dados_perdidos: numeroOuNulo(valores.erros_recebimento),
+      media_sockets_tw: numeroOuNulo(valores.sockets_time_wait),
     };
     adicionarAoHistorico(resultado, dado);
   }
@@ -508,12 +540,11 @@ async function trocarMonitoramento(indice) {
   if (!mainframe) return;
 
   const hostname = mainframe.hostname;
-  const tipo = TIPO_MONITORAMENTO_POR_ABA[indice];
   let historico;
   let mainframeDetalhado;
   try {
     const [registros, detalhes] = await Promise.all([
-      carregarRegistros(tipo, hostname),
+      carregarRegistros(hostname),
       buscarParametrosMainframe(),
     ]);
     historico = montarHistoricoRegistros(registros);
@@ -600,7 +631,7 @@ async function trocarMonitoramento(indice) {
         mediaCpu + "%",
         mediaRam + "%",
         mediaDisco + "%",
-        mediaRede + " TB",
+        formatarRedeEmMiB(mediaRede) + " TB",
       ];
 
       dadosCpu = historico.cpu;
@@ -637,8 +668,8 @@ async function trocarMonitoramento(indice) {
                     <td>${dado.porcentagem_ram}%</td>
                     <td>${dado.porcentagem_disco}%</td>
                     <td>${dado.media_swap_porcentagem}%</td>
-                    <td>${dado.dados_enviados_medio} TB</td>
-                    <td>${dado.dados_recebidos_medio} TB</td>
+                    <td>${formatarRedeEmMiB(dado.dados_enviados_medio)} TB</td>
+                    <td>${formatarRedeEmMiB(dado.dados_recebidos_medio)} TB</td>
                     <td ${obterEstiloStatus(statusLinha)}>${statusLinha}</td>
                 </tr>
             `,
@@ -724,9 +755,9 @@ async function trocarMonitoramento(indice) {
       ];
 
       dadosKpi = [
-        obterMomentoMaisUtilizado(historico.dados),
-        mediaTx + " TB",
-        mediaRx + " TB",
+        obterMomentoMaiorRecebimento(historico.dados),
+        formatarRedeEmMiB(mediaTx) + " TB",
+        formatarRedeEmMiB(mediaRx) + " TB",
         mediaPerdidos,
         mediaTw,
       ];
@@ -751,8 +782,8 @@ async function trocarMonitoramento(indice) {
         html: `
                 <tr>
                     <td>${dado.hora_de_captura}</td>
-                    <td>${dado.media_dados_enviados} TB</td>
-                    <td>${dado.media_dados_recebidos} TB</td>
+                    <td>${formatarRedeEmMiB(dado.media_dados_enviados)} TB</td>
+                    <td>${formatarRedeEmMiB(dado.media_dados_recebidos)} TB</td>
                     <td>${dado.media_dados_perdidos}</td>
                     <td>${dado.media_sockets_tw}</td>
                 </tr>
@@ -813,7 +844,7 @@ async function trocarMonitoramento(indice) {
       ];
 
       dadosKpi = [
-        obterMomentoMaisUtilizado(historico.dados),
+        obterMomentoMaisUtilizado(historico.dados, ["porcentagem_cpu"]),
         mediaCpu + "%",
         mediaFrequencia + " GHz",
       ];
@@ -891,7 +922,7 @@ async function trocarMonitoramento(indice) {
       ];
 
       dadosKpi = [
-        obterMomentoMaisUtilizado(historico.dados),
+        obterMomentoMaisUtilizado(historico.dados, ["porcentagem_ram"]),
         mediaRam + "%",
         mediaLivre + " GB",
         mediaSwap + "%",
@@ -983,7 +1014,7 @@ async function trocarMonitoramento(indice) {
       ];
 
       dadosKpi = [
-        obterMomentoMaisUtilizado(historico.dados),
+        obterMomentoMaisUtilizado(historico.dados, ["porcentagem_disco"]),
         mediaDisco + "%",
         mediaLivre + " GB",
         mediaEscrita,

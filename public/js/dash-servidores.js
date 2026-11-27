@@ -24,32 +24,34 @@ document.addEventListener('DOMContentLoaded', () => {
         return estruturaUsoComponente;
     }
 
-    function formatarParte(valor) {
-        return String(valor).padStart(2, '0');
+    function numero(valor) {
+        return Number.isFinite(valor) ? valor : NaN;
     }
 
-    function nomeArquivoTodos(hostname, data) {
-        const ano = data.getFullYear();
-        const mes = formatarParte(data.getMonth() + 1);
-        const dia = formatarParte(data.getDate());
-        const hora = formatarParte(data.getHours());
-        const minuto = formatarParte(data.getMinutes());
-        return `${hostname}_${ano}-${mes}-${dia}_${hora}-${minuto}_todos_registros.json`;
+    function mibParaTb(valor) {
+        return Number.isFinite(valor) ? valor * (1024 ** 2) / (1000 ** 4) : NaN;
+    }
+
+    function formatarRedeEmMiB(valorTb) {
+        if (!Number.isFinite(valorTb)) return '—';
+        const mib = valorTb * (1000 ** 4) / (1024 ** 2);
+        return mib.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
     }
 
     async function buscarTelemetria(hostname) {
-        const agora = new Date();
-        for (let i = 0; i < 10; i++) {
-            const tentativa = new Date(agora.getTime() - i * 60000);
-            tentativa.setSeconds(0, 0);
-            const arquivo = nomeArquivoTodos(hostname, tentativa);
-            try {
-                return await api.get(`/gold/empresa/${idEmpresa}/${encodeURIComponent(hostname)}/monitoramentoComponentes/arquivo/${arquivo}`);
-            } catch (erro) {
-                // tenta o minuto anterior
-            }
-        }
-        return null;
+        const atual = await api.get(`/gold/empresa/${idEmpresa}/${encodeURIComponent(hostname)}/monitoramento/componentes`);
+        if (!atual) return null;
+
+        const valores = atual.valores || {};
+        return {
+            hora_de_captura: atual.atualizado_em,
+            porcentagem_cpu: numero(valores.cpu),
+            porcentagem_disco: numero(valores.disco),
+            porcentagem_ram: numero(valores.ram),
+            media_swap_porcentagem: numero(valores.swap),
+            dados_enviados_medio: mibParaTb(valores.enviados_mib),
+            dados_recebidos_medio: mibParaTb(valores.recebidos_mib)
+        };
     }
 
     function atualizarIndicadores() {
@@ -148,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const tx = telemetria ? Number(telemetria.dados_enviados_medio) : NaN;
             const rx = telemetria ? Number(telemetria.dados_recebidos_medio) : NaN;
             if (Number.isFinite(tx) && Number.isFinite(rx)) {
-                const celulaRede = criarCelula(linha, `Tx: ${tx.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} TB / Rx: ${rx.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} TB`);
+                const celulaRede = criarCelula(linha, `Tx: ${formatarRedeEmMiB(tx)} TB / Rx: ${formatarRedeEmMiB(rx)} TB`);
                 celulaRede.title = 'Coleta em ' + (telemetria.hora_de_captura || '—');
             } else {
                 criarCelula(linha, 'Sem dados');
