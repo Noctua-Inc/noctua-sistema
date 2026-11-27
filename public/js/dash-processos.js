@@ -6,6 +6,11 @@ const metricasProcessos = {
     ram: { cor: '#2563eb', total: 'Memória dos processos', grafico: 'Memória dos processos por coleta', tabela: 'Processos com maior uso de memória' },
     disco: { cor: '#7c3aed', total: 'Volume de I/O acumulado', grafico: 'Contadores acumulados de I/O por coleta', tabela: 'Processos com maior volume de I/O' }
 };
+const coresGraficoProcessos = {
+    cpu: ['#dc2626', '#059669'],
+    ram: ['#2563eb', '#059669'],
+    disco: ['#7c3aed', '#059669', '#f59e0b', '#0ea5e9']
+};
 const unidadesProcessos = { cpu: '%', ram: ' MiB', disco: ' MiB' };
 let consultaProcessos = 0;
 
@@ -86,9 +91,9 @@ function atualizarProcessos(metrica, dados, aviso) {
 
     if (chartInstance) {
         chartInstance.data.labels = dados?.grafico.labels ?? [];
-        const cores = [contexto.cor, '#059669'];
+        const cores = coresGraficoProcessos[metrica];
         chartInstance.data.datasets = (dados?.grafico.datasets ?? []).map((serie, i) => ({
-            ...serie, borderColor: cores[i], backgroundColor: cores[i]
+            ...serie, borderColor: cores[i] ?? '#64748b', backgroundColor: cores[i] ?? '#64748b'
         }));
         chartInstance.update();
     }
